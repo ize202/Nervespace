@@ -763,14 +763,16 @@
 			buildPhases = (
 				462ACA3AC22D7AB738369BFB /* Sources */,
 				F5BE8422BA9B7CA92ABC0F92 /* Resources */,
-				0676D5EB833CB6EF4DAF2C9C /* Embed Frameworks */,
 				DAE4A3883B1B4551462EE2A6 /* Frameworks */,
+				0676D5EB833CB6EF4DAF2C9C /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			name = SharedKit;
+			packageProductDependencies = (
+			);
 			productName = SharedKit;
 			productReference = 39E86B5FF5E957E5D088F40B /* SharedKit.framework */;
 			productType = "com.apple.product-type.framework";
@@ -781,8 +783,8 @@
 			buildPhases = (
 				F41248F9439B750B3E267C56 /* Sources */,
 				64A23955959BEA26DBB4FB8F /* Resources */,
-				9140E79E083ECA9CBBE5EF15 /* Embed Frameworks */,
 				494EF9E78F2A6233FA85AE71 /* Frameworks */,
+				9140E79E083ECA9CBBE5EF15 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -805,8 +807,8 @@
 			buildPhases = (
 				5F6163615147BF96D42ADC16 /* Sources */,
 				46A8CF37F22D02AAE365A518 /* Resources */,
-				B8684074363300F1FB292DFB /* Embed Frameworks */,
 				3A0B29744C1DD91C37A4B550 /* Frameworks */,
+				B8684074363300F1FB292DFB /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -827,8 +829,8 @@
 			buildPhases = (
 				86DCEB10C53CFABC95810D4E /* Sources */,
 				A33A6457D80A0E90FA1BF630 /* Resources */,
-				0D27C35BC46C989E38DA154D /* Embed Frameworks */,
 				6F9F0919196F7D96555A6295 /* Frameworks */,
+				0D27C35BC46C989E38DA154D /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -849,8 +851,8 @@
 			buildPhases = (
 				570709952AC9B22470D2BE36 /* Sources */,
 				38C48763C92F28F28ADF97D8 /* Resources */,
-				0007C7CE360CF7878DA36226 /* Embed Frameworks */,
 				D979324B92D9FBD67DA7AFBB /* Frameworks */,
+				0007C7CE360CF7878DA36226 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -871,8 +873,6 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				TargetAttributes = {
-				};
 			};
 			buildConfigurationList = C0D2750EF28CF4F78BE110D2 /* Build configuration list for PBXProject "Nervespace" */;
 			compatibilityVersion = "Xcode 14.0";
