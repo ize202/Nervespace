@@ -20,6 +20,12 @@
 		1EEC65B91A20DE2081E77E0D /* AccountSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF13AD0325C6FF35BCBA173 /* AccountSettingsView.swift */; };
 		25679B5834AF7186EB96E180 /* PrivacyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34A5515BCB681B255235B36B /* PrivacyView.swift */; };
 		2B857DD0EC9B9248B272BEE2 /* SharedKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 39E86B5FF5E957E5D088F40B /* SharedKit.framework */; };
+		2BE1461B2D91E26100F85F34 /* Crashlytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BE1461A2D91E25800F85F34 /* Crashlytics.swift */; };
+		2BE1461E2D91E2D700F85F34 /* Sentry-info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 2BE1461D2D91E2CE00F85F34 /* Sentry-info.plist */; };
+		2BE146212D91E30B00F85F34 /* Mixpanel-info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 2BE146202D91E2FF00F85F34 /* Mixpanel-info.plist */; };
+		2BE146262D91E35B00F85F34 /* Analytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BE146252D91E35300F85F34 /* Analytics.swift */; };
+		2BE146282D91E39700F85F34 /* captureTaps.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BE146272D91E39100F85F34 /* captureTaps.swift */; };
+		2BE1462A2D91E3A800F85F34 /* captureViewActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BE146292D91E39F00F85F34 /* captureViewActivity.swift */; };
 		2C09B4EF821A2C217A82A6BA /* SignInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4634A94D674EB513386D2C52 /* SignInView.swift */; };
 		2CC928AEBAD65DD2F42F40CA /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A6C05EE090C2810E6906508 /* App.swift */; };
 		31699A9567B1D5A13CA4645A /* OneSignalExtension in Frameworks */ = {isa = PBXBuildFile; productRef = 53E06AEFBCFEE5D596DDD235 /* OneSignalExtension */; };
@@ -186,6 +192,12 @@
 		1A0BB35B55794BFD54559871 /* UserDefaults+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserDefaults+Extensions.swift"; sourceTree = "<group>"; };
 		2B0BE5BDC5A0673F9FCF7EA7 /* HeroView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroView.swift; sourceTree = "<group>"; };
 		2B41B98092119FB95092A546 /* WhatsNewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhatsNewView.swift; sourceTree = "<group>"; };
+		2BE1461A2D91E25800F85F34 /* Crashlytics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Crashlytics.swift; sourceTree = "<group>"; };
+		2BE1461D2D91E2CE00F85F34 /* Sentry-info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "Sentry-info.plist"; sourceTree = "<group>"; };
+		2BE146202D91E2FF00F85F34 /* Mixpanel-info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "Mixpanel-info.plist"; sourceTree = "<group>"; };
+		2BE146252D91E35300F85F34 /* Analytics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Analytics.swift; sourceTree = "<group>"; };
+		2BE146272D91E39100F85F34 /* captureTaps.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = captureTaps.swift; sourceTree = "<group>"; };
+		2BE146292D91E39F00F85F34 /* captureViewActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = captureViewActivity.swift; sourceTree = "<group>"; };
 		31773E0091EAC17A2A2E11F0 /* TextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextField.swift; sourceTree = "<group>"; };
 		32B592D5EEED8E5B114D2630 /* ProfileImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileImage.swift; sourceTree = "<group>"; };
 		34A5515BCB681B255235B36B /* PrivacyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyView.swift; sourceTree = "<group>"; };
@@ -374,6 +386,8 @@
 		1DCBD6B0C47AD73D8FF20314 /* Targets */ = {
 			isa = PBXGroup;
 			children = (
+				2BE146172D91E1F600F85F34 /* CrashlyticsKit */,
+				2BE146162D91E1E500F85F34 /* AnalyticsKit */,
 				B6CEC81A37B3FECEBD061E1E /* App */,
 				8A70FA6A2DFC1987CBBDF426 /* NotifKit */,
 				18AFC0535BE3761BB1D33335 /* SharedKit */,
@@ -398,6 +412,82 @@
 				D606C8D6CDA599FAFDF76120 /* NotificationService.swift */,
 			);
 			path = OneSignalNotificationServiceExtension;
+			sourceTree = "<group>";
+		};
+		2BE146162D91E1E500F85F34 /* AnalyticsKit */ = {
+			isa = PBXGroup;
+			children = (
+				2BE146222D91E31E00F85F34 /* Sources */,
+				2BE1461F2D91E2F600F85F34 /* Config */,
+			);
+			path = AnalyticsKit;
+			sourceTree = "<group>";
+		};
+		2BE146172D91E1F600F85F34 /* CrashlyticsKit */ = {
+			isa = PBXGroup;
+			children = (
+				2BE146192D91E23600F85F34 /* Sources */,
+				2BE146182D91E20D00F85F34 /* Config */,
+			);
+			path = CrashlyticsKit;
+			sourceTree = "<group>";
+		};
+		2BE146182D91E20D00F85F34 /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				2BE1461D2D91E2CE00F85F34 /* Sentry-info.plist */,
+			);
+			path = Config;
+			sourceTree = "<group>";
+		};
+		2BE146192D91E23600F85F34 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				2BE1461C2D91E2AB00F85F34 /* Model */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		2BE1461C2D91E2AB00F85F34 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				2BE1461A2D91E25800F85F34 /* Crashlytics.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		2BE1461F2D91E2F600F85F34 /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				2BE146202D91E2FF00F85F34 /* Mixpanel-info.plist */,
+			);
+			path = Config;
+			sourceTree = "<group>";
+		};
+		2BE146222D91E31E00F85F34 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				2BE146242D91E33C00F85F34 /* ViewModifier */,
+				2BE146232D91E33600F85F34 /* Model */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		2BE146232D91E33600F85F34 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				2BE146252D91E35300F85F34 /* Analytics.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		2BE146242D91E33C00F85F34 /* ViewModifier */ = {
+			isa = PBXGroup;
+			children = (
+				2BE146292D91E39F00F85F34 /* captureViewActivity.swift */,
+				2BE146272D91E39100F85F34 /* captureTaps.swift */,
+			);
+			path = ViewModifier;
 			sourceTree = "<group>";
 		};
 		3146C9839CF9D47BBD7A053A /* ViewModifier */ = {
@@ -938,7 +1028,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2BE146212D91E30B00F85F34 /* Mixpanel-info.plist in Resources */,
 				3C25A9005BCDA83403899218 /* Assets.xcassets in Resources */,
+				2BE1461E2D91E2D700F85F34 /* Sentry-info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -950,6 +1042,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				8AB1A6952F2251C09351EF47 /* TuistBundle+SharedKit.swift in Sources */,
+				2BE146282D91E39700F85F34 /* captureTaps.swift in Sources */,
 				34A6D5554C6E86F341EC61B2 /* RequestType.swift in Sources */,
 				F91D9E9281A73705484A68ED /* ShowRequestSheetWhenNeededModifier.swift in Sources */,
 				91B16D43A65C65D86EF10C63 /* requireCapabilityPermission.swift in Sources */,
@@ -962,15 +1055,18 @@
 				75B2D55D29E9F430B58A2D35 /* currentPlatform.swift in Sources */,
 				715169DF84AFCBA856E6EB71 /* getPlistEntry.swift in Sources */,
 				CD2C782C2C8644C04E23572D /* isPreview.swift in Sources */,
+				2BE1462A2D91E3A800F85F34 /* captureViewActivity.swift in Sources */,
 				6D755810CAB2E032B92EDBB5 /* openAppInSettings.swift in Sources */,
 				CBFF604839828BB5ECB82947 /* Stack.swift in Sources */,
 				BD3310C36BFFC2316DFAB425 /* VideoPlayerAlphaView.swift in Sources */,
 				601DE389CF83417329FC8964 /* WebView.swift in Sources */,
 				79DB6C3455227F4E62D49C1E /* if.swift in Sources */,
+				2BE146262D91E35B00F85F34 /* Analytics.swift in Sources */,
 				198CAF6CCBD09F35193D821E /* modifier.swift in Sources */,
 				4B6FDA1F1B9575838AA1A6E2 /* onAppearAndChange.swift in Sources */,
 				5620B44B33DAB337229EBF9D /* sensitiveView.swift in Sources */,
 				67A63CBD9499D6DDC2B62785 /* squircle.swift in Sources */,
+				2BE1461B2D91E26100F85F34 /* Crashlytics.swift in Sources */,
 				4E56E4B1449C7049A2E30FC2 /* InAppNotificationView.swift in Sources */,
 				9EFC0B9D77821CC5A7E1460C /* showInAppNotification.swift in Sources */,
 				C5CF30ED98652E66045D6081 /* HeroView.swift in Sources */,

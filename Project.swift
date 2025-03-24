@@ -43,6 +43,8 @@ func tuistProject() -> Project {
 	addSharedKit()
 	addNotifKit()
 	addSupabaseKit()
+    addCrashlyticsKit()
+    addAnalyticsKit()
 
 	addApp()
 
@@ -107,6 +109,63 @@ func tuistProject() -> Project {
 		appDependencies.append(sharedKit)
 		projectTargets.append(sharedTarget)
 	}
+    
+    func addAnalyticsKit() {
+        let targetName = "AnalyticsKit"
+        let analyticsTarget: Target = .target(
+            name: targetName,
+            destinations: destinations,
+            product: .framework,
+            bundleId: "\(bundleID).\(targetName)",
+            deploymentTargets: .iOS(osVersion),
+            infoPlist: .default,
+            sources: ["Targets/\(targetName)/Sources/**"],
+            resources: [],
+            dependencies: [
+                sharedKit,
+                TargetDependency.package(product: "Mixpanel", type: .runtime),
+            ]
+        )
+        appDependencies.append(TargetDependency.target(name: targetName))
+        projectPackages
+            .append(
+                .remote(
+                    url: "https://github.com/mixpanel/mixpanel-swift",
+                    requirement: .upToNextMajor(from: "2.8.0")
+                )
+            )
+        projectTargets.append(analyticsTarget)
+        appResources.append("Targets/\(targetName)/Config/Mixpanel-Info.plist")
+    }
+    
+    func addCrashlyticsKit() {
+        let targetName = "CrashlyticsKit"
+        let crashlyticsTarget: Target = .target(
+            name: targetName,
+            destinations: destinations,
+            product: .framework,
+            bundleId: "\(bundleID).\(targetName)",
+            deploymentTargets: .iOS(osVersion),
+            infoPlist: .default,
+            sources: ["Targets/\(targetName)/Sources/**"],
+            resources: ["Targets/\(targetName)/Config/**"],
+            dependencies: [
+                sharedKit,
+                TargetDependency.package(product: "Sentry", type: .runtime),
+            ]
+        )
+        appDependencies.append(TargetDependency.target(name: targetName))
+        projectPackages
+            .append(
+                .remote(
+                    url: "https://github.com/getsentry/sentry-cocoa",
+                    requirement: .upToNextMajor(from: "8.41.0")
+                )
+            )
+        projectTargets.append(crashlyticsTarget)
+        appResources.append("Targets/\(targetName)/Config/Sentry-Info.plist")
+    }
+
 
 	func addNotifKit() {
 		let notifTargetName = "NotifKit"

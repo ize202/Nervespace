@@ -1,0 +1,58 @@
+//
+//  captureTaps.swift
+//  Nervespace
+//
+//  Created by Aize Igbinakenzua on 2025-03-24.
+//
+
+import SharedKit
+import SwiftUI
+import UIKit
+
+struct CaptureTapsModifier: ViewModifier {
+
+    @Environment(\.isEnabled) var isEnabled: Bool  // to access .disabled() property
+    let tapTargetId: String
+    let analyticsRelevancy: EventRelevancy
+    let fromView: String?
+
+    public init(
+        tapTargetId: String,
+        fromView: String?,
+        relevancy: EventRelevancy
+    ) {
+        self.tapTargetId = tapTargetId
+        self.fromView = fromView
+        self.analyticsRelevancy = relevancy
+    }
+
+    func body(content: Content) -> some View {
+        ZStack {
+            content
+        }
+        .simultaneousGesture(
+            TapGesture().onEnded {
+                if !isPreview, self.isEnabled {
+                    Analytics.captureTap(tapTargetId, fromView: fromView, relevancy: analyticsRelevancy)
+                }
+            })
+    }
+}
+
+extension View {
+    /// This modifier will notify PostHog when a view is tapped
+    /// Sometimes doesn't work and blocks underlying views from tapping (e.g. Native NavigationLink).
+    public func captureTaps(
+        _ tapTargetId: String,
+        fromView: String? = nil,
+        relevancy: EventRelevancy = .medium
+    ) -> some View {
+        modifier(
+            CaptureTapsModifier(
+                tapTargetId: tapTargetId,
+                fromView: fromView,
+                relevancy: relevancy
+            )
+        )
+    }
+}
