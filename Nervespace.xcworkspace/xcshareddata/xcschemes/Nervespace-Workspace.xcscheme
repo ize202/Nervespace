@@ -14,6 +14,34 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
+               BlueprintIdentifier = "D9AB99BC4EB5C67C2E177D44"
+               BuildableName = "AnalyticsKit.framework"
+               BlueprintName = "AnalyticsKit"
+               ReferencedContainer = "container:Nervespace.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "08590A2D507658161A15BCDF"
+               BuildableName = "CrashlyticsKit.framework"
+               BlueprintName = "CrashlyticsKit"
+               ReferencedContainer = "container:Nervespace.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
                BlueprintIdentifier = "3F6205C1A134BE02DABCB2A0"
                BuildableName = "Nervespace.app"
                BlueprintName = "Nervespace"
@@ -96,16 +124,15 @@
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"
       allowLocationSimulation = "YES">
-      <BuildableProductRunnable
-         runnableDebuggingMode = "0">
+      <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "3F6205C1A134BE02DABCB2A0"
-            BuildableName = "Nervespace.app"
-            BlueprintName = "Nervespace"
+            BlueprintIdentifier = "D9AB99BC4EB5C67C2E177D44"
+            BuildableName = "AnalyticsKit.framework"
+            BlueprintName = "AnalyticsKit"
             ReferencedContainer = "container:Nervespace.xcodeproj">
          </BuildableReference>
-      </BuildableProductRunnable>
+      </MacroExpansion>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
@@ -113,16 +140,15 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
-      <BuildableProductRunnable
-         runnableDebuggingMode = "0">
+      <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "3F6205C1A134BE02DABCB2A0"
-            BuildableName = "Nervespace.app"
-            BlueprintName = "Nervespace"
+            BlueprintIdentifier = "D9AB99BC4EB5C67C2E177D44"
+            BuildableName = "AnalyticsKit.framework"
+            BlueprintName = "AnalyticsKit"
             ReferencedContainer = "container:Nervespace.xcodeproj">
          </BuildableReference>
-      </BuildableProductRunnable>
+      </MacroExpansion>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">
