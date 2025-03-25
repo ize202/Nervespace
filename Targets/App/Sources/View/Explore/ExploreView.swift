@@ -30,19 +30,23 @@ struct CategoryCard: View {
     let systemImage: String
     
     var body: some View {
-        VStack {
-            Image(systemName: systemImage)
-                .font(.system(size: 30))
-                .foregroundColor(.brandPrimary)
-                .frame(width: 60, height: 60)
-                .background(Color.baseGray)
-                .cornerRadius(12)
+        VStack(alignment: .center, spacing: 8) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(Color.white)
+                    .shadow(color: Color.black.opacity(0.05), radius: 8, x: 0, y: 2)
+                
+                Image(systemName: systemImage)
+                    .font(.system(size: 40))
+                    .foregroundColor(.brandPrimary)
+            }
+            .frame(width: 140, height: 140)
             
             Text(title)
-                .font(.caption)
+                .font(.system(size: 17, weight: .semibold))
                 .foregroundColor(.baseBlack)
         }
-        .frame(width: 80)
+        .frame(width: 140)
     }
 }
 
@@ -78,18 +82,19 @@ struct ExploreView: View {
                         .padding(.horizontal)
                     
                     // Browse by Category
-                    VStack(alignment: .leading) {
+                    VStack(alignment: .leading, spacing: 16) {
                         Text("Browse by Category")
                             .font(.title2)
                             .bold()
                             .padding(.horizontal)
                         
                         ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: 15) {
+                            LazyHStack(spacing: 16) {
+                                CategoryCard(title: "Meditation", systemImage: "heart.circle.fill")
                                 CategoryCard(title: "Breathwork", systemImage: "wind")
                                 CategoryCard(title: "Movement", systemImage: "figure.walk")
-                                CategoryCard(title: "Grounding", systemImage: "leaf")
-                                CategoryCard(title: "Sleep", systemImage: "moon.stars")
+                                CategoryCard(title: "Grounding", systemImage: "leaf.fill")
+                                CategoryCard(title: "Sleep", systemImage: "moon.stars.fill")
                             }
                             .padding(.horizontal)
                         }
