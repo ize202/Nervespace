@@ -9,7 +9,7 @@ struct SearchBar: View {
             Image(systemName: "magnifyingglass")
                 .foregroundColor(.gray)
             
-            TextField("Search sessions...", text: $text)
+            TextField("Areas, Exercises, Categories, and More", text: $text)
                 .textFieldStyle(PlainTextFieldStyle())
             
             if !text.isEmpty {
@@ -53,22 +53,56 @@ struct CategoryCard: View {
 struct AreaCard: View {
     let title: String
     let color: Color
+    let imageUrl: String?
     
     var body: some View {
-        VStack(alignment: .leading) {
+        ZStack(alignment: .bottomLeading) {
+            // Background with gradient overlay
+            ZStack {
+                if let imageUrl = imageUrl {
+                    AsyncImage(url: URL(string: imageUrl)) { image in
+                        image
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                    } placeholder: {
+                        color
+                    }
+                } else {
+                    color
+                }
+                
+                // Gradient overlay
+                LinearGradient(
+                    gradient: Gradient(colors: [
+                        .black.opacity(0.5),
+                        .clear,
+                        .clear
+                    ]),
+                    startPoint: .bottom,
+                    endPoint: .top
+                )
+            }
+            
+            // Title
             Text(title)
-                .font(.headline)
+                .font(.title3)
+                .fontWeight(.bold)
                 .foregroundColor(.white)
-                .padding()
+                .padding(16)
         }
-        .frame(width: 160, height: 100)
-        .background(color)
-        .cornerRadius(12)
+        .frame(height: 180)
+        .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 }
 
 struct ExploreView: View {
     @State private var searchText = ""
+    
+    // Grid layout configuration
+    private let gridItems = [
+        GridItem(.flexible(), spacing: 16),
+        GridItem(.flexible(), spacing: 16)
+    ]
     
     var body: some View {
         NavigationView {
@@ -101,21 +135,45 @@ struct ExploreView: View {
                     }
                     
                     // Browse by Area
-                    VStack(alignment: .leading) {
+                    VStack(alignment: .leading, spacing: 16) {
                         Text("Browse by Area")
                             .font(.title2)
                             .bold()
                             .padding(.horizontal)
                         
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: 15) {
-                                AreaCard(title: "Stress Relief", color: .brandPrimary)
-                                AreaCard(title: "Anxiety", color: .brandSecondary)
-                                AreaCard(title: "Focus", color: Color(hex: "6B8E23"))
-                                AreaCard(title: "Energy", color: Color(hex: "CD853F"))
-                            }
-                            .padding(.horizontal)
+                        LazyVGrid(columns: gridItems, spacing: 16) {
+                            AreaCard(
+                                title: "Stress Relief",
+                                color: .brandPrimary,
+                                imageUrl: nil
+                            )
+                            AreaCard(
+                                title: "Anxiety",
+                                color: .brandSecondary,
+                                imageUrl: nil
+                            )
+                            AreaCard(
+                                title: "Focus & Clarity",
+                                color: Color(hex: "6B8E23"),
+                                imageUrl: nil
+                            )
+                            AreaCard(
+                                title: "Energy Boost",
+                                color: Color(hex: "CD853F"),
+                                imageUrl: nil
+                            )
+                            AreaCard(
+                                title: "Better Sleep",
+                                color: .brandPrimary,
+                                imageUrl: nil
+                            )
+                            AreaCard(
+                                title: "Quick Reset",
+                                color: .brandSecondary,
+                                imageUrl: nil
+                            )
                         }
+                        .padding(.horizontal)
                     }
                 }
                 .padding(.vertical)
