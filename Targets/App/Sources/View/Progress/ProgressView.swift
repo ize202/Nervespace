@@ -104,7 +104,6 @@ struct ProgressView: View {
                 .padding()
             }
             .navigationTitle("Progress")
-            .background(Color.baseGray.opacity(0.1))
         }
     }
     
