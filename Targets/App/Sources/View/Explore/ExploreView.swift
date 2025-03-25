@@ -124,6 +124,7 @@ struct ExploreView: View {
                         Text("Browse by Category")
                             .font(.title2)
                             .bold()
+                            .foregroundColor(.white)
                             .padding(.horizontal)
                         
                         ScrollView(.horizontal, showsIndicators: false) {
@@ -143,6 +144,7 @@ struct ExploreView: View {
                         Text("Browse by Area")
                             .font(.title2)
                             .bold()
+                            .foregroundColor(.white)
                             .padding(.horizontal)
                         
                         LazyVGrid(columns: gridItems, spacing: 16) {
@@ -182,8 +184,10 @@ struct ExploreView: View {
                 }
                 .padding(.vertical)
             }
+            .background(Color.baseBlack)
             .navigationBarHidden(true)
         }
+        .preferredColorScheme(.dark)
     }
     
     private var header: some View {
@@ -191,7 +195,7 @@ struct ExploreView: View {
             Text("Explore")
                 .font(.largeTitle)
                 .fontWeight(.bold)
-                .foregroundColor(.primary)
+                .foregroundColor(.white)
             
             Spacer()
             
@@ -208,4 +212,6 @@ struct ExploreView: View {
 
 #Preview {
     ExploreView()
+        .preferredColorScheme(.dark)
+        .background(Color.baseBlack)
 } 
