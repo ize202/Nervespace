@@ -8,7 +8,7 @@ public extension Color {
     static let brandSecondary = Color(hex: "503370")
     
     /// Base black color
-    static let baseBlack = Color(hex: "121212")
+    static let baseBlack = Color(hex: "#181818")
     
     /// Pure white color
     static let baseWhite = Color(hex: "ffffff")

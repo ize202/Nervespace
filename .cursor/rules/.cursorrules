@@ -110,6 +110,8 @@ when fixing a problem reflect on 5-7 different possible sources of the problem, 
 - Follow Apple's color palette and contrast guidelines
 - Maintain proper spacing and alignment (8-point grid system)
 - Support dynamic type and bolded text accessibility options
+- The app should be dark mode only and is set to dark mode by default in app.swift
+- the background color is handled in the content view so you don't need to set the background color for each view
 
 ### Navigation & Structure
 - Follow standard navigation patterns (hierarchical, flat, or content-driven)
