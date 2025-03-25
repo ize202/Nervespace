@@ -30,23 +30,27 @@ struct CategoryCard: View {
     let systemImage: String
     
     var body: some View {
-        VStack(alignment: .center, spacing: 8) {
+        VStack(spacing: 0) {
+            // Icon container
             ZStack {
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(Color.white)
-                    .shadow(color: Color.black.opacity(0.05), radius: 8, x: 0, y: 2)
-                
+                Color.white
                 Image(systemName: systemImage)
                     .font(.system(size: 40))
                     .foregroundColor(.brandPrimary)
             }
-            .frame(width: 140, height: 140)
+            .frame(height: 120)
             
+            // Title container
             Text(title)
                 .font(.system(size: 17, weight: .semibold))
                 .foregroundColor(.baseBlack)
+                .frame(maxWidth: .infinity)
+                .frame(height: 44)
+                .background(Color.white)
         }
-        .frame(width: 140)
+        .frame(width: 160)
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .shadow(color: Color.black.opacity(0.05), radius: 8, x: 0, y: 2)
     }
 }
 
