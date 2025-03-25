@@ -6,7 +6,7 @@ struct CircularProgressView: View {
     let goal: Int
     let current: Int
     
-    private let lineWidth: CGFloat = 20
+    private let lineWidth: CGFloat = 30
     
     var body: some View {
         ZStack {
@@ -31,31 +31,31 @@ struct CircularProgressView: View {
                 .animation(.easeOut, value: progress)
             
             // Center content
-            VStack(spacing: 4) {
+            VStack(spacing: 8) {
                 Text("\(current)/\(goal)")
-                    .font(.system(.title, design: .rounded))
-                    .fontWeight(.semibold)
+                    .font(.system(size: 34, weight: .medium, design: .rounded))
                     .foregroundColor(.baseBlack)
                 
-                Text("CAL")
-                    .font(.caption)
-                    .fontWeight(.medium)
-                    .foregroundColor(.baseBlack.opacity(0.7))
+                Text("minutes")
+                    .font(.system(size: 17))
+                    .foregroundColor(.baseBlack.opacity(0.5))
             }
         }
+        .aspectRatio(1, contentMode: .fit)
+        .padding(lineWidth/2)
     }
 }
 
 #Preview {
-    VStack {
+    VStack(spacing: 20) {
         CircularProgressView(progress: 0.75, goal: 300, current: 225)
-            .frame(width: 200, height: 200)
+            .frame(width: 250, height: 250)
             .padding()
             .background(Color.baseGray)
             .cornerRadius(16)
         
-        CircularProgressView(progress: 0.25, goal: 300, current: 75)
-            .frame(width: 200, height: 200)
+        CircularProgressView(progress: 0.163, goal: 300, current: 49)
+            .frame(width: 250, height: 250)
             .padding()
             .background(Color.baseGray)
             .cornerRadius(16)

@@ -8,8 +8,8 @@ struct ProgressView: View {
     @State private var selectedChartType: ChartType = .daily
     
     // TODO: Move these to user settings
-    private let dailyGoal = 300 // Default goal in minutes
-    private let currentMinutes = 49 // This would come from actual tracking
+    private let dailyGoal = 5 // Default goal in minutes
+    private let currentMinutes = 2 // This would come from actual tracking
     
     private let calendar = Calendar.current
     private let daysOfWeek = ["S", "M", "T", "W", "T", "F", "S"]
@@ -107,13 +107,18 @@ struct ProgressView: View {
                         
                         // Chart view
                         if selectedChartType == .daily {
-                            CircularProgressView(
-                                progress: Double(currentMinutes) / Double(dailyGoal),
-                                goal: dailyGoal,
-                                current: currentMinutes
-                            )
-                            .frame(height: 250)
-                            .padding(.vertical)
+                            VStack {
+                                Spacer()
+                                CircularProgressView(
+                                    progress: Double(currentMinutes) / Double(dailyGoal),
+                                    goal: dailyGoal,
+                                    current: currentMinutes
+                                )
+                                .frame(height: 250)
+                                Spacer()
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 20)
                         } else {
                             Rectangle()
                                 .fill(Color.baseBlack.opacity(0.1))
