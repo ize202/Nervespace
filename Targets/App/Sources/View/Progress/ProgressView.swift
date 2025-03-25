@@ -27,9 +27,9 @@ struct ProgressView: View {
                             }) {
                                 HStack(spacing: 4) {
                                     Text("History")
-                                        .font(.subheadline)
+                                        .font(.headline)
                                     Image(systemName: "chevron.right")
-                                        .font(.caption)
+                                        .font(.headline)
                                 }
                                 .foregroundColor(.brandSecondary)
                             }
