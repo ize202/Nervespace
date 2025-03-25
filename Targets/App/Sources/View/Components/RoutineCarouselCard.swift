@@ -7,32 +7,30 @@ struct RoutineCarouselCard: View {
     let isSelected: Bool
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 16) {
             Text(duration)
                 .font(.subheadline)
                 .fontWeight(.medium)
                 .foregroundStyle(.secondary)
             
             Text(title)
-                .font(.title)
-                .fontWeight(.bold)
+                .font(.system(size: 32, weight: .bold))
                 .foregroundStyle(.primary)
                 .minimumScaleFactor(0.8)
             
             // Placeholder for exercise icons - we'll implement this later
             Circle()
                 .fill(Color.brandPrimary.opacity(0.2))
-                .frame(height: 120)
+                .frame(height: 160)
         }
-        .frame(width: UIScreen.main.bounds.width - 48)
+        .frame(width: UIScreen.main.bounds.width * 0.85)
         .padding(24)
         .background(
             RoundedRectangle(cornerRadius: 24)
                 .fill(Color(.systemGray6))
         )
-        .scaleEffect(isSelected ? 1 : 0.9)
-        .opacity(isSelected ? 1 : 0.6)
-        .animation(.spring(response: 0.4, dampingFraction: 0.7), value: isSelected)
+        .scaleEffect(isSelected ? 1 : 0.85)
+        .opacity(isSelected ? 1 : 0.5)
     }
 }
 

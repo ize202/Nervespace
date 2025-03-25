@@ -15,13 +15,14 @@ struct SnapCarousel<Content: View>: View {
                 }
             }
             .offset(x: -CGFloat(currentIndex) * geometry.size.width + dragOffset)
+            .animation(.interpolatingSpring(stiffness: 100, damping: 12), value: dragOffset)
             .gesture(
                 DragGesture()
                     .updating($dragOffset) { value, state, _ in
                         state = value.translation.width
                     }
                     .onEnded { value in
-                        let threshold = geometry.size.width * 0.2
+                        let threshold = geometry.size.width * 0.15
                         var newIndex = currentIndex
                         
                         if abs(value.translation.width) > threshold {
@@ -29,7 +30,7 @@ struct SnapCarousel<Content: View>: View {
                         }
                         
                         newIndex = min(max(newIndex, 0), items.count - 1)
-                        withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
+                        withAnimation(.interpolatingSpring(stiffness: 100, damping: 12)) {
                             currentIndex = newIndex
                         }
                     }

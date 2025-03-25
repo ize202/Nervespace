@@ -25,7 +25,7 @@ struct HomeView: View {
     
     var body: some View {
         ScrollView(showsIndicators: false) {
-            VStack(alignment: .leading, spacing: 24) {
+            VStack(alignment: .leading, spacing: 32) {
                 // Header
                 HStack {
                     Text("Nervespace")
@@ -59,7 +59,8 @@ struct HomeView: View {
                         isSelected: isSelected
                     )
                 }
-                .frame(height: 280)
+                .frame(height: 320)
+                .padding(.top, 8)
                 
                 VStack(alignment: .leading, spacing: 24) {
                     // Quick Sessions
