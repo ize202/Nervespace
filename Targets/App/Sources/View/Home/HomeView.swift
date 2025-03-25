@@ -35,7 +35,6 @@ struct HomeView: View {
                 
                 // Common Routines Carousel
                 SnapCarousel(spacing: 15,
-                           trailingSpace: 100,
                            index: $currentIndex,
                            items: commonRoutines) { routine in
                     // Carousel Card Style

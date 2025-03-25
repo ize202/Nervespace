@@ -4,73 +4,58 @@ struct SnapCarousel<Content: View, T: Identifiable>: View {
     var content: (T) -> Content
     var list: [T]
     var spacing: CGFloat
-    var trailingSpace: CGFloat
+    var cardWidth: CGFloat?
     @Binding var index: Int
     
     init(spacing: CGFloat = 15,
-         trailingSpace: CGFloat = 100,
+         cardWidth: CGFloat? = nil,
          index: Binding<Int>,
          items: [T],
          @ViewBuilder content: @escaping (T) -> Content) {
         self.list = items
         self.spacing = spacing
-        self.trailingSpace = trailingSpace
+        self.cardWidth = cardWidth
         self._index = index
         self.content = content
     }
     
-    @GestureState var offset: CGFloat = 0
-    @State var currentIndex: Int = 0
+    @State private var scrollPosition: T.ID?
     
     var body: some View {
-        GeometryReader { proxy in
-            let size = proxy.size
-            let cardWidth = size.width - (trailingSpace - spacing)
-            let adjustedSpacing = (trailingSpace / 2) - spacing
+        GeometryReader { geometry in
+            let size = geometry.size
+            let computedCardWidth = cardWidth ?? (size.width - 60)
             
-            HStack(spacing: spacing) {
-                ForEach(list) { item in
-                    content(item)
-                        .frame(width: proxy.size.width - trailingSpace)
-                        .offset(y: getOffset(item: item, cardWidth: cardWidth))
+            ScrollView(.horizontal) {
+                HStack(spacing: spacing) {
+                    ForEach(list) { item in
+                        content(item)
+                            .frame(width: computedCardWidth)
+                            .scrollTransition(.interactive, axis: .horizontal) { content, phase in
+                                content
+                                    .scaleEffect(phase.isIdentity ? 1 : 0.95)
+                            }
+                            .id(item.id)
+                    }
+                }
+                .scrollTargetLayout()
+                .padding(.horizontal, (size.width - computedCardWidth) / 2)
+            }
+            .scrollIndicators(.hidden)
+            .scrollTargetBehavior(.viewAligned)
+            .scrollPosition(id: $scrollPosition)
+            .onChange(of: scrollPosition) { oldValue, newValue in
+                if let newPosition = newValue,
+                   let newIndex = list.firstIndex(where: { $0.id == newPosition }) {
+                    index = newIndex
                 }
             }
-            .padding(.horizontal, adjustedSpacing)
-            .offset(x: (CGFloat(currentIndex) * -cardWidth) + (currentIndex != 0 ? adjustedSpacing : 0) + offset)
-            .gesture(
-                DragGesture()
-                    .updating($offset) { value, out, _ in
-                        out = value.translation.width
-                    }
-                    .onEnded { value in
-                        let offsetX = value.translation.width
-                        let progress = -offsetX / cardWidth
-                        let roundIndex = progress.rounded()
-                        currentIndex = max(min(currentIndex + Int(roundIndex), list.count - 1), 0)
-                        currentIndex = index
-                    }
-                    .onChanged { value in
-                        let offsetX = value.translation.width
-                        let progress = -offsetX / cardWidth
-                        let roundIndex = progress.rounded()
-                        index = max(min(currentIndex + Int(roundIndex), list.count - 1), 0)
-                    }
-            )
+            .onChange(of: index) { oldValue, newValue in
+                withAnimation(.easeInOut(duration: 0.3)) {
+                    scrollPosition = list[newValue].id
+                }
+            }
         }
-        .animation(.easeInOut, value: offset == 0)
-    }
-    
-    private func getOffset(item: T, cardWidth: CGFloat) -> CGFloat {
-        let index = getIndex(item: item)
-        let topOffset = -cardWidth * 0.1
-        return index == currentIndex ? 0 : topOffset
-    }
-    
-    private func getIndex(item: T) -> Int {
-        let index = list.firstIndex { current in
-            current.id == item.id
-        } ?? 0
-        return index
     }
 }
 
