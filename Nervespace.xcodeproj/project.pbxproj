@@ -85,7 +85,7 @@
 		C5CF30ED98652E66045D6081 /* HeroView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B0BE5BDC5A0673F9FCF7EA7 /* HeroView.swift */; };
 		C93F1D8A78A7DFE88844E617 /* SignInWithApple.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA42B0E1BD112FA7D35F2246 /* SignInWithApple.swift */; };
 		CA0A5A60B953D2D32EDB42E1 /* SnapCarousel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A30C7E4515091374D43BE5A /* SnapCarousel.swift */; };
-		CBC989AD7421140283524D46 /* RoutineCarouselCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDAF1ED69AB22890039FEB75 /* RoutineCarouselCard.swift */; };
+		CBC989AD7421140283524D46 /* RoutineCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDAF1ED69AB22890039FEB75 /* RoutineCard.swift */; };
 		CBFF604839828BB5ECB82947 /* Stack.swift in Sources */ = {isa = PBXBuildFile; fileRef = E707125AB574BCCB8270439E /* Stack.swift */; };
 		CD2C782C2C8644C04E23572D /* isPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F95AB075CFCC69E3E00BE35 /* isPreview.swift */; };
 		CEB09DA46A099AFAEBBC6FD9 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D8A83FA9A8AFFBB47113490F /* LaunchScreen.storyboard */; };
@@ -344,7 +344,7 @@
 		E792EB44A5FA4D059ECCAD19 /* openAppInSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = openAppInSettings.swift; sourceTree = "<group>"; };
 		E8A6EE964B30D294427E8570 /* Nervespace.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Nervespace.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		EDA25E2E3D1A1DE59AAFCCBE /* CrashlyticsKit-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "CrashlyticsKit-Info.plist"; sourceTree = "<group>"; };
-		EDAF1ED69AB22890039FEB75 /* RoutineCarouselCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineCarouselCard.swift; sourceTree = "<group>"; };
+		EDAF1ED69AB22890039FEB75 /* RoutineCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineCard.swift; sourceTree = "<group>"; };
 		F1B45027C04793D1C7C5909B /* currentPlatform.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = currentPlatform.swift; sourceTree = "<group>"; };
 		FA326228F13EFB0EB155C980 /* NotifKit-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "NotifKit-Info.plist"; sourceTree = "<group>"; };
 		FAE741F68BDCA070A422A0F3 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -845,7 +845,7 @@
 		BA3ABA73DD18624CBFA0F070 /* Components */ = {
 			isa = PBXGroup;
 			children = (
-				EDAF1ED69AB22890039FEB75 /* RoutineCarouselCard.swift */,
+				EDAF1ED69AB22890039FEB75 /* RoutineCard.swift */,
 				2234F8CB18155D3598AA7F9D /* ScrollableSection.swift */,
 				6651C67E1663DF5DFE1F44E1 /* SessionCard.swift */,
 				2A30C7E4515091374D43BE5A /* SnapCarousel.swift */,
@@ -1352,7 +1352,7 @@
 			files = (
 				99347E5C50ECDC12DC4CF52C /* TuistBundle+Nervespace.swift in Sources */,
 				2CC928AEBAD65DD2F42F40CA /* App.swift in Sources */,
-				CBC989AD7421140283524D46 /* RoutineCarouselCard.swift in Sources */,
+				CBC989AD7421140283524D46 /* RoutineCard.swift in Sources */,
 				43167DB9AA036D8BD52F1543 /* ScrollableSection.swift in Sources */,
 				A3B8F6653F38BC04061F35E4 /* SessionCard.swift in Sources */,
 				CA0A5A60B953D2D32EDB42E1 /* SnapCarousel.swift in Sources */,
