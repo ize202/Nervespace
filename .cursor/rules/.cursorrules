@@ -93,6 +93,7 @@ when fixing a problem reflect on 5-7 different possible sources of the problem, 
 - Support all device orientations
 - Implement appropriate keyboard handling
 - Support both light and dark mode
+- Always follow the Human Interface Guidelines for type sizes, spacing, and other UI elements
 
 ### Performance
 - Lazy load views with `LazyVStack`/`LazyHStack`
