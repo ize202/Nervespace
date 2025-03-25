@@ -14,32 +14,37 @@ struct ContentView: View {
 		TabView {
 			HomeView()
 				.tabItem {
-					Image(systemName: "house")
+					Label("Home", systemImage: "house.fill")
 				}
 			
 			ExploreView()
 				.tabItem {
-					Image(systemName: "magnifyingglass")
+					Label("Explore", systemImage: "square.grid.2x2.fill")
 				}
 			
 			ProgressView()
 				.tabItem {
-					Image(systemName: "chart.bar")
+					Label("Progress", systemImage: "chart.bar.fill")
 				}
 			
 			ProfileView()
 				.tabItem {
-					Image(systemName: "person")
+					Label("Profile", systemImage: "person.fill")
 				}
 			
 			#if DEBUG
 			// Use this to create quick settings and toggles to streamline the development process.
 			DeveloperSettingsView()
-				.tabItem { Label("Developer", systemImage: "hammer") }
+				.tabItem { 
+					Label("Developer", systemImage: "hammer.fill")
+				}
 			#endif
 		}
 		.tint(.brandPrimary) // Set the tab bar tint to our brand color
 		.preferredColorScheme(.dark)
+		.safeAreaInset(edge: .bottom) {
+			Color.clear.frame(height: 8) // Add extra padding at the top of the tab bar
+		}
 	}
 }
 
