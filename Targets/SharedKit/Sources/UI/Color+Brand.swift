@@ -14,7 +14,7 @@ public extension Color {
     static let baseWhite = Color(hex: "ffffff")
     
     /// Light gray color
-    static let baseGray = Color(hex: "eeeeee")
+    static let baseGray = Color(hex: "#ebebeb")
     
     // MARK: - Hex Initializer
     init(hex: String) {

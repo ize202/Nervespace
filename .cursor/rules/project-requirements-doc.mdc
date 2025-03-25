@@ -51,7 +51,7 @@ The initial versions of Nervespace (up to v1.0) will prioritize delivering high-
 - Progress Tracking: Basic log of completed sessions.
 - Streaks: Simple counter to encourage consistency.
 - Minimalist UI: Clean design with Digital Lavender (#9b79c1) as the primary color.
-- Brand Colour Palette (#9b79c1, #503370, #141414, #ffffff, #eeeeee)
+- Brand Colour Palette (#9b79c1, #503370, #141414, #ffffff, ##EBEBEB)
 ```swift
 public extension Color {
     /// Primary brand color - Digital Lavender
@@ -67,7 +67,7 @@ public extension Color {
     static let baseWhite = Color(hex: "ffffff")
     
     /// Light gray color
-    static let baseGray = Color(hex: "eeeeee")
+    static let baseGray = Color(hex: "#EBEBEB")
 ```
 - User Onboarding: Brief tutorial introducing app features.
 - User Authentication: Simple Sign-up/login via email/password form like bend.

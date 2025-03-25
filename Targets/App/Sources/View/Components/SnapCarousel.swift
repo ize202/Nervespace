@@ -6,8 +6,8 @@ struct SnapCarousel<Content: View>: View {
     @State private var currentIndex: Int = 0
     @GestureState private var dragOffset: CGFloat = 0
     
-    private let cardWidth: CGFloat = UIScreen.main.bounds.width * 0.75
-    private let cardSpacing: CGFloat = 24
+    private let cardWidth: CGFloat = UIScreen.main.bounds.width * 0.65
+    private let cardSpacing: CGFloat = UIScreen.main.bounds.width * 0.1
     
     var body: some View {
         GeometryReader { geometry in
