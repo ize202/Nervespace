@@ -1,6 +1,7 @@
 import SwiftUI
 
-struct SnapCarousel<T: Identifiable>: View {
+struct SnapCarousel<Content: View, T: Identifiable>: View {
+    var content: (T) -> Content
     var list: [T]
     var spacing: CGFloat
     var trailingSpace: CGFloat
@@ -9,11 +10,13 @@ struct SnapCarousel<T: Identifiable>: View {
     init(spacing: CGFloat = 15,
          trailingSpace: CGFloat = 100,
          index: Binding<Int>,
-         items: [T]) {
+         items: [T],
+         @ViewBuilder content: @escaping (T) -> Content) {
         self.list = items
         self.spacing = spacing
         self.trailingSpace = trailingSpace
         self._index = index
+        self.content = content
     }
     
     @GestureState var offset: CGFloat = 0
@@ -27,43 +30,9 @@ struct SnapCarousel<T: Identifiable>: View {
             
             HStack(spacing: spacing) {
                 ForEach(list) { item in
-                    let index = getIndex(item: item)
-                    // Card Design
-                    ZStack(alignment: .topLeading) {
-                        if let card = item as? RoutineCard {
-                            // Background Image
-                            Image(systemName: card.image)
-                                .resizable()
-                                .aspectRatio(contentMode: .fill)
-                                .foregroundStyle(Color.brandPrimary.opacity(0.2))
-                                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                            
-                            // Content Overlay
-                            VStack(alignment: .leading) {
-                                Text(card.title)
-                                    .font(.system(size: 28, weight: .bold))
-                                    .foregroundStyle(Color.baseBlack)
-                                
-                                Spacer()
-                                
-                                Text(card.duration.replacingOccurrences(of: "MINUTES", with: "mins"))
-                                    .font(.subheadline)
-                                    .fontWeight(.medium)
-                                    .foregroundStyle(.white)
-                                    .padding(.horizontal, 12)
-                                    .padding(.vertical, 6)
-                                    .background(
-                                        Capsule()
-                                            .fill(Color.black.opacity(0.8))
-                                    )
-                            }
-                            .padding(20)
-                        }
-                    }
-                    .frame(width: proxy.size.width - trailingSpace)
-                    .offset(y: getOffset(item: item, cardWidth: cardWidth))
-                    .background(Color.baseGray)
-                    .clipShape(RoundedRectangle(cornerRadius: 20))
+                    content(item)
+                        .frame(width: proxy.size.width - trailingSpace)
+                        .offset(y: getOffset(item: item, cardWidth: cardWidth))
                 }
             }
             .padding(.horizontal, adjustedSpacing)
@@ -106,6 +75,37 @@ struct SnapCarousel<T: Identifiable>: View {
 }
 
 #Preview {
-    SnapCarousel(index: .constant(0), items: RoutineCard.sampleCards)
-        .frame(height: 400)
+    SnapCarousel(index: .constant(0), items: RoutineCard.sampleCards) { card in
+        // Example card styling
+        ZStack(alignment: .topLeading) {
+            Image(systemName: card.image)
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .foregroundStyle(Color.brandPrimary.opacity(0.2))
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            
+            VStack(alignment: .leading) {
+                Text(card.title)
+                    .font(.system(size: 28, weight: .bold))
+                    .foregroundStyle(Color.baseBlack)
+                
+                Spacer()
+                
+                Text(card.duration.replacingOccurrences(of: "MINUTES", with: "mins"))
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(
+                        Capsule()
+                            .fill(Color.black.opacity(0.8))
+                    )
+            }
+            .padding(20)
+        }
+        .background(Color.baseGray)
+        .clipShape(RoundedRectangle(cornerRadius: 20))
+    }
+    .frame(height: 400)
 } 
