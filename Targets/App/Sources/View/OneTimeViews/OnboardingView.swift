@@ -10,6 +10,7 @@
 
 import SharedKit
 import SwiftUI
+import AnalyticsKit
 
 /// Set this to the views you want to show during Onboarding (first App launch ever)
 /// Use these 3-4 views max to showcase the main selling point of your Application
@@ -47,6 +48,7 @@ struct ShowOnboardingViewOnFirstLaunchEverModifier: ViewModifier {
 				OnboardingView {
 					withAnimation(.bouncy) {
 						showOnboarding = false
+						Analytics.capture(.success, id: "onboarding_completed", source: .general)
 					}
 				}
 				.transition(.opacity)
@@ -63,6 +65,9 @@ struct ShowOnboardingViewOnFirstLaunchEverModifier: ViewModifier {
 				self.showOnboarding = true
 			} else {
 				self.showOnboarding = lastAppVersionAppWasOpenedAt == "NONE"
+				if lastAppVersionAppWasOpenedAt == "NONE" {
+					Analytics.capture(.info, id: "onboarding_started", source: .general)
+				}
 			}
 		}
 	}
@@ -85,6 +90,9 @@ struct ShowOnboardingViewOnFirstLaunchEverModifier: ViewModifier {
 					}
 				}
 				.tabViewStyle(.page(indexDisplayMode: .never))  // don't show the page dots
+				.onChange(of: pageIndex) { _, newIndex in
+					Analytics.capture(.info, id: "onboarding_page_viewed", longDescription: "Page \(newIndex + 1)", source: .general)
+				}
 
 				Button(pageIndex == onboardingPages.count - 1 ? "Finish Onboarding" : "Next") {
 					withAnimation {
@@ -100,6 +108,9 @@ struct ShowOnboardingViewOnFirstLaunchEverModifier: ViewModifier {
 				.padding(.bottom)
 			}
 			.accentBackground(strong: true)
+			.onAppear {
+				Analytics.capture(.info, id: "onboarding_page_viewed", longDescription: "Page 1", source: .general)
+			}
 		}
 	}
 }

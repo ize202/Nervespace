@@ -35,6 +35,8 @@ when fixing a problem reflect on 5-7 different possible sources of the problem, 
 - **Boolean Properties**: Use `is`, `has`, or `should` prefixes (e.g., `isEnabled`, `hasCompletedSetup`)
 - **Enums**: Use singular nouns for type names, cases in camelCase
 - **Protocol Names**: Use nouns, adjectives, or ending with `-able`, `-ible`, or `-ing`
+- **AnalyticsKit**: Setup analytics events properly when building the app.
+- **CrashlyticsKit**: Setup crashlytics properly when building the app.
 
 ## Swift Best Practices
 

@@ -15,6 +15,7 @@ import SharedKit
 import SupabaseKit
 import SwiftUI
 import UIKit
+import AnalyticsKit
 
 @main
 struct MainApp: App {
@@ -85,6 +86,9 @@ class AppDelegate: NSObject, UIApplicationDelegate, OSNotificationLifecycleListe
 		_ application: UIApplication,
 		didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
 	) -> Bool {
+
+		// Initialize Mixpanel for analytics
+		Analytics.initMixpanel()
 
 		// If OneSignal initialized successfully, we set up the push notification observers and clear all notifications when the app is opened
 		PushNotifications.initOneSignal(launchOptions)

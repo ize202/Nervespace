@@ -19,7 +19,6 @@
 		1ABF6CC6CD2470A76BC13175 /* DatabaseExampleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90586F044411DC210398E153 /* DatabaseExampleView.swift */; };
 		1CB3C160CC138C777EA393B9 /* SignUpButtons.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBA347A494EF79936440CC9C /* SignUpButtons.swift */; };
 		1EEC65B91A20DE2081E77E0D /* AccountSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF13AD0325C6FF35BCBA173 /* AccountSettingsView.swift */; };
-		21B2F1D2A2D090C5A8D905DB /* Sentry-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 089A3AF5CF095FF7EE474590 /* Sentry-Info.plist */; };
 		25679B5834AF7186EB96E180 /* PrivacyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34A5515BCB681B255235B36B /* PrivacyView.swift */; };
 		2B857DD0EC9B9248B272BEE2 /* SharedKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 39E86B5FF5E957E5D088F40B /* SharedKit.framework */; };
 		2C09B4EF821A2C217A82A6BA /* SignInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4634A94D674EB513386D2C52 /* SignInView.swift */; };
@@ -245,7 +244,6 @@
 
 /* Begin PBXFileReference section */
 		0115360FEAD4F8357698A075 /* ShowPushNotificationPermissionSheetIfNeededModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowPushNotificationPermissionSheetIfNeededModifier.swift; sourceTree = "<group>"; };
-		089A3AF5CF095FF7EE474590 /* Sentry-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "Sentry-Info.plist"; sourceTree = "<group>"; };
 		0A6F5D777272D1E306BA4BB9 /* Supabase-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "Supabase-Info.plist"; sourceTree = "<group>"; };
 		0AC67DFDFC9DBF0FBD43E333 /* Nervespace.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Nervespace.entitlements; sourceTree = "<group>"; };
 		0D514BC5C456FCF285472BAC /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
@@ -472,8 +470,8 @@
 		1DCBD6B0C47AD73D8FF20314 /* Targets */ = {
 			isa = PBXGroup;
 			children = (
-				9A816658FFE6F084748EC4C6 /* AnalyticsKit */,
 				B6CEC81A37B3FECEBD061E1E /* App */,
+				9A816658FFE6F084748EC4C6 /* AnalyticsKit */,
 				C945543AF5E397FA75BD6812 /* CrashlyticsKit */,
 				8A70FA6A2DFC1987CBBDF426 /* NotifKit */,
 				18AFC0535BE3761BB1D33335 /* SharedKit */,
@@ -486,7 +484,6 @@
 			isa = PBXGroup;
 			children = (
 				9445CBCB0DFBD23EC02ABF12 /* Sentry-info.plist */,
-				089A3AF5CF095FF7EE474590 /* Sentry-Info.plist */,
 			);
 			path = Config;
 			sourceTree = "<group>";
@@ -1170,7 +1167,6 @@
 				15310DBE1940D5F200B265D2 /* Assets.xcassets in Resources */,
 				CEB09DA46A099AFAEBBC6FD9 /* LaunchScreen.storyboard in Resources */,
 				4D4B192CEFAF1A2F7B7D5B4A /* PrivacyInfo.xcprivacy in Resources */,
-				21B2F1D2A2D090C5A8D905DB /* Sentry-Info.plist in Resources */,
 				F4A629B961F8144B9F8EA13D /* OneSignal-Info.plist in Resources */,
 				3F285921495C600CA69CD5CA /* Supabase-Info.plist in Resources */,
 			);
