@@ -15,53 +15,74 @@ public class Crashlytics {
     private init() {}
     
     public func configure() {
-        print("Crashlytics.configure() called")
+        print("[CRASHLYTICS] Configure called")
         // Get DSN from plist
-        if let path = Bundle.main.path(forResource: "Sentry-Info", ofType: "plist"),
-           let dict = NSDictionary(contentsOfFile: path) as? [String: Any],
-           let dsn = dict["SENTRY_DSN"] as? String {
-            
-            print("DSN found: \(dsn)")
-            
-            // Initialize Sentry
-            SentrySDK.start { options in
-                options.dsn = dsn
-                options.debug = false // Set to false in production
-                options.enableAutoSessionTracking = true
-                options.enableSwizzling = false
-                options.tracesSampleRate = 1.0
-                options.profilesSampleRate = 1.0
-                
-                // Enable crash and error handling
-                options.enableCrashHandler = true
-                
-                // Set environment
-                #if DEBUG
-                options.environment = "development"
-                #else
-                options.environment = "production"
-                #endif
-                
-                print("Sentry configured with options: \(options)")
+        let bundle = Bundle(for: type(of: self))
+        print("[CRASHLYTICS] Bundle identifier: \(bundle.bundleIdentifier ?? "unknown")")
+        
+        if let path = bundle.path(forResource: "Sentry-info", ofType: "plist") {
+            print("[CRASHLYTICS] Found Sentry-info.plist at path: \(path)")
+            if let dict = NSDictionary(contentsOfFile: path) as? [String: Any] {
+                print("[CRASHLYTICS] Loaded plist contents: \(dict)")
+                if let dsn = dict["SENTRY_DSN"] as? String {
+                    print("[CRASHLYTICS] Found DSN: \(dsn)")
+                    
+                    // Initialize Sentry
+                    SentrySDK.start { options in
+                        options.dsn = dsn
+                        options.debug = true // Enable debug mode temporarily
+                        options.enableAutoSessionTracking = true
+                        options.enableSwizzling = true
+                        options.tracesSampleRate = 1.0
+                        options.profilesSampleRate = 1.0
+                        
+                        // Enable crash and error handling
+                        options.enableCrashHandler = true
+                        
+                        // Set environment
+                        #if DEBUG
+                        options.environment = "development"
+                        #else
+                        options.environment = "production"
+                        #endif
+                        
+                        print("[CRASHLYTICS] Sentry configured with options: \(options)")
+                    }
+                    print("[CRASHLYTICS] Sentry SDK started")
+                } else {
+                    print("[CRASHLYTICS] ERROR: DSN not found in plist dictionary")
+                }
+            } else {
+                print("[CRASHLYTICS] ERROR: Could not load plist as dictionary")
             }
         } else {
-            print("Failed to configure Sentry: DSN not found in Sentry-Info.plist")
+            print("[CRASHLYTICS] ERROR: Sentry-info.plist not found in bundle")
+            // Try main bundle as fallback
+            if let mainPath = Bundle.main.path(forResource: "Sentry-info", ofType: "plist") {
+                print("[CRASHLYTICS] Found Sentry-info.plist in main bundle: \(mainPath)")
+            } else {
+                print("[CRASHLYTICS] ERROR: Sentry-info.plist not found in main bundle either")
+            }
         }
     }
     
     // MARK: - Error Tracking
     
     public func captureError(_ error: Error, additionalInfo: [String: Any]? = nil) {
+        print("[CRASHLYTICS] Capturing error: \(error)")
         SentrySDK.capture(error: error) { scope in
             if let info = additionalInfo {
                 scope.setExtras(info)
             }
+            print("[CRASHLYTICS] Error captured with scope: \(scope)")
         }
     }
     
     public func captureMessage(_ message: String, level: SentryLevel = .info) {
+        print("[CRASHLYTICS] Capturing message: \(message) with level: \(level)")
         SentrySDK.capture(message: message) { scope in
             scope.setLevel(level)
+            print("[CRASHLYTICS] Message captured with scope: \(scope)")
         }
     }
     

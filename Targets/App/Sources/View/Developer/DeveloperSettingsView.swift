@@ -14,6 +14,7 @@ import NotifKit
 import SharedKit
 import SupabaseKit
 import SwiftUI
+import CrashlyticsKit
 
 struct DeveloperSettingsView: View {
 
@@ -73,6 +74,26 @@ struct DeveloperSettingsView: View {
 						Toggle(
 							"Protect this View with Biometrics",
 							isOn: $protectDeveloperViewWithBiometrics)
+					}
+
+					Section(header: Text("Crash Testing")) {
+						Button("Send Test Event to Sentry") {
+							Crashlytics.shared.captureError(
+								NSError(domain: "test", code: 1234, userInfo: [NSLocalizedDescriptionKey: "This is a test event"])
+							)
+							showInAppNotification(
+								.success,
+								content: InAppNotificationContent(
+									title: "Test Event Sent",
+									message: "Check Sentry dashboard"
+								),
+								size: .compact
+							)
+						}
+
+						Button("Trigger Fatal Error", role: .destructive) {
+							fatalError("This is a test crash triggered from developer settings")
+						}
 					}
 
 					Section(header: Text("Ask User For...")) {

@@ -16,6 +16,7 @@ import SupabaseKit
 import SwiftUI
 import UIKit
 import AnalyticsKit
+import CrashlyticsKit
 
 @main
 struct MainApp: App {
@@ -89,6 +90,9 @@ class AppDelegate: NSObject, UIApplicationDelegate, OSNotificationLifecycleListe
 
 		// Initialize Mixpanel for analytics
 		Analytics.initMixpanel()
+
+		// Initialize Sentry for crash reporting
+		Crashlytics.shared.configure()
 
 		// If OneSignal initialized successfully, we set up the push notification observers and clear all notifications when the app is opened
 		PushNotifications.initOneSignal(launchOptions)
