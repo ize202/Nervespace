@@ -10,27 +10,35 @@ import SupabaseKit
 import SwiftUI
 
 struct ContentView: View {
-
 	var body: some View {
 		TabView {
-
-			// Example view on how to access the Database.
-			DatabaseExampleView()
-				.tabItem { Label("DB Examples", systemImage: "externaldrive.badge.icloud") }
-
-			// Pre-made Settings View for easy native-looking settings screen.
-			SettingsView()
-				.tabItem { Label("Settings", systemImage: "gear") }
-
+			HomeView()
+				.tabItem {
+					Image(systemName: "house.fill")
+				}
+			
+			ExploreView()
+				.tabItem {
+					Image(systemName: "safari.fill")
+				}
+			
+			ProgressView()
+				.tabItem {
+					Image(systemName: "chart.bar.fill")
+				}
+			
+			ProfileView()
+				.tabItem {
+					Image(systemName: "person.fill")
+				}
+			
 			#if DEBUG
-
-				// Use this to create quick settings and toggles to streamline the development process.
-				DeveloperSettingsView()
-					.tabItem { Label("Developer", systemImage: "hammer") }
-
+			// Use this to create quick settings and toggles to streamline the development process.
+			DeveloperSettingsView()
+				.tabItem { Label("Developer", systemImage: "hammer") }
 			#endif
 		}
-
+		.tint(.brandPrimary) // Set the tab bar tint to our brand color
 	}
 }
 

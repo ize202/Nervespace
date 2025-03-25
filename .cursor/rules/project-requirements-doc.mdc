@@ -50,7 +50,8 @@ The initial versions of Nervespace (up to v1.0) will prioritize delivering high-
 - Daily Reset Routines: 1 free routine per time slot (morning, midday, evening).
 - Progress Tracking: Basic log of completed sessions.
 - Streaks: Simple counter to encourage consistency.
-- Minimalist UI: Clean design with Digital Lavender (#A78AC7) as the primary color.
+- Minimalist UI: Clean design with Digital Lavender (#9b79c1) as the primary color.
+- Brand Colour Palette (#9b79c1, #503370, #141414, #ffffff, #eeeeee)
 - User Onboarding: Brief tutorial introducing app features.
 - User Authentication: Simple Sign-up/login via email/password form like bend.
 - Customer Support: In-app chat or email support.
