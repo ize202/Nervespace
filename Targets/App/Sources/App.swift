@@ -50,9 +50,8 @@ struct MainApp: App {
 	var body: some Scene {
 		WindowGroup {
 			ContentView()
-				// Force dark mode and black background
+				// Force dark mode
 				.preferredColorScheme(.dark)
-				.background(Color.baseBlack)
 				.environment(\.colorScheme, .dark)
 
 				// For different types of requests: Camera Request, Location Request, Request to Review the App, etc. See `askUserFor.swift` in SharedKit for more information.

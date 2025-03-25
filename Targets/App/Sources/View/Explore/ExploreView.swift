@@ -186,7 +186,6 @@ struct ExploreView: View {
                 }
                 .padding(.vertical)
             }
-            .background(Color.baseBlack)
             .navigationBarHidden(true)
         }
         .preferredColorScheme(.dark)
@@ -215,5 +214,4 @@ struct ExploreView: View {
 #Preview {
     ExploreView()
         .preferredColorScheme(.dark)
-        .background(Color.baseBlack)
 } 
