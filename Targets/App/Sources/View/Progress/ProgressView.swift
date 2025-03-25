@@ -5,9 +5,22 @@ struct ProgressView: View {
     // Remove selectedDate since we're always showing current month
     private let currentDate = Date()
     @State private var streakDays: Set<Date> = [Date()]  // Temporary for demo
+    @State private var selectedChartType: ChartType = .daily
     
     private let calendar = Calendar.current
     private let daysOfWeek = ["S", "M", "T", "W", "T", "F", "S"]
+    
+    enum ChartType {
+        case daily
+        case cumulative
+        
+        var title: String {
+            switch self {
+            case .daily: return "Daily"
+            case .cumulative: return "Total"
+            }
+        }
+    }
     
     var body: some View {
         NavigationView {
@@ -73,17 +86,40 @@ struct ProgressView: View {
                     
                     // Minutes Tracking Chart
                     VStack(alignment: .leading, spacing: 16) {
-                        Text("Minutes Tracking")
-                            .font(.headline)
-                            .foregroundColor(.baseBlack)
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("Minutes Tracking")
+                                .font(.headline)
+                                .foregroundColor(.baseBlack)
+                            
+                            // Chart type selector
+                            Picker("Chart Type", selection: $selectedChartType) {
+                                ForEach([ChartType.daily, ChartType.cumulative], id: \.title) { type in
+                                    Text(type.title)
+                                        .tag(type)
+                                }
+                            }
+                            .pickerStyle(.segmented)
+                        }
                         
-                        Rectangle()
-                            .fill(Color.baseBlack.opacity(0.1))
-                            .frame(height: 200)
-                            .overlay(
-                                Text("Daily Activity Chart")
-                                    .foregroundColor(.baseBlack.opacity(0.5))
-                            )
+                        // Chart view
+                        ZStack {
+                            if selectedChartType == .daily {
+                                Rectangle()
+                                    .fill(Color.baseBlack.opacity(0.1))
+                                    .overlay(
+                                        Text("Daily Minutes Bar Chart")
+                                            .foregroundColor(.baseBlack.opacity(0.5))
+                                    )
+                            } else {
+                                Rectangle()
+                                    .fill(Color.baseBlack.opacity(0.1))
+                                    .overlay(
+                                        Text("Cumulative Minutes Line Graph")
+                                            .foregroundColor(.baseBlack.opacity(0.5))
+                                    )
+                            }
+                        }
+                        .frame(height: 200)
                     }
                     .padding()
                     .background(Color.baseGray)
