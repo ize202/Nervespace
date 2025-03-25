@@ -70,6 +70,9 @@ struct ExploreView: View {
         NavigationView {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
+                    // Header
+                    header
+                    
                     // Search Bar
                     SearchBar(text: $searchText)
                         .padding(.horizontal)
@@ -112,12 +115,27 @@ struct ExploreView: View {
                 }
                 .padding(.vertical)
             }
-            .navigationTitle("Explore")
-            .navigationBarItems(trailing: Button(action: {}) {
+            .navigationBarHidden(true)
+        }
+    }
+    
+    private var header: some View {
+        HStack {
+            Text("Explore")
+                .font(.largeTitle)
+                .fontWeight(.bold)
+                .foregroundColor(.primary)
+            
+            Spacer()
+            
+            Button(action: {}) {
                 Image(systemName: "bookmark")
                     .foregroundColor(.brandPrimary)
-            })
+                    .font(.system(size: 24))
+            }
         }
+        .padding(.horizontal)
+        .padding(.top)
     }
 }
 
