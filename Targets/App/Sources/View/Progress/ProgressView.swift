@@ -121,6 +121,7 @@ struct ProgressView: View {
             }
             .navigationBarHidden(true)
         }
+        .preferredColorScheme(.dark)
     }
     
     private var monthYearString: String {
@@ -177,4 +178,5 @@ struct DayCell: View {
 
 #Preview {
     ProgressView()
-} 
+        .preferredColorScheme(.dark)
+}
