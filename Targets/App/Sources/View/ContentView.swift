@@ -14,22 +14,22 @@ struct ContentView: View {
 		TabView {
 			HomeView()
 				.tabItem {
-					Image(systemName: "house.fill")
+					Image(systemName: "house")
 				}
 			
 			ExploreView()
 				.tabItem {
-					Image(systemName: "safari.fill")
+					Image(systemName: "magnifyingglass")
 				}
 			
 			ProgressView()
 				.tabItem {
-					Image(systemName: "chart.bar.fill")
+					Image(systemName: "chart.bar")
 				}
 			
 			ProfileView()
 				.tabItem {
-					Image(systemName: "person.fill")
+					Image(systemName: "person")
 				}
 			
 			#if DEBUG
