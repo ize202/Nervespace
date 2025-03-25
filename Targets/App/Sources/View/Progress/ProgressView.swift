@@ -2,7 +2,8 @@ import SwiftUI
 import SharedKit
 
 struct ProgressView: View {
-    @State private var selectedDate = Date()
+    // Remove selectedDate since we're always showing current month
+    private let currentDate = Date()
     @State private var streakDays: Set<Date> = [Date()]  // Temporary for demo
     
     private let calendar = Calendar.current
@@ -24,35 +25,23 @@ struct ProgressView: View {
                             Button(action: {
                                 // History action
                             }) {
-                                Text("History")
-                                    .font(.subheadline)
-                                    .foregroundColor(.brandSecondary)
+                                HStack(spacing: 4) {
+                                    Text("History")
+                                        .font(.subheadline)
+                                    Image(systemName: "chevron.right")
+                                        .font(.caption)
+                                }
+                                .foregroundColor(.brandSecondary)
                             }
                         }
                         
                         // Month Calendar
                         VStack(spacing: 20) {
-                            // Month Navigation
-                            HStack {
-                                Button(action: { previousMonth() }) {
-                                    Image(systemName: "chevron.left")
-                                        .foregroundColor(.baseBlack)
-                                }
-                                
-                                Spacer()
-                                
-                                Text(monthYearString)
-                                    .font(.title3)
-                                    .fontWeight(.semibold)
-                                    .foregroundColor(.baseBlack)
-                                
-                                Spacer()
-                                
-                                Button(action: { nextMonth() }) {
-                                    Image(systemName: "chevron.right")
-                                        .foregroundColor(.baseBlack)
-                                }
-                            }
+                            // Month title without navigation
+                            Text(monthYearString)
+                                .font(.title3)
+                                .fontWeight(.semibold)
+                                .foregroundColor(.baseBlack)
                             
                             // Days of week header
                             HStack {
@@ -109,11 +98,11 @@ struct ProgressView: View {
     private var monthYearString: String {
         let formatter = DateFormatter()
         formatter.dateFormat = "MMMM yyyy"
-        return formatter.string(from: selectedDate)
+        return formatter.string(from: currentDate)
     }
     
     private var days: [Date?] {
-        let start = calendar.date(from: calendar.dateComponents([.year, .month], from: selectedDate))!
+        let start = calendar.date(from: calendar.dateComponents([.year, .month], from: currentDate))!
         let range = calendar.range(of: .day, in: .month, for: start)!
         
         let firstWeekday = calendar.component(.weekday, from: start)
@@ -128,18 +117,6 @@ struct ProgressView: View {
     
     private func isDateInStreak(_ date: Date) -> Bool {
         return streakDays.contains { calendar.isDate($0, inSameDayAs: date) }
-    }
-    
-    private func previousMonth() {
-        if let newDate = calendar.date(byAdding: .month, value: -1, to: selectedDate) {
-            selectedDate = newDate
-        }
-    }
-    
-    private func nextMonth() {
-        if let newDate = calendar.date(byAdding: .month, value: 1, to: selectedDate) {
-            selectedDate = newDate
-        }
     }
 }
 
