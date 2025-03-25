@@ -17,7 +17,7 @@ struct ProgressView: View {
                         HStack {
                             Label("4-Day Streak", systemImage: "flame.fill")
                                 .font(.headline)
-                                .foregroundColor(.brandPrimary)
+                                .foregroundColor(.brandSecondary)
                             
                             Spacer()
                             
@@ -26,7 +26,7 @@ struct ProgressView: View {
                             }) {
                                 Text("History")
                                     .font(.subheadline)
-                                    .foregroundColor(.brandPrimary)
+                                    .foregroundColor(.brandSecondary)
                             }
                         }
                         
@@ -36,7 +36,7 @@ struct ProgressView: View {
                             HStack {
                                 Button(action: { previousMonth() }) {
                                     Image(systemName: "chevron.left")
-                                        .foregroundColor(.brandPrimary)
+                                        .foregroundColor(.baseBlack)
                                 }
                                 
                                 Spacer()
@@ -44,12 +44,13 @@ struct ProgressView: View {
                                 Text(monthYearString)
                                     .font(.title3)
                                     .fontWeight(.semibold)
+                                    .foregroundColor(.baseBlack)
                                 
                                 Spacer()
                                 
                                 Button(action: { nextMonth() }) {
                                     Image(systemName: "chevron.right")
-                                        .foregroundColor(.brandPrimary)
+                                        .foregroundColor(.baseBlack)
                                 }
                             }
                             
@@ -59,7 +60,7 @@ struct ProgressView: View {
                                     Text(day)
                                         .font(.caption)
                                         .fontWeight(.medium)
-                                        .foregroundColor(.gray)
+                                        .foregroundColor(.baseBlack)
                                         .frame(maxWidth: .infinity)
                                 }
                             }
@@ -78,28 +79,26 @@ struct ProgressView: View {
                         }
                     }
                     .padding()
-                    .background(Color.baseWhite)
+                    .background(Color.baseGray)
                     .cornerRadius(16)
-                    .shadow(radius: 2)
                     
                     // Minutes Tracking Chart
                     VStack(alignment: .leading, spacing: 16) {
                         Text("Minutes Tracking")
                             .font(.headline)
-                            .foregroundColor(.brandPrimary)
+                            .foregroundColor(.baseBlack)
                         
                         Rectangle()
-                            .fill(Color.baseGray.opacity(0.3))
+                            .fill(Color.baseBlack.opacity(0.1))
                             .frame(height: 200)
                             .overlay(
                                 Text("Daily Activity Chart")
-                                    .foregroundColor(.gray)
+                                    .foregroundColor(.baseBlack.opacity(0.5))
                             )
                     }
                     .padding()
-                    .background(Color.baseWhite)
+                    .background(Color.baseGray)
                     .cornerRadius(16)
-                    .shadow(radius: 2)
                 }
                 .padding()
             }
@@ -157,15 +156,15 @@ struct DayCell: View {
         Text("\(calendar.component(.day, from: date))")
             .font(.system(.body, design: .rounded))
             .fontWeight(isToday ? .bold : .regular)
-            .foregroundColor(isToday ? .brandPrimary : .primary)
+            .foregroundColor(isToday ? .brandSecondary : .baseBlack)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .aspectRatio(1, contentMode: .fill)
             .background(
                 Circle()
-                    .fill(isSelected ? Color.brandPrimary.opacity(0.2) : Color.clear)
+                    .fill(isSelected ? Color.brandSecondary.opacity(0.2) : Color.clear)
                     .overlay(
                         Circle()
-                            .stroke(isToday ? Color.brandPrimary : Color.clear, lineWidth: 1)
+                            .stroke(isToday ? Color.brandSecondary : Color.clear, lineWidth: 1)
                     )
             )
     }
