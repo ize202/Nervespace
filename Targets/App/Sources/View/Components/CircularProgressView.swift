@@ -13,7 +13,7 @@ struct CircularProgressView: View {
             // Background ring
             Circle()
                 .stroke(
-                    Color.baseBlack.opacity(0.1),
+                    Color.white.opacity(0.1),
                     lineWidth: lineWidth
                 )
             
@@ -21,7 +21,7 @@ struct CircularProgressView: View {
             Circle()
                 .trim(from: 0, to: min(progress, 1.0))
                 .stroke(
-                    Color.brandSecondary,
+                    Color.brandPrimary,
                     style: StrokeStyle(
                         lineWidth: lineWidth,
                         lineCap: .round
@@ -34,11 +34,11 @@ struct CircularProgressView: View {
             VStack(spacing: 8) {
                 Text("\(current)/\(goal)")
                     .font(.system(size: 34, weight: .medium, design: .rounded))
-                    .foregroundColor(.baseBlack)
+                    .foregroundColor(.white)
                 
                 Text("minutes")
                     .font(.system(size: 17))
-                    .foregroundColor(.baseBlack.opacity(0.5))
+                    .foregroundColor(.white.opacity(0.5))
             }
         }
         .aspectRatio(1, contentMode: .fit)

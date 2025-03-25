@@ -38,7 +38,7 @@ struct ProgressView: View {
                                 HStack {
                                     Label("4-Day Streak", systemImage: "flame.fill")
                                         .font(.headline)
-                                        .foregroundColor(.brandSecondary)
+                                        .foregroundColor(.brandPrimary)
                                     
                                     Spacer()
                                     
@@ -51,7 +51,7 @@ struct ProgressView: View {
                                             Image(systemName: "chevron.right")
                                                 .font(.headline)
                                         }
-                                        .foregroundColor(.brandSecondary)
+                                        .foregroundColor(.brandPrimary)
                                     }
                                 }
                                 
@@ -61,7 +61,7 @@ struct ProgressView: View {
                                     Text(monthYearString)
                                         .font(.title3)
                                         .fontWeight(.semibold)
-                                        .foregroundColor(.baseBlack)
+                                        .foregroundColor(.white)
                                     
                                     // Days of week header
                                     HStack {
@@ -69,7 +69,7 @@ struct ProgressView: View {
                                             Text(day)
                                                 .font(.caption)
                                                 .fontWeight(.medium)
-                                                .foregroundColor(.baseBlack)
+                                                .foregroundColor(.white.opacity(0.7))
                                                 .frame(maxWidth: .infinity)
                                         }
                                     }
@@ -88,14 +88,16 @@ struct ProgressView: View {
                                 }
                             }
                             .padding()
-                            .background(Color.baseGray)
-                            .cornerRadius(16)
+                            .background {
+                                RoundedRectangle(cornerRadius: 16)
+                                    .fill(.ultraThinMaterial)
+                            }
                             
                             // Minutes Tracking Chart
                             VStack(alignment: .leading, spacing: 16) {
                                 Text("Minutes Goal")
                                     .font(.headline)
-                                    .foregroundColor(.baseBlack)
+                                    .foregroundColor(.white)
                                 
                                 VStack {
                                     Spacer()
@@ -111,8 +113,10 @@ struct ProgressView: View {
                                 .padding(.vertical, 20)
                             }
                             .padding()
-                            .background(Color.baseGray)
-                            .cornerRadius(16)
+                            .background {
+                                RoundedRectangle(cornerRadius: 16)
+                                    .fill(.ultraThinMaterial)
+                            }
                         }
                         .padding(.horizontal)
                     }
@@ -162,15 +166,15 @@ struct DayCell: View {
         Text("\(calendar.component(.day, from: date))")
             .font(.system(.body, design: .rounded))
             .fontWeight(isToday ? .bold : .regular)
-            .foregroundColor(isToday ? .brandSecondary : .baseBlack)
+            .foregroundColor(isToday ? .brandPrimary : .white)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .aspectRatio(1, contentMode: .fill)
             .background(
                 Circle()
-                    .fill(isSelected ? Color.brandSecondary.opacity(0.2) : Color.clear)
+                    .fill(isSelected ? Color.brandPrimary.opacity(0.2) : Color.clear)
                     .overlay(
                         Circle()
-                            .stroke(isToday ? Color.brandSecondary : Color.clear, lineWidth: 1)
+                            .stroke(isToday ? Color.brandPrimary : Color.clear, lineWidth: 1)
                     )
             )
     }
