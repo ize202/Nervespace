@@ -172,7 +172,7 @@ struct HomeView: View {
     private var header: some View {
         HStack {
             Text("Nervespace")
-                .font(.system(.largeTitle, design: .rounded))
+                .font(.largeTitle)
                 .fontWeight(.bold)
                 .foregroundStyle(.primary)
             
