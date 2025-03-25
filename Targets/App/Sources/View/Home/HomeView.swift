@@ -25,7 +25,7 @@ struct HomeView: View {
     
     var body: some View {
         ScrollView(showsIndicators: false) {
-            VStack(alignment: .leading, spacing: 32) {
+            VStack(alignment: .leading, spacing: 40) {
                 // Header
                 HStack {
                     Text("Nervespace")
@@ -50,6 +50,7 @@ struct HomeView: View {
                     )
                 }
                 .padding(.horizontal)
+                .padding(.top)
                 
                 // Most Used Routines Carousel
                 SnapCarousel(items: mostUsedRoutines) { title, duration, isSelected in
@@ -60,47 +61,51 @@ struct HomeView: View {
                     )
                 }
                 .frame(height: 320)
-                .padding(.top, 8)
+                .padding(.top, 16)
                 
-                VStack(alignment: .leading, spacing: 24) {
+                VStack(alignment: .leading, spacing: 32) {
                     // Quick Sessions
-                    Text("Quick Sessions")
-                        .font(.title2)
-                        .fontWeight(.bold)
-                        .foregroundStyle(.primary)
-                        .padding(.horizontal)
-                    
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        LazyHStack(spacing: 12) {
-                            ForEach(quickSessions, id: \.0) { session in
-                                SessionCard(
-                                    title: session.0,
-                                    duration: session.1,
-                                    backgroundColor: .brandSecondary
-                                )
+                    VStack(alignment: .leading, spacing: 16) {
+                        Text("Quick Sessions")
+                            .font(.title2)
+                            .fontWeight(.bold)
+                            .foregroundStyle(.primary)
+                            .padding(.horizontal)
+                        
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            LazyHStack(spacing: 16) {
+                                ForEach(quickSessions, id: \.0) { session in
+                                    SessionCard(
+                                        title: session.0,
+                                        duration: session.1,
+                                        backgroundColor: .brandSecondary
+                                    )
+                                }
                             }
+                            .padding(.horizontal)
                         }
-                        .padding(.horizontal)
                     }
                     
                     // Plans
-                    Text("Plans")
-                        .font(.title2)
-                        .fontWeight(.bold)
-                        .foregroundStyle(.primary)
-                        .padding(.horizontal)
-                    
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        LazyHStack(spacing: 12) {
-                            ForEach(plans, id: \.0) { plan in
-                                SessionCard(
-                                    title: plan.0,
-                                    duration: plan.1,
-                                    backgroundColor: Color(hex: "503370")
-                                )
+                    VStack(alignment: .leading, spacing: 16) {
+                        Text("Plans")
+                            .font(.title2)
+                            .fontWeight(.bold)
+                            .foregroundStyle(.primary)
+                            .padding(.horizontal)
+                        
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            LazyHStack(spacing: 16) {
+                                ForEach(plans, id: \.0) { plan in
+                                    SessionCard(
+                                        title: plan.0,
+                                        duration: plan.1,
+                                        backgroundColor: Color(hex: "503370")
+                                    )
+                                }
                             }
+                            .padding(.horizontal)
                         }
-                        .padding(.horizontal)
                     }
                 }
             }

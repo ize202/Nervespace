@@ -6,15 +6,18 @@ struct SnapCarousel<Content: View>: View {
     @State private var currentIndex: Int = 0
     @GestureState private var dragOffset: CGFloat = 0
     
+    private let cardWidth: CGFloat = UIScreen.main.bounds.width * 0.75
+    private let cardSpacing: CGFloat = 24
+    
     var body: some View {
         GeometryReader { geometry in
-            HStack(spacing: 0) {
+            HStack(spacing: cardSpacing) {
                 ForEach(items.indices, id: \.self) { index in
                     content(items[index].0, items[index].1, currentIndex == index)
-                        .frame(width: geometry.size.width)
+                        .frame(width: cardWidth)
                 }
             }
-            .offset(x: -CGFloat(currentIndex) * geometry.size.width + dragOffset)
+            .offset(x: calculateOffset(geometry))
             .animation(.interpolatingSpring(stiffness: 100, damping: 12), value: dragOffset)
             .gesture(
                 DragGesture()
@@ -22,7 +25,7 @@ struct SnapCarousel<Content: View>: View {
                         state = value.translation.width
                     }
                     .onEnded { value in
-                        let threshold = geometry.size.width * 0.15
+                        let threshold = cardWidth * 0.15
                         var newIndex = currentIndex
                         
                         if abs(value.translation.width) > threshold {
@@ -36,6 +39,15 @@ struct SnapCarousel<Content: View>: View {
                     }
             )
         }
+    }
+    
+    private func calculateOffset(_ geometry: GeometryProxy) -> CGFloat {
+        let totalSpacing = cardSpacing * CGFloat(items.count - 1)
+        let totalWidth = cardWidth * CGFloat(items.count) + totalSpacing
+        let screenWidth = geometry.size.width
+        let initialOffset = (screenWidth - cardWidth) / 2
+        let contentOffset = -CGFloat(currentIndex) * (cardWidth + cardSpacing)
+        return initialOffset + contentOffset + dragOffset
     }
 }
 

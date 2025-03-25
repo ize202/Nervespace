@@ -15,7 +15,7 @@ struct RoutineCarouselCard: View {
             
             Text(title)
                 .font(.system(size: 32, weight: .bold))
-                .foregroundStyle(.primary)
+                .foregroundStyle(Color.baseBlack)
                 .minimumScaleFactor(0.8)
             
             // Placeholder for exercise icons - we'll implement this later
@@ -23,13 +23,14 @@ struct RoutineCarouselCard: View {
                 .fill(Color.brandPrimary.opacity(0.2))
                 .frame(height: 160)
         }
-        .frame(width: UIScreen.main.bounds.width * 0.85)
+        .frame(width: UIScreen.main.bounds.width * 0.75)
         .padding(24)
         .background(
             RoundedRectangle(cornerRadius: 24)
-                .fill(Color(.systemGray6))
+                .fill(Color.baseGray)
         )
-        .scaleEffect(isSelected ? 1 : 0.85)
+        .shadow(color: Color.black.opacity(0.05), radius: 15, x: 0, y: 5)
+        .scaleEffect(isSelected ? 1 : 0.9)
         .opacity(isSelected ? 1 : 0.5)
     }
 }
