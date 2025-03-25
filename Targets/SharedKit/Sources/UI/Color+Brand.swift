@@ -8,13 +8,13 @@ public extension Color {
     static let brandSecondary = Color(hex: "503370")
     
     /// Base black color
-    static let baseBlack = Color(hex: "#181818")
+    static let baseBlack = Color(hex: "181818")
     
     /// Pure white color
     static let baseWhite = Color(hex: "ffffff")
     
     /// Light gray color
-    static let baseGray = Color(hex: "#ebebeb")
+    static let baseGray = Color(hex: "ebebeb")
     
     // MARK: - Hex Initializer
     init(hex: String) {
