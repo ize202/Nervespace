@@ -3,11 +3,15 @@ import SharedKit
 
 struct ProfileView: View {
     var body: some View {
-        NavigationView {
-            VStack {
-                Text("Profile")
-                    .font(.largeTitle)
-                    .foregroundColor(.brandPrimary)
+        NavigationStack {
+            ZStack {
+                Color.baseBlack.ignoresSafeArea()
+                
+                VStack {
+                    Text("Profile")
+                        .font(.largeTitle)
+                        .foregroundColor(.brandPrimary)
+                }
             }
             .navigationTitle("Profile")
         }
@@ -16,4 +20,5 @@ struct ProfileView: View {
 
 #Preview {
     ProfileView()
+        .preferredColorScheme(.dark)
 } 

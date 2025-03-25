@@ -14,91 +14,95 @@ struct ProgressView: View {
     private let daysOfWeek = ["S", "M", "T", "W", "T", "F", "S"]
     
     var body: some View {
-        NavigationView {
-            ScrollView {
-                VStack(spacing: 20) {
-                    // Calendar Card
-                    VStack(alignment: .leading, spacing: 16) {
-                        HStack {
-                            Label("4-Day Streak", systemImage: "flame.fill")
-                                .font(.headline)
-                                .foregroundColor(.brandSecondary)
-                            
-                            Spacer()
-                            
-                            Button(action: {
-                                // History action
-                            }) {
-                                HStack(spacing: 4) {
-                                    Text("History")
-                                        .font(.headline)
-                                    Image(systemName: "chevron.right")
-                                        .font(.headline)
-                                }
-                                .foregroundColor(.brandSecondary)
-                            }
-                        }
-                        
-                        // Month Calendar
-                        VStack(spacing: 20) {
-                            // Month title without navigation
-                            Text(monthYearString)
-                                .font(.title3)
-                                .fontWeight(.semibold)
-                                .foregroundColor(.baseBlack)
-                            
-                            // Days of week header
+        NavigationStack {
+            ZStack {
+                Color.baseBlack.ignoresSafeArea()
+                
+                ScrollView {
+                    VStack(spacing: 20) {
+                        // Calendar Card
+                        VStack(alignment: .leading, spacing: 16) {
                             HStack {
-                                ForEach(daysOfWeek, id: \.self) { day in
-                                    Text(day)
-                                        .font(.caption)
-                                        .fontWeight(.medium)
-                                        .foregroundColor(.baseBlack)
-                                        .frame(maxWidth: .infinity)
+                                Label("4-Day Streak", systemImage: "flame.fill")
+                                    .font(.headline)
+                                    .foregroundColor(.brandSecondary)
+                                
+                                Spacer()
+                                
+                                Button(action: {
+                                    // History action
+                                }) {
+                                    HStack(spacing: 4) {
+                                        Text("History")
+                                            .font(.headline)
+                                        Image(systemName: "chevron.right")
+                                            .font(.headline)
+                                    }
+                                    .foregroundColor(.brandSecondary)
                                 }
                             }
                             
-                            // Calendar grid
-                            LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7), spacing: 8) {
-                                ForEach(days, id: \.self) { date in
-                                    if let date = date {
-                                        DayCell(date: date, isSelected: isDateInStreak(date))
-                                    } else {
-                                        Color.clear
-                                            .aspectRatio(1, contentMode: .fill)
+                            // Month Calendar
+                            VStack(spacing: 20) {
+                                // Month title without navigation
+                                Text(monthYearString)
+                                    .font(.title3)
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(.baseBlack)
+                                
+                                // Days of week header
+                                HStack {
+                                    ForEach(daysOfWeek, id: \.self) { day in
+                                        Text(day)
+                                            .font(.caption)
+                                            .fontWeight(.medium)
+                                            .foregroundColor(.baseBlack)
+                                            .frame(maxWidth: .infinity)
+                                    }
+                                }
+                                
+                                // Calendar grid
+                                LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7), spacing: 8) {
+                                    ForEach(days, id: \.self) { date in
+                                        if let date = date {
+                                            DayCell(date: date, isSelected: isDateInStreak(date))
+                                        } else {
+                                            Color.clear
+                                                .aspectRatio(1, contentMode: .fill)
+                                        }
                                     }
                                 }
                             }
                         }
-                    }
-                    .padding()
-                    .background(Color.baseGray)
-                    .cornerRadius(16)
-                    
-                    // Minutes Tracking Chart
-                    VStack(alignment: .leading, spacing: 16) {
-                        Text("Minutes Goal")
-                            .font(.headline)
-                            .foregroundColor(.baseBlack)
+                        .padding()
+                        .background(Color.baseGray)
+                        .cornerRadius(16)
                         
-                        VStack {
-                            Spacer()
-                            CircularProgressView(
-                                progress: Double(currentMinutes) / Double(dailyGoal),
-                                goal: dailyGoal,
-                                current: currentMinutes
-                            )
-                            .frame(height: 250)
-                            Spacer()
+                        // Minutes Tracking Chart
+                        VStack(alignment: .leading, spacing: 16) {
+                            Text("Minutes Goal")
+                                .font(.headline)
+                                .foregroundColor(.baseBlack)
+                            
+                            VStack {
+                                Spacer()
+                                CircularProgressView(
+                                    progress: Double(currentMinutes) / Double(dailyGoal),
+                                    goal: dailyGoal,
+                                    current: currentMinutes
+                                )
+                                .frame(height: 250)
+                                Spacer()
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 20)
                         }
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 20)
+                        .padding()
+                        .background(Color.baseGray)
+                        .cornerRadius(16)
                     }
                     .padding()
-                    .background(Color.baseGray)
-                    .cornerRadius(16)
                 }
-                .padding()
             }
             .navigationTitle("Progress")
         }

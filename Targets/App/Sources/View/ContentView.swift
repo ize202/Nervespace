@@ -39,10 +39,11 @@ struct ContentView: View {
 			#endif
 		}
 		.tint(.brandPrimary) // Set the tab bar tint to our brand color
-		.background(Color.baseBlack.ignoresSafeArea())
+		.preferredColorScheme(.dark)
 	}
 }
 
 #Preview {
 	ContentView()
+		.preferredColorScheme(.dark)
 }

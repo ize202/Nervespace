@@ -111,84 +111,87 @@ struct ExploreView: View {
     ]
     
     var body: some View {
-        NavigationView {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
-                    // Header
-                    header
-                    
-                    // Search Bar
-                    SearchBar(text: $searchText)
-                        .padding(.horizontal)
-                    
-                    // Browse by Category
-                    VStack(alignment: .leading, spacing: 16) {
-                        Text("Browse by Category")
-                            .font(.title2)
-                            .bold()
-                            .foregroundColor(.white)
+        NavigationStack {
+            ZStack {
+                Color.baseBlack.ignoresSafeArea()
+                
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 20) {
+                        // Header
+                        header
+                        
+                        // Search Bar
+                        SearchBar(text: $searchText)
                             .padding(.horizontal)
                         
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            LazyHStack(spacing: 16) {
-                                CategoryCard(title: "Meditation", systemImage: "heart.circle.fill")
-                                CategoryCard(title: "Breathwork", systemImage: "wind")
-                                CategoryCard(title: "Movement", systemImage: "figure.walk")
-                                CategoryCard(title: "Grounding", systemImage: "leaf.fill")
-                                CategoryCard(title: "Sleep", systemImage: "moon.stars.fill")
+                        // Browse by Category
+                        VStack(alignment: .leading, spacing: 16) {
+                            Text("Browse by Category")
+                                .font(.title2)
+                                .bold()
+                                .foregroundColor(.white)
+                                .padding(.horizontal)
+                            
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                LazyHStack(spacing: 16) {
+                                    CategoryCard(title: "Meditation", systemImage: "heart.circle.fill")
+                                    CategoryCard(title: "Breathwork", systemImage: "wind")
+                                    CategoryCard(title: "Movement", systemImage: "figure.walk")
+                                    CategoryCard(title: "Grounding", systemImage: "leaf.fill")
+                                    CategoryCard(title: "Sleep", systemImage: "moon.stars.fill")
+                                }
+                                .padding(.horizontal)
+                            }
+                        }
+                        
+                        // Browse by Area
+                        VStack(alignment: .leading, spacing: 16) {
+                            Text("Browse by Area")
+                                .font(.title2)
+                                .bold()
+                                .foregroundColor(.white)
+                                .padding(.horizontal)
+                            
+                            LazyVGrid(columns: gridItems, spacing: 16) {
+                                AreaCard(
+                                    title: "Stress Relief",
+                                    color: .brandPrimary,
+                                    imageUrl: nil
+                                )
+                                AreaCard(
+                                    title: "Anxiety",
+                                    color: .brandSecondary,
+                                    imageUrl: nil
+                                )
+                                AreaCard(
+                                    title: "Focus & Clarity",
+                                    color: Color(hex: "6B8E23"),
+                                    imageUrl: nil
+                                )
+                                AreaCard(
+                                    title: "Energy Boost",
+                                    color: Color(hex: "CD853F"),
+                                    imageUrl: nil
+                                )
+                                AreaCard(
+                                    title: "Better Sleep",
+                                    color: .brandPrimary,
+                                    imageUrl: nil
+                                )
+                                AreaCard(
+                                    title: "Quick Reset",
+                                    color: .brandSecondary,
+                                    imageUrl: nil
+                                )
                             }
                             .padding(.horizontal)
                         }
                     }
-                    
-                    // Browse by Area
-                    VStack(alignment: .leading, spacing: 16) {
-                        Text("Browse by Area")
-                            .font(.title2)
-                            .bold()
-                            .foregroundColor(.white)
-                            .padding(.horizontal)
-                        
-                        LazyVGrid(columns: gridItems, spacing: 16) {
-                            AreaCard(
-                                title: "Stress Relief",
-                                color: .brandPrimary,
-                                imageUrl: nil
-                            )
-                            AreaCard(
-                                title: "Anxiety",
-                                color: .brandSecondary,
-                                imageUrl: nil
-                            )
-                            AreaCard(
-                                title: "Focus & Clarity",
-                                color: Color(hex: "6B8E23"),
-                                imageUrl: nil
-                            )
-                            AreaCard(
-                                title: "Energy Boost",
-                                color: Color(hex: "CD853F"),
-                                imageUrl: nil
-                            )
-                            AreaCard(
-                                title: "Better Sleep",
-                                color: .brandPrimary,
-                                imageUrl: nil
-                            )
-                            AreaCard(
-                                title: "Quick Reset",
-                                color: .brandSecondary,
-                                imageUrl: nil
-                            )
-                        }
-                        .padding(.horizontal)
-                    }
+                    .padding(.vertical)
                 }
-                .padding(.vertical)
             }
             .navigationBarHidden(true)
         }
-        .preferredColorScheme(.dark)
     }
     
     private var header: some View {

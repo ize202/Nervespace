@@ -28,145 +28,150 @@ struct HomeView: View {
     ]
     
     var body: some View {
-        ScrollView(showsIndicators: false) {
-            VStack(alignment: .leading, spacing: 40) {
-                // Header
-                header
+        NavigationStack {
+            ZStack {
+                Color.baseBlack.ignoresSafeArea()
                 
-                // Common Routines Carousel
-                SnapCarousel(spacing: 9,
-                           index: $currentIndex,
-                           items: commonRoutines) { routine in
-                    // Carousel Card Style
-                    ZStack(alignment: .topLeading) {
-                        Image(systemName: routine.image)
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                            .foregroundStyle(Color.brandPrimary.opacity(0.2))
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                ScrollView(showsIndicators: false) {
+                    VStack(alignment: .leading, spacing: 40) {
+                        // Header
+                        header
                         
-                        VStack(alignment: .leading) {
-                            Text(routine.title)
-                                .font(.system(size: 28, weight: .bold))
-                                .foregroundStyle(Color.baseBlack)
-                            
-                            Spacer()
-                            
-                            Text(routine.duration.replacingOccurrences(of: "MINUTES", with: "mins"))
-                                .font(.subheadline)
-                                .fontWeight(.medium)
-                                .foregroundStyle(.white)
-                                .padding(.horizontal, 12)
-                                .padding(.vertical, 6)
-                                .background(
-                                    Capsule()
-                                        .fill(Color.black.opacity(0.8))
-                                )
+                        // Common Routines Carousel
+                        SnapCarousel(spacing: 9,
+                                   index: $currentIndex,
+                                   items: commonRoutines) { routine in
+                            // Carousel Card Style
+                            ZStack(alignment: .topLeading) {
+                                Image(systemName: routine.image)
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fill)
+                                    .foregroundStyle(Color.brandPrimary.opacity(0.2))
+                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                
+                                VStack(alignment: .leading) {
+                                    Text(routine.title)
+                                        .font(.system(size: 28, weight: .bold))
+                                        .foregroundStyle(Color.baseBlack)
+                                    
+                                    Spacer()
+                                    
+                                    Text(routine.duration.replacingOccurrences(of: "MINUTES", with: "mins"))
+                                        .font(.subheadline)
+                                        .fontWeight(.medium)
+                                        .foregroundStyle(.white)
+                                        .padding(.horizontal, 12)
+                                        .padding(.vertical, 6)
+                                        .background(
+                                            Capsule()
+                                                .fill(Color.black.opacity(0.8))
+                                        )
+                                }
+                                .padding(20)
+                            }
+                            .background(Color.baseGray)
+                            .clipShape(RoundedRectangle(cornerRadius: 20))
                         }
-                        .padding(20)
-                    }
-                    .background(Color.baseGray)
-                    .clipShape(RoundedRectangle(cornerRadius: 20))
-                }
-                .frame(height: 320)
-                
-                VStack(alignment: .leading, spacing: 32) {
-                    // Quick Sessions Section
-                    VStack(alignment: .leading, spacing: 16) {
-                        Text("Quick Routines")
-                            .font(.title2)
-                            .fontWeight(.bold)
-                            .foregroundStyle(.primary)
-                            .padding(.horizontal)
+                        .frame(height: 320)
                         
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            LazyHStack(spacing: 16) {
-                                ForEach(quickSessions) { session in
-                                    // Quick Session Card Style
-                                    VStack(alignment: .leading, spacing: 12) {
-                                        // Image container
-                                        ZStack {
-                                            if let imageUrl = session.imageUrl {
-                                                AsyncImage(url: URL(string: imageUrl)) { image in
-                                                    image
-                                                        .resizable()
-                                                        .aspectRatio(contentMode: .fill)
-                                                } placeholder: {
-                                                    Color.baseGray
+                        VStack(alignment: .leading, spacing: 32) {
+                            // Quick Sessions Section
+                            VStack(alignment: .leading, spacing: 16) {
+                                Text("Quick Routines")
+                                    .font(.title2)
+                                    .fontWeight(.bold)
+                                    .foregroundStyle(.primary)
+                                    .padding(.horizontal)
+                                
+                                ScrollView(.horizontal, showsIndicators: false) {
+                                    LazyHStack(spacing: 16) {
+                                        ForEach(quickSessions) { session in
+                                            // Quick Session Card Style
+                                            VStack(alignment: .leading, spacing: 12) {
+                                                // Image container
+                                                ZStack {
+                                                    if let imageUrl = session.imageUrl {
+                                                        AsyncImage(url: URL(string: imageUrl)) { image in
+                                                            image
+                                                                .resizable()
+                                                                .aspectRatio(contentMode: .fill)
+                                                        } placeholder: {
+                                                            Color.baseGray
+                                                        }
+                                                    }
                                                 }
+                                                .frame(width: 200, height: 160)
+                                                .clipShape(RoundedRectangle(cornerRadius: 12))
+                                                
+                                                // Text content
+                                                VStack(alignment: .leading, spacing: 4) {
+                                                    Text(session.title)
+                                                        .font(.headline)
+                                                        .foregroundStyle(.primary)
+                                                    Text(session.duration)
+                                                        .font(.subheadline)
+                                                        .foregroundStyle(.secondary)
+                                                }
+                                                .padding(.horizontal, 4)
                                             }
+                                            .frame(width: 200)
                                         }
-                                        .frame(width: 200, height: 160)
-                                        .clipShape(RoundedRectangle(cornerRadius: 12))
-                                        
-                                        // Text content
-                                        VStack(alignment: .leading, spacing: 4) {
-                                            Text(session.title)
-                                                .font(.headline)
-                                                .foregroundStyle(.primary)
-                                            Text(session.duration)
-                                                .font(.subheadline)
-                                                .foregroundStyle(.secondary)
-                                        }
-                                        .padding(.horizontal, 4)
                                     }
-                                    .frame(width: 200)
+                                    .padding(.horizontal)
                                 }
                             }
-                            .padding(.horizontal)
-                        }
-                    }
-                    
-                    // Plans Section
-                    VStack(alignment: .leading, spacing: 16) {
-                        Text("Plans")
-                            .font(.title2)
-                            .fontWeight(.bold)
-                            .foregroundStyle(.primary)
-                            .padding(.horizontal)
-                        
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            LazyHStack(spacing: 16) {
-                                ForEach(plans) { plan in
-                                    // Plan Card Style - matching Quick Routines style
-                                    VStack(alignment: .leading, spacing: 12) {
-                                        // Image container
-                                        ZStack {
-                                            if let imageUrl = plan.imageUrl {
-                                                AsyncImage(url: URL(string: imageUrl)) { image in
-                                                    image
-                                                        .resizable()
-                                                        .aspectRatio(contentMode: .fill)
-                                                } placeholder: {
-                                                    Color.baseGray
+                            
+                            // Plans Section
+                            VStack(alignment: .leading, spacing: 16) {
+                                Text("Plans")
+                                    .font(.title2)
+                                    .fontWeight(.bold)
+                                    .foregroundStyle(.primary)
+                                    .padding(.horizontal)
+                                
+                                ScrollView(.horizontal, showsIndicators: false) {
+                                    LazyHStack(spacing: 16) {
+                                        ForEach(plans) { plan in
+                                            // Plan Card Style - matching Quick Routines style
+                                            VStack(alignment: .leading, spacing: 12) {
+                                                // Image container
+                                                ZStack {
+                                                    if let imageUrl = plan.imageUrl {
+                                                        AsyncImage(url: URL(string: imageUrl)) { image in
+                                                            image
+                                                                .resizable()
+                                                                .aspectRatio(contentMode: .fill)
+                                                        } placeholder: {
+                                                            Color.baseGray
+                                                        }
+                                                    }
                                                 }
+                                                .frame(width: 200, height: 160)
+                                                .clipShape(RoundedRectangle(cornerRadius: 12))
+                                                
+                                                // Text content
+                                                VStack(alignment: .leading, spacing: 4) {
+                                                    Text(plan.title)
+                                                        .font(.headline)
+                                                        .foregroundStyle(.primary)
+                                                    Text(plan.duration)
+                                                        .font(.subheadline)
+                                                        .foregroundStyle(.secondary)
+                                                }
+                                                .padding(.horizontal, 4)
                                             }
+                                            .frame(width: 200)
                                         }
-                                        .frame(width: 200, height: 160)
-                                        .clipShape(RoundedRectangle(cornerRadius: 12))
-                                        
-                                        // Text content
-                                        VStack(alignment: .leading, spacing: 4) {
-                                            Text(plan.title)
-                                                .font(.headline)
-                                                .foregroundStyle(.primary)
-                                            Text(plan.duration)
-                                                .font(.subheadline)
-                                                .foregroundStyle(.secondary)
-                                        }
-                                        .padding(.horizontal, 4)
                                     }
-                                    .frame(width: 200)
+                                    .padding(.horizontal)
                                 }
                             }
-                            .padding(.horizontal)
                         }
                     }
+                    .padding(.vertical)
                 }
             }
-            .padding(.vertical)
         }
-        .background(Color(.systemBackground))
     }
     
     private var header: some View {
