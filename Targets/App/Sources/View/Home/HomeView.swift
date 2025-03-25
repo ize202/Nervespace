@@ -14,10 +14,10 @@ struct HomeView: View {
     
     // Quick Sessions (under 5 minutes)
     private let quickSessions: [RoutineCard] = [
-        .init(title: "Desk Stretch", duration: "5 MINUTES"),
-        .init(title: "Neck Relief", duration: "3 MINUTES"),
-        .init(title: "Tech Neck", duration: "5 MINUTES"),
-        .init(title: "Detox", duration: "4 MINUTES")
+        .init(title: "Desk Stretch", duration: "4 min", imageUrl: "desk-stretch"),
+        .init(title: "Neck Relief", duration: "3 min", imageUrl: "neck-relief"),
+        .init(title: "Tech Neck", duration: "5 min", imageUrl: "tech-neck"),
+        .init(title: "Detox", duration: "4 min", imageUrl: "detox")
     ]
     
     // Multi-day Plans
@@ -73,7 +73,7 @@ struct HomeView: View {
                 VStack(alignment: .leading, spacing: 32) {
                     // Quick Sessions Section
                     VStack(alignment: .leading, spacing: 16) {
-                        Text("Quick Sessions")
+                        Text("Quick Routines")
                             .font(.title2)
                             .fontWeight(.bold)
                             .foregroundStyle(.primary)
@@ -83,18 +83,34 @@ struct HomeView: View {
                             LazyHStack(spacing: 16) {
                                 ForEach(quickSessions) { session in
                                     // Quick Session Card Style
-                                    VStack(alignment: .leading, spacing: 8) {
-                                        Text(session.title)
-                                            .font(.headline)
-                                            .foregroundStyle(.white)
-                                        Text(session.duration.replacingOccurrences(of: "MINUTES", with: "mins"))
-                                            .font(.subheadline)
-                                            .foregroundStyle(.white.opacity(0.8))
+                                    VStack(alignment: .leading, spacing: 12) {
+                                        // Image container
+                                        ZStack {
+                                            if let imageUrl = session.imageUrl {
+                                                AsyncImage(url: URL(string: imageUrl)) { image in
+                                                    image
+                                                        .resizable()
+                                                        .aspectRatio(contentMode: .fill)
+                                                } placeholder: {
+                                                    Color.baseGray
+                                                }
+                                            }
+                                        }
+                                        .frame(width: 200, height: 160)
+                                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                                        
+                                        // Text content
+                                        VStack(alignment: .leading, spacing: 4) {
+                                            Text(session.title)
+                                                .font(.headline)
+                                                .foregroundStyle(.primary)
+                                            Text(session.duration)
+                                                .font(.subheadline)
+                                                .foregroundStyle(.secondary)
+                                        }
+                                        .padding(.horizontal, 4)
                                     }
-                                    .frame(width: 160, height: 100)
-                                    .padding(16)
-                                    .background(Color.brandSecondary)
-                                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                                    .frame(width: 200)
                                 }
                             }
                             .padding(.horizontal)

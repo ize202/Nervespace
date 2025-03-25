@@ -7,6 +7,7 @@ struct RoutineCard: Identifiable, Hashable {
     var title: String
     var duration: String
     var image: String = "figure.flexibility" // Default placeholder, will be replaced with actual illustrations
+    var imageUrl: String? // URL for the vector image
     
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
@@ -20,9 +21,9 @@ struct RoutineCard: Identifiable, Hashable {
 /// Sample Cards
 extension RoutineCard {
     static var sampleCards: [RoutineCard] = [
-        .init(title: "Wake Up", duration: "4 MINUTES"),
-        .init(title: "Sleep", duration: "10 MINUTES"),
-        .init(title: "Full Body", duration: "15 MINUTES")
+        .init(title: "Wake Up", duration: "4 MINUTES", imageUrl: "wake-up-illustration"),
+        .init(title: "Sleep", duration: "10 MINUTES", imageUrl: "sleep-illustration"),
+        .init(title: "Full Body", duration: "15 MINUTES", imageUrl: "full-body-illustration")
     ]
 }
 
