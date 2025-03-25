@@ -5,7 +5,6 @@ struct ProgressView: View {
     // Remove selectedDate since we're always showing current month
     private let currentDate = Date()
     @State private var streakDays: Set<Date> = [Date()]  // Temporary for demo
-    @State private var selectedChartType: ChartType = .daily
     
     // TODO: Move these to user settings
     private let dailyGoal = 5 // Default goal in minutes
@@ -13,18 +12,6 @@ struct ProgressView: View {
     
     private let calendar = Calendar.current
     private let daysOfWeek = ["S", "M", "T", "W", "T", "F", "S"]
-    
-    enum ChartType {
-        case daily
-        case cumulative
-        
-        var title: String {
-            switch self {
-            case .daily: return "Daily"
-            case .cumulative: return "Total"
-            }
-        }
-    }
     
     var body: some View {
         NavigationView {
@@ -90,44 +77,22 @@ struct ProgressView: View {
                     
                     // Minutes Tracking Chart
                     VStack(alignment: .leading, spacing: 16) {
-                        VStack(alignment: .leading, spacing: 12) {
-                            Text("Minutes Tracking")
-                                .font(.headline)
-                                .foregroundColor(.baseBlack)
-                            
-                            // Chart type selector
-                            Picker("Chart Type", selection: $selectedChartType) {
-                                ForEach([ChartType.daily, ChartType.cumulative], id: \.title) { type in
-                                    Text(type.title)
-                                        .tag(type)
-                                }
-                            }
-                            .pickerStyle(.segmented)
-                        }
+                        Text("Minutes Goal")
+                            .font(.headline)
+                            .foregroundColor(.baseBlack)
                         
-                        // Chart view
-                        if selectedChartType == .daily {
-                            VStack {
-                                Spacer()
-                                CircularProgressView(
-                                    progress: Double(currentMinutes) / Double(dailyGoal),
-                                    goal: dailyGoal,
-                                    current: currentMinutes
-                                )
-                                .frame(height: 250)
-                                Spacer()
-                            }
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 20)
-                        } else {
-                            Rectangle()
-                                .fill(Color.baseBlack.opacity(0.1))
-                                .frame(height: 200)
-                                .overlay(
-                                    Text("Cumulative Minutes Line Graph")
-                                        .foregroundColor(.baseBlack.opacity(0.5))
-                                )
+                        VStack {
+                            Spacer()
+                            CircularProgressView(
+                                progress: Double(currentMinutes) / Double(dailyGoal),
+                                goal: dailyGoal,
+                                current: currentMinutes
+                            )
+                            .frame(height: 250)
+                            Spacer()
                         }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 20)
                     }
                     .padding()
                     .background(Color.baseGray)
