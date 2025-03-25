@@ -22,9 +22,9 @@ struct HomeView: View {
     
     // Multi-day Plans
     private let plans: [RoutineCard] = [
-        .init(title: "Morning Routine", duration: "7 DAYS"),
-        .init(title: "Stress Relief", duration: "5 DAYS"),
-        .init(title: "Better Sleep", duration: "3 DAYS")
+        .init(title: "Morning Routine", duration: "7 day series", imageUrl: "morning-routine"),
+        .init(title: "Stress Relief", duration: "5 day series", imageUrl: "stress-relief"),
+        .init(title: "Better Sleep", duration: "3 day series", imageUrl: "better-sleep")
     ]
     
     var body: some View {
@@ -128,19 +128,35 @@ struct HomeView: View {
                         ScrollView(.horizontal, showsIndicators: false) {
                             LazyHStack(spacing: 16) {
                                 ForEach(plans) { plan in
-                                    // Plan Card Style
-                                    VStack(alignment: .leading, spacing: 8) {
-                                        Text(plan.title)
-                                            .font(.headline)
-                                            .foregroundStyle(.white)
-                                        Text(plan.duration)
-                                            .font(.subheadline)
-                                            .foregroundStyle(.white.opacity(0.8))
+                                    // Plan Card Style - matching Quick Routines style
+                                    VStack(alignment: .leading, spacing: 12) {
+                                        // Image container
+                                        ZStack {
+                                            if let imageUrl = plan.imageUrl {
+                                                AsyncImage(url: URL(string: imageUrl)) { image in
+                                                    image
+                                                        .resizable()
+                                                        .aspectRatio(contentMode: .fill)
+                                                } placeholder: {
+                                                    Color.baseGray
+                                                }
+                                            }
+                                        }
+                                        .frame(width: 200, height: 160)
+                                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                                        
+                                        // Text content
+                                        VStack(alignment: .leading, spacing: 4) {
+                                            Text(plan.title)
+                                                .font(.headline)
+                                                .foregroundStyle(.primary)
+                                            Text(plan.duration)
+                                                .font(.subheadline)
+                                                .foregroundStyle(.secondary)
+                                        }
+                                        .padding(.horizontal, 4)
                                     }
-                                    .frame(width: 160, height: 100)
-                                    .padding(16)
-                                    .background(Color(hex: "503370"))
-                                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                                    .frame(width: 200)
                                 }
                             }
                             .padding(.horizontal)
