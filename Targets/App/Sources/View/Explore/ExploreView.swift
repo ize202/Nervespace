@@ -117,8 +117,23 @@ struct ExploreView: View {
                 
                 ScrollView {
                     VStack(alignment: .leading, spacing: 20) {
-                        // Header
-                        header
+                        // Header with bookmark
+                        HStack {
+                            Text("Explore")
+                                .font(.largeTitle)
+                                .fontWeight(.bold)
+                                .foregroundColor(.white)
+                            
+                            Spacer()
+                            
+                            Button(action: {}) {
+                                Image(systemName: "bookmark")
+                                    .foregroundColor(.brandPrimary)
+                                    .font(.system(size: 24))
+                            }
+                        }
+                        .padding(.horizontal)
+                        .padding(.top)
                         
                         // Search Bar
                         SearchBar(text: $searchText)
@@ -192,25 +207,6 @@ struct ExploreView: View {
             }
             .navigationBarHidden(true)
         }
-    }
-    
-    private var header: some View {
-        HStack {
-            Text("Explore")
-                .font(.largeTitle)
-                .fontWeight(.bold)
-                .foregroundColor(.white)
-            
-            Spacer()
-            
-            Button(action: {}) {
-                Image(systemName: "bookmark")
-                    .foregroundColor(.brandPrimary)
-                    .font(.system(size: 24))
-            }
-        }
-        .padding(.horizontal)
-        .padding(.top)
     }
 }
 

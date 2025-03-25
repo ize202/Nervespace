@@ -34,8 +34,31 @@ struct HomeView: View {
                 
                 ScrollView(showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 40) {
-                        // Header
-                        header
+                        // Header with streak
+                        HStack {
+                            Text("Nervespace")
+                                .font(.largeTitle)
+                                .fontWeight(.bold)
+                                .foregroundStyle(.primary)
+                            
+                            Spacer()
+                            
+                            HStack(spacing: 4) {
+                                Image(systemName: "flame.fill")
+                                    .foregroundStyle(.orange)
+                                Text("4")
+                                    .font(.subheadline)
+                                    .fontWeight(.semibold)
+                            }
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .background(
+                                Capsule()
+                                    .fill(Color.orange.opacity(0.1))
+                            )
+                        }
+                        .padding(.horizontal)
+                        .padding(.top)
                         
                         // Common Routines Carousel
                         SnapCarousel(spacing: 9,
@@ -171,37 +194,12 @@ struct HomeView: View {
                     .padding(.vertical)
                 }
             }
+            .navigationBarHidden(true)
         }
-    }
-    
-    private var header: some View {
-        HStack {
-            Text("Nervespace")
-                .font(.largeTitle)
-                .fontWeight(.bold)
-                .foregroundStyle(.primary)
-            
-            Spacer()
-            
-            HStack(spacing: 4) {
-                Image(systemName: "flame.fill")
-                    .foregroundStyle(.orange)
-                Text("4")
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
-            }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 6)
-            .background(
-                Capsule()
-                    .fill(Color.orange.opacity(0.1))
-            )
-        }
-        .padding(.horizontal)
-        .padding(.top)
     }
 }
 
 #Preview {
     HomeView()
 } 
+

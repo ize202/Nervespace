@@ -7,10 +7,12 @@ struct ProfileView: View {
             ZStack {
                 Color.baseBlack.ignoresSafeArea()
                 
-                VStack {
-                    Text("Profile")
-                        .font(.largeTitle)
-                        .foregroundColor(.brandPrimary)
+                ScrollView {
+                    VStack {
+                        Text("Profile Content")
+                            .foregroundColor(.brandPrimary)
+                    }
+                    .padding()
                 }
             }
             .navigationTitle("Profile")
