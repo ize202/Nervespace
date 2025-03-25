@@ -23,15 +23,12 @@ struct RoutineCarouselCard: View {
                 .fill(Color.brandPrimary.opacity(0.2))
                 .frame(height: 160)
         }
-        .frame(width: UIScreen.main.bounds.width * 0.75)
         .padding(24)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
         .background(
             RoundedRectangle(cornerRadius: 24)
                 .fill(Color.baseGray)
         )
-        .shadow(color: Color.black.opacity(0.05), radius: 15, x: 0, y: 5)
-        .scaleEffect(isSelected ? 1 : 0.9)
-        .opacity(isSelected ? 1 : 0.5)
     }
 }
 
