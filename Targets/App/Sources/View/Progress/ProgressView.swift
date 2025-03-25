@@ -7,6 +7,10 @@ struct ProgressView: View {
     @State private var streakDays: Set<Date> = [Date()]  // Temporary for demo
     @State private var selectedChartType: ChartType = .daily
     
+    // TODO: Move these to user settings
+    private let dailyGoal = 300 // Default goal in minutes
+    private let currentMinutes = 49 // This would come from actual tracking
+    
     private let calendar = Calendar.current
     private let daysOfWeek = ["S", "M", "T", "W", "T", "F", "S"]
     
@@ -102,24 +106,23 @@ struct ProgressView: View {
                         }
                         
                         // Chart view
-                        ZStack {
-                            if selectedChartType == .daily {
-                                Rectangle()
-                                    .fill(Color.baseBlack.opacity(0.1))
-                                    .overlay(
-                                        Text("Daily Minutes Bar Chart")
-                                            .foregroundColor(.baseBlack.opacity(0.5))
-                                    )
-                            } else {
-                                Rectangle()
-                                    .fill(Color.baseBlack.opacity(0.1))
-                                    .overlay(
-                                        Text("Cumulative Minutes Line Graph")
-                                            .foregroundColor(.baseBlack.opacity(0.5))
-                                    )
-                            }
+                        if selectedChartType == .daily {
+                            CircularProgressView(
+                                progress: Double(currentMinutes) / Double(dailyGoal),
+                                goal: dailyGoal,
+                                current: currentMinutes
+                            )
+                            .frame(height: 250)
+                            .padding(.vertical)
+                        } else {
+                            Rectangle()
+                                .fill(Color.baseBlack.opacity(0.1))
+                                .frame(height: 200)
+                                .overlay(
+                                    Text("Cumulative Minutes Line Graph")
+                                        .foregroundColor(.baseBlack.opacity(0.5))
+                                )
                         }
-                        .frame(height: 200)
                     }
                     .padding()
                     .background(Color.baseGray)
