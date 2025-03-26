@@ -11,7 +11,7 @@ struct AccountSettingsView: View {
         List {
             // Profile Section
             Section {
-                HStack(spacing: 16) {
+                VStack(spacing: 16) {
                     // Profile Image
                     Button {
                         showingImagePicker = true
@@ -20,30 +20,44 @@ struct AccountSettingsView: View {
                             Image(uiImage: profileImage)
                                 .resizable()
                                 .scaledToFill()
-                                .frame(width: 80, height: 80)
+                                .frame(width: 100, height: 100)
                                 .clipShape(Circle())
+                                .background(
+                                    Circle()
+                                        .fill(Color.gray.opacity(0.2))
+                                        .frame(width: 102, height: 102)
+                                )
                         } else {
-                            Image(systemName: "person.circle.fill")
-                                .resizable()
-                                .frame(width: 80, height: 80)
-                                .foregroundColor(Color.brandPrimary)
+                            ZStack {
+                                Circle()
+                                    .fill(Color.brandPrimary)
+                                    .frame(width: 100, height: 100)
+                                
+                                Image(systemName: "person.fill")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 50, height: 50)
+                                    .foregroundColor(.white)
+                            }
                         }
                     }
                     
-                    // Name and Email Fields
-                    VStack(alignment: .leading, spacing: 12) {
-                        TextField("Name", text: $name)
-                            .textContentType(.name)
-                            .font(.headline)
+                    // Name and Email
+                    VStack(spacing: 4) {
+                        Text(name)
+                            .font(.title2)
+                            .fontWeight(.semibold)
                         
-                        TextField("Email", text: $email)
-                            .textContentType(.emailAddress)
+                        Text(email)
                             .font(.subheadline)
                             .foregroundColor(.secondary)
                     }
                 }
+                .frame(maxWidth: .infinity)
                 .padding(.vertical, 8)
+                .listRowBackground(Color.clear)
             }
+            .listRowInsets(EdgeInsets())
             
             // Account Management Section
             Section {
