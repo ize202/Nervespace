@@ -3,6 +3,7 @@ import SharedKit
 
 struct HomeView: View {
     @State private var currentIndex: Int = 0
+    @State private var showingProfile = false
     
     // Common Routines for Carousel
     private let commonRoutines: [RoutineCard] = [
@@ -58,7 +59,7 @@ struct HomeView: View {
                             )
                             
                             Button {
-                                // Profile button action will be added later
+                                showingProfile = true
                             } label: {
                                 Image(systemName: "person.circle.fill")
                                     .font(.system(size: 32))
@@ -204,6 +205,9 @@ struct HomeView: View {
                 }
             }
             .navigationBarHidden(true)
+        }
+        .sheet(isPresented: $showingProfile) {
+            ProfileView()
         }
     }
 }

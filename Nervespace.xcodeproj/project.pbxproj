@@ -69,6 +69,7 @@
 		9460B86E4A63B3D88D12BA4B /* SharedKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 39E86B5FF5E957E5D088F40B /* SharedKit.framework */; };
 		978270648561AA9A6516EF73 /* SupabaseBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68127D761F8CF5F33120898D /* SupabaseBackend.swift */; };
 		99347E5C50ECDC12DC4CF52C /* TuistBundle+Nervespace.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83A9214733C3AC2CFF832873 /* TuistBundle+Nervespace.swift */; };
+		9C9D2BFE9AB3340B61C46261 /* AccountSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C72FB855CB10B1BA0E8FE23 /* AccountSettingsView.swift */; };
 		9D2E3E5F2E1E9F13DB3F01AD /* Button.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACFDE9512C613A2E8A568D6D /* Button.swift */; };
 		9EFC0B9D77821CC5A7E1460C /* showInAppNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D1A73B0736C403765CF552B /* showInAppNotification.swift */; };
 		A26EBEA5D3CDE46589B50078 /* PushNotifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1277B682814579C39C505B9B /* PushNotifications.swift */; };
@@ -305,6 +306,7 @@
 		83A9214733C3AC2CFF832873 /* TuistBundle+Nervespace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistBundle+Nervespace.swift"; sourceTree = "<group>"; };
 		845E04FFC5739ED0DE0AD18F /* SupabaseKit-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "SupabaseKit-Info.plist"; sourceTree = "<group>"; };
 		856C413A000FFA297D005F9B /* OneSignalNotificationServiceExtension-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "OneSignalNotificationServiceExtension-Info.plist"; sourceTree = "<group>"; };
+		8C72FB855CB10B1BA0E8FE23 /* AccountSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountSettingsView.swift; sourceTree = "<group>"; };
 		8F2F096B3BD836B3AE613C34 /* OneSignalNotificationServiceExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = OneSignalNotificationServiceExtension.entitlements; sourceTree = "<group>"; };
 		8FE3DE787DCFD28B3DC075CE /* OneSignal-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "OneSignal-Info.plist"; sourceTree = "<group>"; };
 		90586F044411DC210398E153 /* DatabaseExampleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseExampleView.swift; sourceTree = "<group>"; };
@@ -419,6 +421,7 @@
 		008830A50992CEA2C7778B7A /* Profile */ = {
 			isa = PBXGroup;
 			children = (
+				8C72FB855CB10B1BA0E8FE23 /* AccountSettingsView.swift */,
 				2470AAF9C69F809F21F03D04 /* ProfileView.swift */,
 			);
 			path = Profile;
@@ -1358,6 +1361,7 @@
 				2517BB44FACE02E21DDE3B02 /* HomeView.swift in Sources */,
 				5F3DC110D5E209A65485438A /* OnboardingView.swift in Sources */,
 				F4F252C9D438A26CC4F592A3 /* WhatsNewView.swift in Sources */,
+				9C9D2BFE9AB3340B61C46261 /* AccountSettingsView.swift in Sources */,
 				887A7A89BAFE84FA99F4B50A /* ProfileView.swift in Sources */,
 				71BA8BA640E472796457CDDB /* ProgressView.swift in Sources */,
 				BE2FD497F28CF79CFD0AC6C2 /* AppearanceView.swift in Sources */,
