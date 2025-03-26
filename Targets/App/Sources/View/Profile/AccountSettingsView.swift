@@ -1,6 +1,31 @@
 import SwiftUI
 import SharedKit
 
+// Settings row styling
+struct SettingsRowItem: View {
+    let iconName: String
+    let label: String
+    let iconColor: Color
+    
+    init(iconName: String, label: String, iconColor: Color) {
+        self.iconName = iconName
+        self.label = label
+        self.iconColor = iconColor
+    }
+    
+    var body: some View {
+        HStack(spacing: 15) {
+            Image(systemName: iconName)
+                .foregroundStyle(.white)
+                .font(.callout)
+                .frame(width: 25, height: 25)
+                .background(iconColor.gradient)
+                .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
+            Text(label)
+        }
+    }
+}
+
 struct AccountSettingsView: View {
     @State private var name = "Aize Igbinakenzua"
     @State private var email = "aizeakenzua@gmail.com"
@@ -61,16 +86,28 @@ struct AccountSettingsView: View {
             
             // Account Management Section
             Section {
-                NavigationLink("Change Password") {
+                NavigationLink {
                     Text("Change Password View")
+                } label: {
+                    SettingsRowItem(iconName: "key.fill", 
+                                  label: "Change Password", 
+                                  iconColor: Color.accentColor)
                 }
                 
-                NavigationLink("Privacy Settings") {
+                NavigationLink {
                     Text("Privacy Settings View")
+                } label: {
+                    SettingsRowItem(iconName: "hand.raised.fill", 
+                                  label: "Privacy Settings", 
+                                  iconColor: Color.brandPrimary)
                 }
                 
-                NavigationLink("Data & Storage") {
+                NavigationLink {
                     Text("Data & Storage View")
+                } label: {
+                    SettingsRowItem(iconName: "externaldrive.fill", 
+                                  label: "Data & Storage", 
+                                  iconColor: Color.brandPrimary.opacity(0.8))
                 }
             } header: {
                 Text("ACCOUNT MANAGEMENT")
@@ -81,17 +118,17 @@ struct AccountSettingsView: View {
                 NavigationLink {
                     Text("Subscription Details View")
                 } label: {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Current Plan")
-                            .font(.headline)
-                        Text("Free Plan")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                    }
+                    SettingsRowItem(iconName: "creditcard.fill", 
+                                  label: "Current Plan", 
+                                  iconColor: Color.orange)
                 }
                 
-                NavigationLink("Billing History") {
+                NavigationLink {
                     Text("Billing History View")
+                } label: {
+                    SettingsRowItem(iconName: "clock.fill", 
+                                  label: "Billing History", 
+                                  iconColor: Color.orange)
                 }
             } header: {
                 Text("SUBSCRIPTION")
@@ -102,13 +139,17 @@ struct AccountSettingsView: View {
                 Button(role: .destructive) {
                     // Handle logout
                 } label: {
-                    Text("Log Out")
+                    SettingsRowItem(iconName: "rectangle.portrait.and.arrow.right", 
+                                  label: "Log Out", 
+                                  iconColor: Color.red)
                 }
                 
                 Button(role: .destructive) {
                     // Handle account deletion
                 } label: {
-                    Text("Delete Account")
+                    SettingsRowItem(iconName: "trash.fill", 
+                                  label: "Delete Account", 
+                                  iconColor: Color.red)
                 }
             }
         }
