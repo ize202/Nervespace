@@ -56,6 +56,15 @@ struct HomeView: View {
                                 Capsule()
                                     .fill(Color.orange.opacity(0.1))
                             )
+                            
+                            Button {
+                                // Profile button action will be added later
+                            } label: {
+                                Image(systemName: "person.circle.fill")
+                                    .font(.system(size: 32))
+                                    .foregroundColor(Color.brandPrimary)
+                            }
+                            .padding(.leading, 8)
                         }
                         .padding(.horizontal)
                         .padding(.top)

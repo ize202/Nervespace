@@ -27,11 +27,6 @@ struct ContentView: View {
 					Label("Progress", systemImage: "chart.bar.fill")
 				}
 			
-			ProfileView()
-				.tabItem {
-					Label("Profile", systemImage: "person.fill")
-				}
-			
 			#if DEBUG
 			// Use this to create quick settings and toggles to streamline the development process.
 			DeveloperSettingsView()
