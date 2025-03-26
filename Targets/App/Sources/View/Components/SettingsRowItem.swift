@@ -1,25 +1,16 @@
 import SwiftUI
 
 struct SettingsRowItem: View {
-    let iconName: String
     let label: String
-    let iconColor: Color
+    let isDestructive: Bool
     
-    init(iconName: String, label: String, iconColor: Color) {
-        self.iconName = iconName
+    init(label: String, isDestructive: Bool = false) {
         self.label = label
-        self.iconColor = iconColor
+        self.isDestructive = isDestructive
     }
     
     var body: some View {
-        HStack(spacing: 15) {
-            Image(systemName: iconName)
-                .foregroundStyle(.white)
-                .font(.callout)
-                .frame(width: 25, height: 25)
-                .background(iconColor.gradient)
-                .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
-            Text(label)
-        }
+        Text(label)
+            .foregroundColor(isDestructive ? .red : .primary)
     }
 } 

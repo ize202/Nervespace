@@ -65,25 +65,19 @@ struct AccountSettingsView: View {
                 NavigationLink {
                     Text("Change Password View")
                 } label: {
-                    SettingsRowItem(iconName: "key.fill", 
-                                  label: "Change Password", 
-                                  iconColor: Color.accentColor)
+                    SettingsRowItem(label: "Change Password")
                 }
                 
                 NavigationLink {
                     Text("Privacy Settings View")
                 } label: {
-                    SettingsRowItem(iconName: "hand.raised.fill", 
-                                  label: "Privacy Settings", 
-                                  iconColor: Color.brandPrimary)
+                    SettingsRowItem(label: "Privacy Settings")
                 }
                 
                 NavigationLink {
                     Text("Data & Storage View")
                 } label: {
-                    SettingsRowItem(iconName: "externaldrive.fill", 
-                                  label: "Data & Storage", 
-                                  iconColor: Color.brandPrimary.opacity(0.8))
+                    SettingsRowItem(label: "Data & Storage")
                 }
             } header: {
                 Text("ACCOUNT MANAGEMENT")
@@ -94,17 +88,13 @@ struct AccountSettingsView: View {
                 NavigationLink {
                     Text("Subscription Details View")
                 } label: {
-                    SettingsRowItem(iconName: "creditcard.fill", 
-                                  label: "Current Plan", 
-                                  iconColor: Color.orange)
+                    SettingsRowItem(label: "Current Plan")
                 }
                 
                 NavigationLink {
                     Text("Billing History View")
                 } label: {
-                    SettingsRowItem(iconName: "clock.fill", 
-                                  label: "Billing History", 
-                                  iconColor: Color.orange)
+                    SettingsRowItem(label: "Billing History")
                 }
             } header: {
                 Text("SUBSCRIPTION")
@@ -115,17 +105,13 @@ struct AccountSettingsView: View {
                 Button(role: .destructive) {
                     // Handle logout
                 } label: {
-                    SettingsRowItem(iconName: "rectangle.portrait.and.arrow.right", 
-                                  label: "Log Out", 
-                                  iconColor: Color.red)
+                    SettingsRowItem(label: "Log Out", isDestructive: true)
                 }
                 
                 Button(role: .destructive) {
                     // Handle account deletion
                 } label: {
-                    SettingsRowItem(iconName: "trash.fill", 
-                                  label: "Delete Account", 
-                                  iconColor: Color.red)
+                    SettingsRowItem(label: "Delete Account", isDestructive: true)
                 }
             }
         }
