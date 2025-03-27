@@ -6,6 +6,7 @@ public struct RoutineDetailView: View {
     let exercises: [Exercise]
     let previewMode: Bool
     @State private var exerciseDurations: [UUID: Int]
+    @State private var showingActiveSession = false
     
     public init(routine: Routine, exercises: [Exercise], previewMode: Bool = false) {
         self.routine = routine
@@ -64,7 +65,7 @@ public struct RoutineDetailView: View {
                 // Start Button
                 if !previewMode {
                     Button(action: {
-                        // TODO: Start workout
+                        showingActiveSession = true
                     }) {
                         Text("START")
                             .font(.headline)
@@ -92,6 +93,13 @@ public struct RoutineDetailView: View {
                     }
                 }
             }
+        }
+        .fullScreenCover(isPresented: $showingActiveSession) {
+            ActiveSessionView(
+                routine: routine,
+                exercises: exercises,
+                customDurations: exerciseDurations
+            )
         }
     }
     

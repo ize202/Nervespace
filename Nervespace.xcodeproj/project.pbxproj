@@ -109,6 +109,7 @@
 		E8C7C342A6E04E55009CF00B /* Exercise.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36A56A98BDEA5F818BD9DA75 /* Exercise.swift */; };
 		EB9C03485408E65431F8857B /* DeveloperSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B91DA9A946B618DF10C7A55C /* DeveloperSettingsView.swift */; };
 		F03723331AB206198013112C /* visibleOnlyToUserWithID.swift in Sources */ = {isa = PBXBuildFile; fileRef = D18AE4FF14A97AE6F967A631 /* visibleOnlyToUserWithID.swift */; };
+		F0E81C883C30503D2B8AC781 /* ActiveSessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF747F3614BCE4B335F57E62 /* ActiveSessionView.swift */; };
 		F43A5AB5408F3D5E36637EAD /* ShowPushNotificationPermissionSheetIfNeededModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0115360FEAD4F8357698A075 /* ShowPushNotificationPermissionSheetIfNeededModifier.swift */; };
 		F44676509FDFBA07126F8641 /* PlanDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA592D584CE1DAC849EA9F2D /* PlanDetailView.swift */; };
 		F4A629B961F8144B9F8EA13D /* OneSignal-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8FE3DE787DCFD28B3DC075CE /* OneSignal-Info.plist */; };
@@ -360,6 +361,7 @@
 		D8A83FA9A8AFFBB47113490F /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		DE39ECFCD12E409C396DEEBD /* AnalyticsKit-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "AnalyticsKit-Info.plist"; sourceTree = "<group>"; };
 		DE99235AA5F43FE52F18CE50 /* RoutineCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineCard.swift; sourceTree = "<group>"; };
+		DF747F3614BCE4B335F57E62 /* ActiveSessionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveSessionView.swift; sourceTree = "<group>"; };
 		E015553A7F98EF624CB69E09 /* getPlistEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = getPlistEntry.swift; sourceTree = "<group>"; };
 		E5DFA5E09A8701AD67D4ECAB /* RequestType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestType.swift; sourceTree = "<group>"; };
 		E707125AB574BCCB8270439E /* Stack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stack.swift; sourceTree = "<group>"; };
@@ -905,6 +907,7 @@
 		BA3ABA73DD18624CBFA0F070 /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				DF747F3614BCE4B335F57E62 /* ActiveSessionView.swift */,
 				16D53C5DB25242D48C9A8614 /* CircularProgressView.swift */,
 				DE99235AA5F43FE52F18CE50 /* RoutineCard.swift */,
 				15989630AEF2469047AE2505 /* RoutineDetailView.swift */,
@@ -1424,6 +1427,7 @@
 			files = (
 				99347E5C50ECDC12DC4CF52C /* TuistBundle+Nervespace.swift in Sources */,
 				2CC928AEBAD65DD2F42F40CA /* App.swift in Sources */,
+				F0E81C883C30503D2B8AC781 /* ActiveSessionView.swift in Sources */,
 				D0E0829C06F292050D66A833 /* CircularProgressView.swift in Sources */,
 				2D448A8AA3B5BCFCE9F47C2A /* RoutineCard.swift in Sources */,
 				1E8752F4D4EB28AF00A5B1EF /* RoutineDetailView.swift in Sources */,
