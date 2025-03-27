@@ -23,22 +23,25 @@ struct RoutineDetailView: View {
     var body: some View {
         VStack(spacing: 0) {
             // Header
-            VStack(alignment: .center, spacing: 16) {
+            VStack(alignment: .leading, spacing: 8) {
                 Text(routine.name)
-                    .font(.title)
+                    .font(.largeTitle)
                     .fontWeight(.bold)
                 
                 Text("\(totalDuration / 60) MINUTES")
-                    .font(.headline)
+                    .font(.subheadline)
                     .foregroundColor(.gray)
+                    .textCase(.uppercase)
                 
                 if let description = routine.description {
                     Text(description)
                         .font(.body)
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal)
+                        .foregroundColor(.secondary)
+                        .padding(.top, 4)
                 }
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal)
             .padding(.vertical, 24)
             
             // Exercise List
@@ -81,8 +84,9 @@ struct RoutineDetailView: View {
                 Button(action: {
                     // TODO: Add to favorites
                 }) {
-                    Image(systemName: "heart")
-                        .foregroundColor(.primary)
+                    Image(systemName: "bookmark")
+                        .foregroundColor(.brandPrimary)
+                        .font(.system(size: 24))
                 }
             }
         }
@@ -101,7 +105,7 @@ struct ExerciseRow: View {
     @Binding var duration: Int
     
     var body: some View {
-        HStack(spacing: 16) {
+        HStack(spacing: 12) {
             // Exercise Icon/Thumbnail
             if let thumbnailURL = exercise.thumbnailURL {
                 AsyncImage(url: thumbnailURL) { image in
@@ -111,53 +115,54 @@ struct ExerciseRow: View {
                 } placeholder: {
                     Color.gray.opacity(0.2)
                 }
-                .frame(width: 60, height: 60)
-                .clipShape(Circle())
+                .frame(width: 56, height: 56)
+                .clipShape(RoundedRectangle(cornerRadius: 8))
             } else {
-                Circle()
+                RoundedRectangle(cornerRadius: 8)
                     .fill(Color.gray.opacity(0.2))
-                    .frame(width: 60, height: 60)
+                    .frame(width: 56, height: 56)
             }
             
-            VStack(alignment: .leading, spacing: 4) {
-                Text(exercise.name)
-                    .font(.headline)
-                
-                if let description = exercise.description {
-                    Text(description)
-                        .font(.subheadline)
-                        .foregroundColor(.gray)
-                }
-            }
+            // Exercise Name
+            Text(exercise.name)
+                .font(.headline)
+                .foregroundColor(.white)
             
             Spacer()
             
             // Duration Controls
-            HStack(spacing: 12) {
+            HStack(spacing: 8) {
                 Button(action: { duration = max(0, duration - 30) }) {
                     Image(systemName: "minus")
-                        .foregroundColor(.primary)
-                        .padding(8)
-                        .background(Color.gray.opacity(0.2))
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundColor(.white)
+                        .frame(width: 28, height: 28)
+                        .background(Color.white.opacity(0.2))
                         .clipShape(Circle())
                 }
                 
                 Text("\(duration / 60):\(String(format: "%02d", duration % 60))")
-                    .font(.headline)
-                    .monospacedDigit()
+                    .font(.system(.subheadline, design: .monospaced))
+                    .fontWeight(.medium)
+                    .foregroundColor(.white)
+                    .frame(minWidth: 45)
                 
                 Button(action: { duration += 30 }) {
                     Image(systemName: "plus")
-                        .foregroundColor(.primary)
-                        .padding(8)
-                        .background(Color.gray.opacity(0.2))
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundColor(.white)
+                        .frame(width: 28, height: 28)
+                        .background(Color.white.opacity(0.2))
                         .clipShape(Circle())
                 }
             }
         }
-        .padding()
-        .background(Color.gray.opacity(0.1))
-        .cornerRadius(12)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
+        .background {
+            RoundedRectangle(cornerRadius: 12)
+                .fill(.ultraThinMaterial)
+        }
     }
 }
 
@@ -168,4 +173,5 @@ struct ExerciseRow: View {
             exercises: Dictionary.mockRoutineExercises[Routine.mockWakeAndShake.id] ?? []
         )
     }
-} 
+    .preferredColorScheme(.dark)
+}
