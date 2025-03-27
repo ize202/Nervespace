@@ -21,63 +21,67 @@ struct RoutineDetailView: View {
     }
     
     var body: some View {
-        VStack(spacing: 0) {
-            // Header
-            VStack(alignment: .leading, spacing: 8) {
-                Text(routine.name)
-                    .font(.system(size: 34, weight: .bold))
-                    .foregroundColor(.white)
-                
-                Text("\(totalDuration / 60) MINUTES")
-                    .font(.system(size: 15, weight: .medium))
-                    .foregroundColor(.white.opacity(0.6))
-                    .textCase(.uppercase)
-                
-                if let description = routine.description {
-                    Text(description)
-                        .font(.system(size: 17))
-                        .foregroundColor(.white.opacity(0.7))
-                        .lineSpacing(4)
-                        .padding(.top, 8)
-                }
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal)
-            .padding(.vertical, 24)
+        ZStack {
+            Color.baseBlack.ignoresSafeArea()
             
-            // Exercise List
-            ScrollView {
-                VStack(spacing: 16) {
-                    ForEach(exercises) { exercise in
-                        ExerciseRow(
-                            exercise: exercise,
-                            duration: exerciseDurationBinding(for: exercise)
-                        )
+            VStack(spacing: 0) {
+                // Header
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(routine.name)
+                        .font(.system(size: 34, weight: .bold))
+                        .foregroundColor(.white)
+                    
+                    Text("\(totalDuration / 60) MINUTES")
+                        .font(.system(size: 15, weight: .medium))
+                        .foregroundColor(.white.opacity(0.6))
+                        .textCase(.uppercase)
+                    
+                    if let description = routine.description {
+                        Text(description)
+                            .font(.system(size: 17))
+                            .foregroundColor(.white.opacity(0.7))
+                            .lineSpacing(4)
+                            .padding(.top, 8)
                     }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal)
+                .padding(.vertical, 24)
+                
+                // Exercise List
+                ScrollView {
+                    VStack(spacing: 16) {
+                        ForEach(exercises) { exercise in
+                            ExerciseRow(
+                                exercise: exercise,
+                                duration: exerciseDurationBinding(for: exercise)
+                            )
+                        }
+                    }
+                    .padding()
+                }
+                
+                // Start Button
+                Button(action: {
+                    // TODO: Start workout
+                }) {
+                    Text("START")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.brandPrimary)
+                        .cornerRadius(12)
                 }
                 .padding()
             }
-            
-            // Start Button
-            Button(action: {
-                // TODO: Start workout
-            }) {
-                Text("START")
-                    .font(.headline)
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.brandPrimary)
-                    .cornerRadius(12)
-            }
-            .padding()
         }
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button(action: { dismiss() }) {
                     Image(systemName: "xmark")
-                        .foregroundColor(.primary)
+                        .foregroundColor(.white)
                 }
             }
             
