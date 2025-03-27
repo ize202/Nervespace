@@ -153,28 +153,6 @@ struct HistoryView: View {
         }
         .navigationBarTitleDisplayMode(.inline)
         .navigationTitle("History")
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Menu {
-                    Button(action: {
-                        // TODO: Filter by routine type
-                    }) {
-                        Label("Filter by Type", systemImage: "line.3.horizontal.decrease.circle")
-                    }
-                    
-                    Button(action: {
-                        // TODO: Export history
-                    }) {
-                        Label("Export History", systemImage: "square.and.arrow.up")
-                    }
-                } label: {
-                    Image(systemName: "ellipsis.circle")
-                        .font(.system(size: 20))
-                        .foregroundColor(.white)
-                        .frame(width: 44, height: 44)
-                }
-            }
-        }
     }
 }
 
