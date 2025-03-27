@@ -149,11 +149,21 @@ struct ExploreView: View {
                             
                             ScrollView(.horizontal, showsIndicators: false) {
                                 LazyHStack(spacing: 16) {
-                                    CategoryCard(title: "Meditation", systemImage: "heart.circle.fill")
-                                    CategoryCard(title: "Breathwork", systemImage: "wind")
-                                    CategoryCard(title: "Movement", systemImage: "figure.walk")
-                                    CategoryCard(title: "Grounding", systemImage: "leaf.fill")
-                                    CategoryCard(title: "Sleep", systemImage: "moon.stars.fill")
+                                    NavigationLink(destination: CategoryListView(category: "Meditation", systemImage: "heart.circle.fill")) {
+                                        CategoryCard(title: "Meditation", systemImage: "heart.circle.fill")
+                                    }
+                                    NavigationLink(destination: CategoryListView(category: "Breathwork", systemImage: "wind")) {
+                                        CategoryCard(title: "Breathwork", systemImage: "wind")
+                                    }
+                                    NavigationLink(destination: CategoryListView(category: "Movement", systemImage: "figure.walk")) {
+                                        CategoryCard(title: "Movement", systemImage: "figure.walk")
+                                    }
+                                    NavigationLink(destination: CategoryListView(category: "Grounding", systemImage: "leaf.fill")) {
+                                        CategoryCard(title: "Grounding", systemImage: "leaf.fill")
+                                    }
+                                    NavigationLink(destination: CategoryListView(category: "Sleep", systemImage: "moon.stars.fill")) {
+                                        CategoryCard(title: "Sleep", systemImage: "moon.stars.fill")
+                                    }
                                 }
                                 .padding(.horizontal)
                             }
@@ -168,36 +178,72 @@ struct ExploreView: View {
                                 .padding(.horizontal)
                             
                             LazyVGrid(columns: gridItems, spacing: 16) {
-                                AreaCard(
+                                NavigationLink(destination: AreaListView(
                                     title: "Stress Relief",
                                     color: .brandPrimary,
                                     imageUrl: nil
-                                )
-                                AreaCard(
+                                )) {
+                                    AreaCard(
+                                        title: "Stress Relief",
+                                        color: .brandPrimary,
+                                        imageUrl: nil
+                                    )
+                                }
+                                NavigationLink(destination: AreaListView(
                                     title: "Anxiety",
                                     color: .brandSecondary,
                                     imageUrl: nil
-                                )
-                                AreaCard(
+                                )) {
+                                    AreaCard(
+                                        title: "Anxiety",
+                                        color: .brandSecondary,
+                                        imageUrl: nil
+                                    )
+                                }
+                                NavigationLink(destination: AreaListView(
                                     title: "Focus & Clarity",
                                     color: Color(hex: "6B8E23"),
                                     imageUrl: nil
-                                )
-                                AreaCard(
+                                )) {
+                                    AreaCard(
+                                        title: "Focus & Clarity",
+                                        color: Color(hex: "6B8E23"),
+                                        imageUrl: nil
+                                    )
+                                }
+                                NavigationLink(destination: AreaListView(
                                     title: "Energy Boost",
                                     color: Color(hex: "CD853F"),
                                     imageUrl: nil
-                                )
-                                AreaCard(
+                                )) {
+                                    AreaCard(
+                                        title: "Energy Boost",
+                                        color: Color(hex: "CD853F"),
+                                        imageUrl: nil
+                                    )
+                                }
+                                NavigationLink(destination: AreaListView(
                                     title: "Better Sleep",
                                     color: .brandPrimary,
                                     imageUrl: nil
-                                )
-                                AreaCard(
+                                )) {
+                                    AreaCard(
+                                        title: "Better Sleep",
+                                        color: .brandPrimary,
+                                        imageUrl: nil
+                                    )
+                                }
+                                NavigationLink(destination: AreaListView(
                                     title: "Quick Reset",
                                     color: .brandSecondary,
                                     imageUrl: nil
-                                )
+                                )) {
+                                    AreaCard(
+                                        title: "Quick Reset",
+                                        color: .brandSecondary,
+                                        imageUrl: nil
+                                    )
+                                }
                             }
                             .padding(.horizontal)
                         }
