@@ -195,7 +195,7 @@ struct HomeView: View {
                             
                             // Plans Section
                             VStack(alignment: .leading, spacing: 16) {
-                                Text("Your Plans")
+                                Text("Plans")
                                     .font(.title2)
                                     .fontWeight(.bold)
                                     .foregroundStyle(Color.baseWhite)
@@ -203,31 +203,34 @@ struct HomeView: View {
                                 
                                 ScrollView(.horizontal, showsIndicators: false) {
                                     LazyHStack(spacing: 16) {
-                                        ForEach(Routine.mockPlans) { routine in
-                                            NavigationLink(destination: RoutineDetailView(
-                                                routine: routine,
-                                                exercises: Dictionary.mockRoutineExercises[routine.id] ?? []
+                                        ForEach(Plan.allMockPlans) { plan in
+                                            NavigationLink(destination: PlanDetailView(
+                                                title: plan.name,
+                                                description: plan.description,
+                                                duration: plan.duration,
+                                                routines: plan.routines
                                             )) {
                                                 // Plan Card Style
                                                 VStack(alignment: .leading, spacing: 12) {
                                                     // Image container
                                                     RoundedRectangle(cornerRadius: 12)
                                                         .fill(Color.brandPrimary.opacity(0.2))
-                                                        .frame(width: 200, height: 160)
+                                                        .frame(width: 320, height: 200)
                                                     
                                                     // Text content
                                                     VStack(alignment: .leading, spacing: 4) {
-                                                        Text(routine.name)
-                                                            .font(.headline)
+                                                        Text(plan.name)
+                                                            .font(.title3)
+                                                            .fontWeight(.bold)
                                                             .foregroundStyle(Color.baseWhite)
                                                         
-                                                        Text("\(Dictionary.mockRoutineExercises[routine.id]?.count ?? 0) exercises • 5 min")
+                                                        Text(plan.duration.lowercased())
                                                             .font(.subheadline)
                                                             .foregroundStyle(Color.baseWhite.opacity(0.6))
                                                     }
                                                     .padding(.horizontal, 4)
                                                 }
-                                                .frame(width: 200)
+                                                .frame(width: 320)
                                             }
                                         }
                                     }

@@ -188,4 +188,128 @@ public extension Dictionary where Key == UUID, Value == [String] {
         Exercise.mockTrunkTwist.id: ["Movement", "Energy Boost", "Quick Reset"],
         Exercise.mockHipCircles.id: ["Movement", "Stress Relief", "Anxiety"]
     ]
+}
+
+public extension Plan {
+    static let mockMorningRoutine = Plan(
+        name: "Morning Routine",
+        description: "A series designed to help you build a consistent routine and improve your overall well-being.",
+        isPremium: false,
+        duration: "7 DAY SERIES",
+        routines: [
+            Routine.mockWakeAndShake,
+            Routine.mockEveningUnwind,
+            Routine.mockQuickReset,
+            // Create more routines for the remaining days
+            Routine(
+                id: UUID(),
+                name: "Energy Flow",
+                description: "Dynamic movements to energize your body",
+                thumbnailURL: nil,
+                isPremium: false,
+                createdAt: Date(),
+                updatedAt: Date()
+            ),
+            Routine(
+                id: UUID(),
+                name: "Morning Stretch",
+                description: "Gentle stretches to wake up your body",
+                thumbnailURL: nil,
+                isPremium: false,
+                createdAt: Date(),
+                updatedAt: Date()
+            ),
+            Routine(
+                id: UUID(),
+                name: "Rise & Shine",
+                description: "Start your day with invigorating movements",
+                thumbnailURL: nil,
+                isPremium: false,
+                createdAt: Date(),
+                updatedAt: Date()
+            ),
+            Routine(
+                id: UUID(),
+                name: "Dawn Flow",
+                description: "Flow through energizing movements",
+                thumbnailURL: nil,
+                isPremium: false,
+                createdAt: Date(),
+                updatedAt: Date()
+            )
+        ]
+    )
+    
+    static let mockStressRelief = Plan(
+        name: "Stress Relief",
+        description: "A targeted program to help you manage and reduce stress through mindful movement.",
+        isPremium: true,
+        duration: "5 DAY SERIES",
+        routines: [
+            Routine(
+                id: UUID(),
+                name: "Tension Release",
+                description: "Release physical tension from your body",
+                thumbnailURL: nil,
+                isPremium: true,
+                createdAt: Date(),
+                updatedAt: Date()
+            ),
+            Routine(
+                id: UUID(),
+                name: "Calm & Center",
+                description: "Find your center with grounding exercises",
+                thumbnailURL: nil,
+                isPremium: true,
+                createdAt: Date(),
+                updatedAt: Date()
+            ),
+            Routine(
+                id: UUID(),
+                name: "Mindful Movement",
+                description: "Connect movement with breath",
+                thumbnailURL: nil,
+                isPremium: true,
+                createdAt: Date(),
+                updatedAt: Date()
+            ),
+            Routine(
+                id: UUID(),
+                name: "Stress Melt",
+                description: "Melt away stress with gentle flows",
+                thumbnailURL: nil,
+                isPremium: true,
+                createdAt: Date(),
+                updatedAt: Date()
+            ),
+            Routine(
+                id: UUID(),
+                name: "Deep Release",
+                description: "Deep relaxation and tension release",
+                thumbnailURL: nil,
+                isPremium: true,
+                createdAt: Date(),
+                updatedAt: Date()
+            )
+        ]
+    )
+    
+    static let allMockPlans = [mockMorningRoutine, mockStressRelief]
+}
+
+public extension Dictionary where Key == UUID, Value == [Exercise] {
+    static let mockPlanExercises: [UUID: [Exercise]] = [
+        Plan.mockMorningRoutine.id: [
+            Exercise.mockDynamicSideBends,
+            Exercise.mockArmCircles,
+            Exercise.mockNeckRoll,
+            Exercise.mockTrunkTwist,
+            Exercise.mockHipCircles
+        ],
+        Plan.mockStressRelief.id: [
+            Exercise.mockNeckRoll,
+            Exercise.mockDynamicSideBends,
+            Exercise.mockHipCircles
+        ]
+    ]
 } 
