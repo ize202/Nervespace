@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 55;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -105,6 +105,7 @@
 		DD7E441B9CEF6641476392AA /* NotifKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A02B81F1B672F870A7DAECC1 /* NotifKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		DEF4A8F27A0D5F8EA3964B17 /* AnalyticsKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 7B96390C931279366EC8AD1D /* AnalyticsKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		E11CA1CE09BCB460543086E1 /* AnalyticsKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B96390C931279366EC8AD1D /* AnalyticsKit.framework */; };
+		E15DF09BCDD7C84A51399AF9 /* BookmarkedRoutinesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 568A7E9396109819AEB17150 /* BookmarkedRoutinesView.swift */; };
 		E2C2035666066E0B41E865E2 /* OneSignalFramework in Frameworks */ = {isa = PBXBuildFile; productRef = 73A4451A26D46F43055C8E84 /* OneSignalFramework */; };
 		E670585492C9687438ABD52D /* ProfileImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32B592D5EEED8E5B114D2630 /* ProfileImage.swift */; };
 		E674917B24E102446F777879 /* ShowSignInSheetWhenCalledModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE67853F85FCBDD31F1BBD02 /* ShowSignInSheetWhenCalledModifier.swift */; };
@@ -309,6 +310,7 @@
 		553CD736FB8477C349AC0D06 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		5659C5D7AD221C5697002B98 /* requireLogin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = requireLogin.swift; sourceTree = "<group>"; };
 		5680309FE39BC8223920FFD0 /* ProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressView.swift; sourceTree = "<group>"; };
+		568A7E9396109819AEB17150 /* BookmarkedRoutinesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkedRoutinesView.swift; sourceTree = "<group>"; };
 		5A9CD7C3F832361E212F90E4 /* UserProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfile.swift; sourceTree = "<group>"; };
 		5ABB9FEAD6E86F6A57C86CA8 /* squircle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = squircle.swift; sourceTree = "<group>"; };
 		5B27CBD2795F983D1F48697D /* captureViewActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = captureViewActivity.swift; sourceTree = "<group>"; };
@@ -325,7 +327,7 @@
 		77B2560E5F25C3F8FB314501 /* accentBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = accentBackground.swift; sourceTree = "<group>"; };
 		79594A6344FB719426E5AF8D /* askUserFor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = askUserFor.swift; sourceTree = "<group>"; };
 		7B96390C931279366EC8AD1D /* AnalyticsKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = AnalyticsKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		7CE6AF7F72F5552A74F3A7B1 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		7CE6AF7F72F5552A74F3A7B1 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		7D6D299A62A80B88F79B904D /* RoutineExercise.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineExercise.swift; sourceTree = "<group>"; };
 		813FF311671CDA4CFBB4342D /* NotificationsPermissionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsPermissionView.swift; sourceTree = "<group>"; };
 		83A9214733C3AC2CFF832873 /* TuistBundle+Nervespace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistBundle+Nervespace.swift"; sourceTree = "<group>"; };
@@ -949,6 +951,7 @@
 			isa = PBXGroup;
 			children = (
 				2AA28166D86E5C2B8F07B9CE /* AreaListView.swift */,
+				568A7E9396109819AEB17150 /* BookmarkedRoutinesView.swift */,
 				B055696983C91B9B522BF4E1 /* CategoryListView.swift */,
 				1EC0846D7CD91621E5443B23 /* ExploreView.swift */,
 			);
@@ -1449,6 +1452,7 @@
 				FC5547BF79431E1A1F84001B /* ContentView.swift in Sources */,
 				EB9C03485408E65431F8857B /* DeveloperSettingsView.swift in Sources */,
 				421339BA8FE2CE2D4CC641C7 /* AreaListView.swift in Sources */,
+				E15DF09BCDD7C84A51399AF9 /* BookmarkedRoutinesView.swift in Sources */,
 				EE1BE72FFF720D27642FB55C /* CategoryListView.swift in Sources */,
 				F7C4629C557B760D327D6751 /* ExploreView.swift in Sources */,
 				2517BB44FACE02E21DDE3B02 /* HomeView.swift in Sources */,
@@ -1550,7 +1554,10 @@
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
+					"$(inherited)",
+					DEBUG,
+				);
 				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -1582,7 +1589,10 @@
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
+					"$(inherited)",
+					DEBUG,
+				);
 				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -1753,7 +1763,6 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Derived/Entitlements/Nervespace.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				DEVELOPMENT_TEAM = NMXU2ZADVX;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = "Derived/InfoPlists/Nervespace-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -1782,7 +1791,6 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Derived/Entitlements/Nervespace.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				DEVELOPMENT_TEAM = NMXU2ZADVX;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = "Derived/InfoPlists/Nervespace-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -1797,7 +1805,10 @@
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
+					"$(inherited)",
+					DEBUG,
+				);
 				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -1829,7 +1840,10 @@
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
+					"$(inherited)",
+					DEBUG,
+				);
 				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -1896,7 +1910,10 @@
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
+					"$(inherited)",
+					DEBUG,
+				);
 				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -1987,7 +2004,10 @@
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
+					"$(inherited)",
+					DEBUG,
+				);
 				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -2087,7 +2107,10 @@
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
+					"$(inherited)",
+					DEBUG,
+				);
 				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
