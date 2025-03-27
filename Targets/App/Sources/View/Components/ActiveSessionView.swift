@@ -11,6 +11,7 @@ public struct ActiveSessionView: View {
     @State private var timer: Timer?
     @State private var animationId: UUID = UUID()
     @Environment(\.dismiss) private var dismiss
+    @State private var progressValue: Double = 0
     
     public init(routine: Routine, exercises: [Exercise], customDurations: [UUID: Int]) {
         self.routine = routine
@@ -88,12 +89,13 @@ public struct ActiveSessionView: View {
                     
                     // Timer Progress Indicator
                     RoundedRectangle(cornerRadius: 24)
-                        .trim(from: 0, to: timeRemaining > 0 ? 1 - (Double(timeRemaining) / Double(currentExercise?.baseDuration ?? 30)) : 0)
+                        .trim(from: 0, to: progressValue)
                         .stroke(Color.brandPrimary, lineWidth: 12)
                         .frame(width: 280, height: 280)
                         .rotationEffect(.degrees(-90))
-                        .animation(.linear(duration: 1), value: timeRemaining)
-                        .id(animationId) // Force new animation context when exercise changes
+                        .animation(.none, value: currentExerciseIndex)
+                        .animation(.linear(duration: 1), value: progressValue)
+                        .id(animationId)
                 }
                 
                 // Exercise Name
@@ -163,13 +165,26 @@ public struct ActiveSessionView: View {
         return String(format: "%d:%02d", minutes, remainingSeconds)
     }
     
+    private func updateProgress() {
+        let duration = Double(currentExercise?.baseDuration ?? 30)
+        let remaining = Double(timeRemaining)
+        // Ensure we reach exactly 1.0 when time is up
+        let progress = remaining <= 0 ? 1.0 : 1.0 - (remaining / duration)
+        
+        withAnimation(.linear(duration: 1)) {
+            progressValue = progress
+        }
+    }
+    
     private func startTimer() {
         guard timer == nil else { return }
+        updateProgress() // Initial progress update
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
             guard !isPaused else { return }
             
             if timeRemaining > 0 {
                 timeRemaining -= 1
+                updateProgress()
             } else {
                 // Time's up for current exercise
                 if currentExerciseIndex < exercises.count - 1 {
@@ -198,16 +213,22 @@ public struct ActiveSessionView: View {
     
     private func nextExercise() {
         guard currentExerciseIndex < exercises.count - 1 else { return }
+        withAnimation(.none) {
+            progressValue = 0 // Reset progress with no animation
+        }
         currentExerciseIndex += 1
-        animationId = UUID() // Reset animation context
         timeRemaining = customDurations[exercises[currentExerciseIndex].id] ?? exercises[currentExerciseIndex].baseDuration
+        updateProgress() // Start new progress animation
     }
     
     private func previousExercise() {
         guard currentExerciseIndex > 0 else { return }
+        withAnimation(.none) {
+            progressValue = 0 // Reset progress with no animation
+        }
         currentExerciseIndex -= 1
-        animationId = UUID() // Reset animation context
         timeRemaining = customDurations[exercises[currentExerciseIndex].id] ?? exercises[currentExerciseIndex].baseDuration
+        updateProgress() // Start new progress animation
     }
 }
 
