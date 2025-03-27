@@ -17,42 +17,41 @@ public enum AuthState {
 	case signedIn
 }
 
-/// Represents data structure for a post.
-struct PostData: Codable, Identifiable, Equatable {
-	let id: Int
-	let title: String
-	let content: String
-	let creationDate: Date
-	let postUserID: UUID  // post author id
-}
-
 @MainActor
 public class DB: ObservableObject {
-
 	/// Variable reference to access Supabase.
-	///
-	/// Don't access it directly, to fetch data, but rather do so via
-	/// dedicated functions such as the `fetchPosts()` example function below.
 	internal let _db: SupabaseClient
-
-	/// See DatabaseExampleView.swift
-	@Published var posts: [PostData] = []
-
+	
+	/// Exercise service for handling exercise-related operations
+	public private(set) lazy var exerciseService: ExerciseService = {
+		SupabaseExerciseService(supabase: _db)
+	}()
+	
+	/// Routine service for handling routine-related operations
+	public private(set) lazy var routineService: RoutineService = {
+		SupabaseRoutineService(supabase: _db, exerciseService: exerciseService)
+	}()
+	
+	/// User service for handling user-related operations
+	public private(set) lazy var userService: UserService = {
+		SupabaseUserService(supabase: _db)
+	}()
+	
 	/// SupabaseAuth user state, nil if not logged in
 	@Published public var currentUser: User? = nil
-
+	
 	/// SupabaseAuth State (use this to check auth state, updates with currentUser)
 	@Published public var authState: AuthState = .signedOut
-
+	
 	/// For Supabase to keep track of the Auth State (see AuthGeneral.swift)
 	internal var authStateHandler: AuthStateChangeListenerRegistration?
-
+	
 	/// For Sign in With Apple (Specifically, for account deletion. Is set when the user signs in with Apple)
 	internal var appleIDCredential: ASAuthorizationAppleIDCredential?
-
+	
 	/// For Sign in With Apple (see SignInWithApple.siwft)
 	internal var currentNonce: String?
-
+	
 	///- Parameter onAuthStateChange: Additional closure to pass to the AuthState Listener.
 	/// We use this to set all the different providers to use the same, supabase-issued user ID to identify the user.
 	public init(
@@ -70,83 +69,18 @@ public class DB: ObservableObject {
 		
 		let supabaseURLString = try? getPlistEntry(urlKey, in: "Supabase-Info")
 		let apiKey = try? getPlistEntry(apiKeyKey, in: "Supabase-Info")
-
+		
 		guard let apiKey, let supabaseURLString, let supabaseURL = URL(string: supabaseURLString) else {
 			fatalError("ERROR: Couldn't get SupabaseURL and API Keys in Supabase-Info.plist!")
 		}
-
+		
 		_db = SupabaseClient(
 			supabaseURL: supabaseURL,
 			supabaseKey: apiKey
 		)
-
+		
 		Task {
 			await registerAuthStateListener(additionalHandler: onAuthStateChange)
-		}
-	}
-}
-
-//MARK: - DatabaseExampleView
-extension DB {
-
-	/// Fetches posts from the database asynchronously and sets them in the `posts` property.
-	@MainActor
-	public func fetchPosts() async {
-		print("[DB][INFO] Fetching Posts from DB...")
-		var newPostsData: [PostData] = []
-
-		do {
-			newPostsData = try await _db.from("posts").select().execute().value
-
-			print("[DB][SUCCESS] Fetching Posts Success. Fetched \(newPostsData.count) posts.")
-		} catch {
-			print("[DB][ERROR] Fetching Posts Failed: \(error.localizedDescription).")
-			return
-		}
-		newPostsData.sort(by: { $0.creationDate > $1.creationDate })
-		posts = newPostsData
-	}
-
-	/// Adds a post anonymously to the database.
-	public func addPost(title: String, content: String) async -> Bool {
-		print("[DB][INFO] Adding New Post to DB...")
-		do {
-
-			// If we just insert using the normal PostData, we will have to provide
-			// it with an ID and a creationDate. If we don't pass them, the DB will automatically
-			// assign the newly created post these values.
-			// (If you have set up your DB to automatically set default values)
-			struct PostDataWithoutIdAndDate: Encodable {
-				let title: String
-				let content: String
-			}
-
-			// Add a new post to the DB with provided values
-			// and return the result.
-			let createdPost: PostData =
-				try await _db
-				.from("posts")
-				.insert(PostDataWithoutIdAndDate(title: title, content: content))
-				.select()
-				.single()
-				.execute()
-				.value
-
-			print("[DB][SUCCESS] User created post with ID: \(createdPost.id)")
-			return true
-		} catch {
-			print("[DB][ERROR] Post Creation Error: \(error.localizedDescription)")
-			return false
-		}
-	}
-
-	public func deletePost(id: Int) async {
-		print("[DB][INFO] Deleting Post with from DB with ID: \(id)...")
-		do {
-			try await _db.from("posts").delete().eq("id", value: id).execute()
-			print("[DB][SUCCESS] Deleted Post with ID: \(id)")
-		} catch {
-			print("[DB][ERROR] Error deleting post with ID: \(id): \(error.localizedDescription)")
 		}
 	}
 }
