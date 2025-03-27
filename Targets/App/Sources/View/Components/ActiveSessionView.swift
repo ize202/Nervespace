@@ -12,6 +12,7 @@ public struct ActiveSessionView: View {
     @State private var animationId: UUID = UUID()
     @Environment(\.dismiss) private var dismiss
     @State private var progressValue: Double = 0
+    @State private var showExerciseDetail = false
     
     public init(routine: Routine, exercises: [Exercise], customDurations: [UUID: Int]) {
         self.routine = routine
@@ -111,11 +112,12 @@ public struct ActiveSessionView: View {
                         .foregroundColor(Color.baseWhite)
                     
                     Button(action: {
-                        // TODO: Show exercise info
+                        showExerciseDetail = true
                     }) {
                         Image(systemName: "info.circle")
                             .font(.system(size: 20))
                             .foregroundColor(Color.baseWhite.opacity(0.6))
+                            .frame(width: 44, height: 44)
                     }
                 }
                 
@@ -162,6 +164,11 @@ public struct ActiveSessionView: View {
         .onDisappear {
             timer?.invalidate()
             timer = nil
+        }
+        .sheet(isPresented: $showExerciseDetail) {
+            if let exercise = currentExercise {
+                ExerciseDetailView(exercise: exercise)
+            }
         }
     }
     
