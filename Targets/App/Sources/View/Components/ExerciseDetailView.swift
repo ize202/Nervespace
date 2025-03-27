@@ -6,85 +6,123 @@ struct ExerciseDetailView: View {
     @Environment(\.dismiss) private var dismiss
     
     var body: some View {
-        NavigationView {
-            ZStack {
-                Color.baseBlack.ignoresSafeArea()
-                
-                ScrollView {
-                    VStack(spacing: 24) {
-                        // Preview/Animation
+        ZStack {
+            Color.baseBlack.ignoresSafeArea()
+            
+            ScrollView {
+                VStack(spacing: 24) {
+                    // Thumbnail/Video Area
+                    Group {
                         if let previewURL = exercise.previewURL {
                             AsyncImage(url: previewURL) { image in
                                 image
                                     .resizable()
-                                    .aspectRatio(contentMode: .fit)
+                                    .aspectRatio(contentMode: .fill)
                             } placeholder: {
                                 Color.gray.opacity(0.2)
                             }
-                            .frame(height: 200)
-                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                        } else {
+                            Color.gray.opacity(0.2)
                         }
-                        
-                        // Header Info
+                    }
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 280)
+                    .clipped()
+                    
+                    VStack(spacing: 32) {
+                        // Title and Duration
                         VStack(alignment: .leading, spacing: 8) {
                             Text(exercise.name)
-                                .font(.system(size: 28, weight: .bold))
+                                .font(.system(size: 34, weight: .bold))
                                 .foregroundColor(.white)
                             
-                            Text("\(exercise.baseDuration / 60) MINUTES")
+                            Text("\(exercise.baseDuration / 60) min")
                                 .font(.system(size: 15, weight: .medium))
                                 .foregroundColor(.white.opacity(0.6))
                                 .textCase(.uppercase)
-                            
-                            if let description = exercise.description {
-                                Text(description)
-                                    .font(.system(size: 17))
-                                    .foregroundColor(.white.opacity(0.7))
-                                    .lineSpacing(4)
-                                    .padding(.top, 4)
-                            }
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal)
                         
-                        // Instructions
-                        if let instructions = exercise.instructions {
-                            VStack(alignment: .leading, spacing: 16) {
-                                Text("Instructions")
-                                    .font(.title2)
-                                    .bold()
-                                    .foregroundColor(.white)
+                        // Instructions Section
+                        if let instructions = exercise.instructions?.components(separatedBy: "\n") {
+                            VStack(alignment: .leading, spacing: 24) {
+                                Text("INSTRUCTIONS")
+                                    .font(.system(size: 15, weight: .medium))
+                                    .foregroundColor(.white.opacity(0.6))
+                                    .textCase(.uppercase)
+                                    .padding(.horizontal)
                                 
-                                Text(instructions)
-                                    .font(.body)
-                                    .foregroundColor(.white.opacity(0.7))
-                                    .lineSpacing(4)
+                                TimelineView(items: instructions)
                             }
-                            .frame(maxWidth: .infinity, alignment: .leading)
+                        }
+                        
+                        // Modifications Section
+                        VStack(alignment: .leading, spacing: 24) {
+                            Text("MODIFICATIONS")
+                                .font(.system(size: 15, weight: .medium))
+                                .foregroundColor(.white.opacity(0.6))
+                                .textCase(.uppercase)
+                                .padding(.horizontal)
+                            
+                            TimelineView(items: [
+                                "For less intensity, keep your hands on your front thigh.",
+                                "Place a towel or cushion under your back knee for support.",
+                                "Hold onto a wall or chair for balance if needed."
+                            ])
+                        }
+                        
+                        // Benefits Section
+                        VStack(alignment: .leading, spacing: 16) {
+                            Text("BENEFITS")
+                                .font(.system(size: 15, weight: .medium))
+                                .foregroundColor(.white.opacity(0.6))
+                                .textCase(.uppercase)
+                                .padding(.horizontal)
+                            
+                            Text("Abdomen, Hips, Lower Back, Psoas, Quadriceps")
+                                .font(.system(size: 17))
+                                .foregroundColor(.white)
+                                .lineSpacing(4)
+                                .padding(.horizontal)
                         }
                     }
-                    .padding()
-                }
-            }
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button(action: { dismiss() }) {
-                        Image(systemName: "xmark")
-                            .foregroundColor(.white)
-                            .font(.system(size: 17, weight: .semibold))
-                    }
-                }
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: {
-                        // TODO: Add to favorites
-                    }) {
-                        Image(systemName: "bookmark")
-                            .foregroundColor(.brandPrimary)
-                            .font(.system(size: 20))
-                    }
+                    .padding(.bottom, 32)
                 }
             }
         }
+    }
+}
+
+private struct TimelineView: View {
+    let items: [String]
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 24) {
+            ForEach(Array(items.enumerated()), id: \.offset) { index, item in
+                HStack(alignment: .top, spacing: 12) {
+                    // Step indicator
+                    ZStack {
+                        Circle()
+                            .fill(Color.brandPrimary.opacity(0.2))
+                            .frame(width: 32, height: 32)
+                        
+                        Text("\(index + 1)")
+                            .font(.system(size: 15, weight: .medium))
+                            .foregroundColor(.brandPrimary)
+                    }
+                    
+                    Text(item)
+                        .font(.system(size: 17))
+                        .foregroundColor(.white)
+                        .lineSpacing(4)
+                        .padding(.top, 6)
+                    
+                    Spacer()
+                }
+            }
+        }
+        .padding(.horizontal)
     }
 }
 
