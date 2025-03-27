@@ -77,7 +77,18 @@ struct HomeView: View {
                         SnapCarousel(spacing: 9,
                                    index: $currentIndex,
                                    items: commonRoutines) { routine in
-                            Button(action: { selectedRoutine = routine }) {
+                            NavigationLink(destination: RoutineDetailView(
+                                routine: Routine(
+                                    id: routine.id,
+                                    name: routine.title,
+                                    description: nil,
+                                    thumbnailURL: nil,
+                                    isPremium: false,
+                                    createdAt: Date(),
+                                    updatedAt: Date()
+                                ),
+                                exercises: Dictionary.mockRoutineExercises[Routine.mockWakeAndShake.id] ?? []
+                            )) {
                                 // Carousel Card Style
                                 ZStack(alignment: .topLeading) {
                                     Image(systemName: routine.image)
@@ -124,7 +135,18 @@ struct HomeView: View {
                                 ScrollView(.horizontal, showsIndicators: false) {
                                     LazyHStack(spacing: 16) {
                                         ForEach(quickSessions) { session in
-                                            Button(action: { selectedRoutine = session }) {
+                                            NavigationLink(destination: RoutineDetailView(
+                                                routine: Routine(
+                                                    id: session.id,
+                                                    name: session.title,
+                                                    description: nil,
+                                                    thumbnailURL: session.imageUrl.flatMap { URL(string: $0) },
+                                                    isPremium: false,
+                                                    createdAt: Date(),
+                                                    updatedAt: Date()
+                                                ),
+                                                exercises: Dictionary.mockRoutineExercises[Routine.mockWakeAndShake.id] ?? []
+                                            )) {
                                                 // Quick Session Card Style
                                                 VStack(alignment: .leading, spacing: 12) {
                                                     // Image container
@@ -172,7 +194,16 @@ struct HomeView: View {
                                 ScrollView(.horizontal, showsIndicators: false) {
                                     LazyHStack(spacing: 16) {
                                         ForEach(plans) { plan in
-                                            Button(action: { selectedPlan = plan }) {
+                                            NavigationLink(destination: PlanDetailView(
+                                                title: plan.title,
+                                                description: "A series designed to help you build a consistent routine and improve your overall well-being.",
+                                                duration: plan.duration.uppercased(),
+                                                routines: [
+                                                    .mockWakeAndShake,
+                                                    .mockEveningUnwind,
+                                                    .mockQuickReset
+                                                ]
+                                            )) {
                                                 // Plan Card Style - matching Quick Routines style
                                                 VStack(alignment: .leading, spacing: 12) {
                                                     // Image container
@@ -214,36 +245,6 @@ struct HomeView: View {
                 }
             }
             .navigationBarHidden(true)
-        }
-        .sheet(item: $selectedRoutine) { routineCard in
-            NavigationView {
-                RoutineDetailView(
-                    routine: Routine(
-                        id: routineCard.id,
-                        name: routineCard.title,
-                        description: nil,
-                        thumbnailURL: routineCard.imageUrl.flatMap { URL(string: $0) },
-                        isPremium: false,
-                        createdAt: Date(),
-                        updatedAt: Date()
-                    ),
-                    exercises: Dictionary.mockRoutineExercises[Routine.mockWakeAndShake.id] ?? []
-                )
-            }
-        }
-        .sheet(item: $selectedPlan) { plan in
-            NavigationView {
-                PlanDetailView(
-                    title: plan.title,
-                    description: "A series designed to help you build a consistent routine and improve your overall well-being.",
-                    duration: plan.duration.uppercased(),
-                    routines: [
-                        .mockWakeAndShake,
-                        .mockEveningUnwind,
-                        .mockQuickReset
-                    ]
-                )
-            }
         }
         .sheet(isPresented: $showingProfile) {
             ProfileView()

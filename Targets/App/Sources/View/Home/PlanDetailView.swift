@@ -6,7 +6,6 @@ struct PlanDetailView: View {
     let description: String
     let duration: String // e.g., "3 DAY SERIES"
     let routines: [Routine]
-    @Environment(\.dismiss) private var dismiss
     
     var body: some View {
         ZStack {
@@ -68,14 +67,6 @@ struct PlanDetailView: View {
             }
         }
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarLeading) {
-                Button(action: { dismiss() }) {
-                    Image(systemName: "xmark")
-                        .foregroundColor(.white)
-                }
-            }
-        }
     }
 }
 
