@@ -9,64 +9,16 @@ struct HomeView: View {
     
     // Common Routines for Carousel
     private let commonRoutines: [Routine] = [
-        Routine(
-            id: UUID(),
-            name: "Wake Up",
-            description: "Start your day with an energizing sequence",
-            thumbnailURL: nil,
-            isPremium: false,
-            createdAt: Date(),
-            updatedAt: Date()
-        ),
-        Routine(
-            id: UUID(),
-            name: "Sleep",
-            description: "Prepare your body and mind for restful sleep",
-            thumbnailURL: nil,
-            isPremium: false,
-            createdAt: Date(),
-            updatedAt: Date()
-        ),
-        Routine(
-            id: UUID(),
-            name: "Full Body",
-            description: "A comprehensive full-body mobility routine",
-            thumbnailURL: nil,
-            isPremium: false,
-            createdAt: Date(),
-            updatedAt: Date()
-        )
+        .mockWakeAndShake,
+        .mockEveningUnwind,
+        .mockQuickReset
     ]
     
     // Quick Sessions (under 5 minutes)
     private let quickSessions: [Routine] = [
-        Routine(
-            id: UUID(),
-            name: "Desk Stretch",
-            description: "Quick stretches to do at your desk",
-            thumbnailURL: nil,
-            isPremium: false,
-            createdAt: Date(),
-            updatedAt: Date()
-        ),
-        Routine(
-            id: UUID(),
-            name: "Neck Relief",
-            description: "Relieve neck tension and stiffness",
-            thumbnailURL: nil,
-            isPremium: false,
-            createdAt: Date(),
-            updatedAt: Date()
-        ),
-        Routine(
-            id: UUID(),
-            name: "Tech Neck",
-            description: "Counter the effects of looking at screens",
-            thumbnailURL: nil,
-            isPremium: false,
-            createdAt: Date(),
-            updatedAt: Date()
-        )
+        .mockWakeAndShake,
+        .mockEveningUnwind,
+        .mockQuickReset
     ]
     
     var body: some View {
@@ -118,7 +70,7 @@ struct HomeView: View {
                                    items: commonRoutines) { routine in
                             NavigationLink(destination: RoutineDetailView(
                                 routine: routine,
-                                exercises: Dictionary.mockRoutineExercises[Routine.mockWakeAndShake.id] ?? []
+                                exercises: Dictionary.mockRoutineExercises[routine.id] ?? []
                             )) {
                                 // Carousel Card Style
                                 ZStack(alignment: .topLeading) {
@@ -131,7 +83,7 @@ struct HomeView: View {
                                         
                                         Spacer()
                                         
-                                        Text("\(Dictionary.mockRoutineExercises[Routine.mockWakeAndShake.id]?.count ?? 0) exercises • 5 min")
+                                        Text("\(Dictionary.mockRoutineExercises[routine.id]?.count ?? 0) exercises • 5 min")
                                             .font(.subheadline)
                                             .fontWeight(.medium)
                                             .foregroundStyle(Color.baseWhite)
@@ -164,7 +116,7 @@ struct HomeView: View {
                                         ForEach(quickSessions) { routine in
                                             NavigationLink(destination: RoutineDetailView(
                                                 routine: routine,
-                                                exercises: Dictionary.mockRoutineExercises[Routine.mockWakeAndShake.id] ?? []
+                                                exercises: Dictionary.mockRoutineExercises[routine.id] ?? []
                                             )) {
                                                 // Quick Session Card Style
                                                 VStack(alignment: .leading, spacing: 12) {
@@ -179,7 +131,7 @@ struct HomeView: View {
                                                             .font(.headline)
                                                             .foregroundStyle(Color.baseWhite)
                                                         
-                                                        Text("\(Dictionary.mockRoutineExercises[Routine.mockWakeAndShake.id]?.count ?? 0) exercises • 5 min")
+                                                        Text("\(Dictionary.mockRoutineExercises[routine.id]?.count ?? 0) exercises • 5 min")
                                                             .font(.subheadline)
                                                             .foregroundStyle(Color.baseWhite.opacity(0.6))
                                                     }
