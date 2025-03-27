@@ -4,13 +4,14 @@ import SupabaseKit
 public struct RoutineDetailView: View {
     let routine: Routine
     let exercises: [Exercise]
+    let isModal: Bool
     @State private var exerciseDurations: [UUID: Int]
     @Environment(\.dismiss) private var dismiss
     
-    public init(routine: Routine, exercises: [Exercise]) {
+    public init(routine: Routine, exercises: [Exercise], isModal: Bool = false) {
         self.routine = routine
         self.exercises = exercises
-        // Initialize with base durations from exercises
+        self.isModal = isModal
         _exerciseDurations = State(initialValue: Dictionary(
             uniqueKeysWithValues: exercises.map { ($0.id, $0.baseDuration) }
         ))
@@ -78,10 +79,12 @@ public struct RoutineDetailView: View {
         }
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItem(placement: .navigationBarLeading) {
-                Button(action: { dismiss() }) {
-                    Image(systemName: "xmark")
-                        .foregroundColor(.white)
+            if isModal {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(action: { dismiss() }) {
+                        Image(systemName: "xmark")
+                            .foregroundColor(.white)
+                    }
                 }
             }
             
