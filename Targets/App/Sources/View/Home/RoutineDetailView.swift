@@ -25,19 +25,20 @@ struct RoutineDetailView: View {
             // Header
             VStack(alignment: .leading, spacing: 8) {
                 Text(routine.name)
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
+                    .font(.system(size: 34, weight: .bold))
+                    .foregroundColor(.white)
                 
                 Text("\(totalDuration / 60) MINUTES")
-                    .font(.subheadline)
-                    .foregroundColor(.gray)
+                    .font(.system(size: 15, weight: .medium))
+                    .foregroundColor(.white.opacity(0.6))
                     .textCase(.uppercase)
                 
                 if let description = routine.description {
                     Text(description)
-                        .font(.body)
-                        .foregroundColor(.secondary)
-                        .padding(.top, 4)
+                        .font(.system(size: 17))
+                        .foregroundColor(.white.opacity(0.7))
+                        .lineSpacing(4)
+                        .padding(.top, 8)
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
