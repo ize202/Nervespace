@@ -56,7 +56,7 @@ public struct ActiveSessionView: View {
                     Button(action: {
                         // TODO: Show more options
                     }) {
-                        Image(systemName: "ellipsis")
+                        Image(systemName: "gear")
                             .font(.system(size: 20))
                             .foregroundColor(.white)
                             .frame(width: 44, height: 44)
