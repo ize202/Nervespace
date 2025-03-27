@@ -6,6 +6,7 @@ struct PlanDetailView: View {
     let description: String
     let duration: String // e.g., "3 DAY SERIES"
     let routines: [Routine]
+    @State private var selectedRoutineForPreview: Routine?
     
     var body: some View {
         ZStack {
@@ -37,10 +38,7 @@ struct PlanDetailView: View {
                 ScrollView {
                     VStack(spacing: 16) {
                         ForEach(Array(routines.enumerated()), id: \.element.id) { index, routine in
-                            NavigationLink(destination: RoutineDetailView(
-                                routine: routine,
-                                exercises: Dictionary.mockRoutineExercises[routine.id] ?? []
-                            )) {
+                            Button(action: { selectedRoutineForPreview = routine }) {
                                 PlanRoutineRow(
                                     routine: routine,
                                     dayNumber: index + 1
@@ -51,11 +49,12 @@ struct PlanDetailView: View {
                     .padding()
                 }
                 
-                // Continue Button
-                Button(action: {
-                    // TODO: Start plan
-                }) {
-                    Text("CONTINUE")
+                // Select Plan Button
+                NavigationLink(destination: RoutineDetailView(
+                    routine: routines[0],
+                    exercises: Dictionary.mockRoutineExercises[routines[0].id] ?? []
+                )) {
+                    Text("SELECT PLAN")
                         .font(.headline)
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
@@ -67,6 +66,15 @@ struct PlanDetailView: View {
             }
         }
         .navigationBarTitleDisplayMode(.inline)
+        .sheet(item: $selectedRoutineForPreview) { routine in
+            NavigationView {
+                RoutineDetailView(
+                    routine: routine,
+                    exercises: Dictionary.mockRoutineExercises[routine.id] ?? [],
+                    previewMode: true
+                )
+            }
+        }
     }
 }
 

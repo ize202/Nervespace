@@ -4,11 +4,13 @@ import SupabaseKit
 public struct RoutineDetailView: View {
     let routine: Routine
     let exercises: [Exercise]
+    let previewMode: Bool
     @State private var exerciseDurations: [UUID: Int]
     
-    public init(routine: Routine, exercises: [Exercise]) {
+    public init(routine: Routine, exercises: [Exercise], previewMode: Bool = false) {
         self.routine = routine
         self.exercises = exercises
+        self.previewMode = previewMode
         _exerciseDurations = State(initialValue: Dictionary(
             uniqueKeysWithValues: exercises.map { ($0.id, $0.baseDuration) }
         ))
@@ -60,30 +62,34 @@ public struct RoutineDetailView: View {
                 }
                 
                 // Start Button
-                Button(action: {
-                    // TODO: Start workout
-                }) {
-                    Text("START")
-                        .font(.headline)
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.brandPrimary)
-                        .cornerRadius(12)
+                if !previewMode {
+                    Button(action: {
+                        // TODO: Start workout
+                    }) {
+                        Text("START")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.brandPrimary)
+                            .cornerRadius(12)
+                    }
+                    .padding()
                 }
-                .padding()
             }
         }
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button(action: {
-                    // TODO: Add to favorites
-                }) {
-                    Image(systemName: "bookmark")
-                        .foregroundColor(.brandPrimary)
-                        .font(.system(size: 20))
-                        .frame(width: 44, height: 44)
+            if !previewMode {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: {
+                        // TODO: Add to favorites
+                    }) {
+                        Image(systemName: "bookmark")
+                            .foregroundColor(.brandPrimary)
+                            .font(.system(size: 20))
+                            .frame(width: 44, height: 44)
+                    }
                 }
             }
         }
