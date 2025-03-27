@@ -5,30 +5,68 @@ import SupabaseKit
 struct HomeView: View {
     @State private var currentIndex: Int = 0
     @State private var showingProfile = false
-    @State private var selectedPlan: RoutineCard?
-    @State private var selectedRoutine: RoutineCard?
+    @StateObject private var bookmarkManager = BookmarkManager.shared
     
     // Common Routines for Carousel
-    private let commonRoutines: [RoutineCard] = [
-        .init(title: "Wake Up", duration: "5 MINUTES"),
-        .init(title: "Sleep", duration: "10 MINUTES"),
-        .init(title: "Full Body", duration: "15 MINUTES"),
-        .init(title: "Complete Reset", duration: "20 MINUTES")
+    private let commonRoutines: [Routine] = [
+        Routine(
+            id: UUID(),
+            name: "Wake Up",
+            description: "Start your day with an energizing sequence",
+            thumbnailURL: nil,
+            isPremium: false,
+            createdAt: Date(),
+            updatedAt: Date()
+        ),
+        Routine(
+            id: UUID(),
+            name: "Sleep",
+            description: "Prepare your body and mind for restful sleep",
+            thumbnailURL: nil,
+            isPremium: false,
+            createdAt: Date(),
+            updatedAt: Date()
+        ),
+        Routine(
+            id: UUID(),
+            name: "Full Body",
+            description: "A comprehensive full-body mobility routine",
+            thumbnailURL: nil,
+            isPremium: false,
+            createdAt: Date(),
+            updatedAt: Date()
+        )
     ]
     
     // Quick Sessions (under 5 minutes)
-    private let quickSessions: [RoutineCard] = [
-        .init(title: "Desk Stretch", duration: "4 min", imageUrl: "desk-stretch"),
-        .init(title: "Neck Relief", duration: "3 min", imageUrl: "neck-relief"),
-        .init(title: "Tech Neck", duration: "5 min", imageUrl: "tech-neck"),
-        .init(title: "Detox", duration: "4 min", imageUrl: "detox")
-    ]
-    
-    // Multi-day Plans
-    private let plans: [RoutineCard] = [
-        .init(title: "Morning Routine", duration: "7 day series", imageUrl: "morning-routine"),
-        .init(title: "Stress Relief", duration: "5 day series", imageUrl: "stress-relief"),
-        .init(title: "Better Sleep", duration: "3 day series", imageUrl: "better-sleep")
+    private let quickSessions: [Routine] = [
+        Routine(
+            id: UUID(),
+            name: "Desk Stretch",
+            description: "Quick stretches to do at your desk",
+            thumbnailURL: nil,
+            isPremium: false,
+            createdAt: Date(),
+            updatedAt: Date()
+        ),
+        Routine(
+            id: UUID(),
+            name: "Neck Relief",
+            description: "Relieve neck tension and stiffness",
+            thumbnailURL: nil,
+            isPremium: false,
+            createdAt: Date(),
+            updatedAt: Date()
+        ),
+        Routine(
+            id: UUID(),
+            name: "Tech Neck",
+            description: "Counter the effects of looking at screens",
+            thumbnailURL: nil,
+            isPremium: false,
+            createdAt: Date(),
+            updatedAt: Date()
+        )
     ]
     
     var body: some View {
@@ -79,33 +117,21 @@ struct HomeView: View {
                                    index: $currentIndex,
                                    items: commonRoutines) { routine in
                             NavigationLink(destination: RoutineDetailView(
-                                routine: Routine(
-                                    id: routine.id,
-                                    name: routine.title,
-                                    description: nil,
-                                    thumbnailURL: nil,
-                                    isPremium: false,
-                                    createdAt: Date(),
-                                    updatedAt: Date()
-                                ),
+                                routine: routine,
                                 exercises: Dictionary.mockRoutineExercises[Routine.mockWakeAndShake.id] ?? []
                             )) {
                                 // Carousel Card Style
                                 ZStack(alignment: .topLeading) {
-                                    Image(systemName: routine.image)
-                                        .resizable()
-                                        .aspectRatio(contentMode: .fill)
-                                        .foregroundStyle(Color.brandPrimary.opacity(0.2))
-                                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                    Color.brandPrimary.opacity(0.2)
                                     
                                     VStack(alignment: .leading) {
-                                        Text(routine.title)
+                                        Text(routine.name)
                                             .font(.system(size: 28, weight: .bold))
                                             .foregroundStyle(Color.baseWhite)
                                         
                                         Spacer()
                                         
-                                        Text(routine.duration.replacingOccurrences(of: "MINUTES", with: "mins"))
+                                        Text("\(Dictionary.mockRoutineExercises[Routine.mockWakeAndShake.id]?.count ?? 0) exercises • 5 min")
                                             .font(.subheadline)
                                             .fontWeight(.medium)
                                             .foregroundStyle(Color.baseWhite)
@@ -135,42 +161,25 @@ struct HomeView: View {
                                 
                                 ScrollView(.horizontal, showsIndicators: false) {
                                     LazyHStack(spacing: 16) {
-                                        ForEach(quickSessions) { session in
+                                        ForEach(quickSessions) { routine in
                                             NavigationLink(destination: RoutineDetailView(
-                                                routine: Routine(
-                                                    id: session.id,
-                                                    name: session.title,
-                                                    description: nil,
-                                                    thumbnailURL: session.imageUrl.flatMap { URL(string: $0) },
-                                                    isPremium: false,
-                                                    createdAt: Date(),
-                                                    updatedAt: Date()
-                                                ),
+                                                routine: routine,
                                                 exercises: Dictionary.mockRoutineExercises[Routine.mockWakeAndShake.id] ?? []
                                             )) {
                                                 // Quick Session Card Style
                                                 VStack(alignment: .leading, spacing: 12) {
                                                     // Image container
-                                                    ZStack {
-                                                        if let imageUrl = session.imageUrl {
-                                                            AsyncImage(url: URL(string: imageUrl)) { image in
-                                                                image
-                                                                    .resizable()
-                                                                    .aspectRatio(contentMode: .fill)
-                                                            } placeholder: {
-                                                                Color.baseGray
-                                                            }
-                                                        }
-                                                    }
-                                                    .frame(width: 200, height: 160)
-                                                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                                                    RoundedRectangle(cornerRadius: 12)
+                                                        .fill(Color.brandPrimary.opacity(0.2))
+                                                        .frame(width: 200, height: 160)
                                                     
                                                     // Text content
                                                     VStack(alignment: .leading, spacing: 4) {
-                                                        Text(session.title)
+                                                        Text(routine.name)
                                                             .font(.headline)
                                                             .foregroundStyle(Color.baseWhite)
-                                                        Text(session.duration)
+                                                        
+                                                        Text("\(Dictionary.mockRoutineExercises[Routine.mockWakeAndShake.id]?.count ?? 0) exercises • 5 min")
                                                             .font(.subheadline)
                                                             .foregroundStyle(Color.baseWhite.opacity(0.6))
                                                     }
@@ -186,7 +195,7 @@ struct HomeView: View {
                             
                             // Plans Section
                             VStack(alignment: .leading, spacing: 16) {
-                                Text("Plans")
+                                Text("Your Plans")
                                     .font(.title2)
                                     .fontWeight(.bold)
                                     .foregroundStyle(Color.baseWhite)
@@ -194,40 +203,25 @@ struct HomeView: View {
                                 
                                 ScrollView(.horizontal, showsIndicators: false) {
                                     LazyHStack(spacing: 16) {
-                                        ForEach(plans) { plan in
-                                            NavigationLink(destination: PlanDetailView(
-                                                title: plan.title,
-                                                description: "A series designed to help you build a consistent routine and improve your overall well-being.",
-                                                duration: plan.duration.uppercased(),
-                                                routines: [
-                                                    .mockWakeAndShake,
-                                                    .mockEveningUnwind,
-                                                    .mockQuickReset
-                                                ]
+                                        ForEach(Routine.mockPlans) { routine in
+                                            NavigationLink(destination: RoutineDetailView(
+                                                routine: routine,
+                                                exercises: Dictionary.mockRoutineExercises[routine.id] ?? []
                                             )) {
-                                                // Plan Card Style - matching Quick Routines style
+                                                // Plan Card Style
                                                 VStack(alignment: .leading, spacing: 12) {
                                                     // Image container
-                                                    ZStack {
-                                                        if let imageUrl = plan.imageUrl {
-                                                            AsyncImage(url: URL(string: imageUrl)) { image in
-                                                                image
-                                                                    .resizable()
-                                                                    .aspectRatio(contentMode: .fill)
-                                                            } placeholder: {
-                                                                Color.baseGray
-                                                            }
-                                                        }
-                                                    }
-                                                    .frame(width: 200, height: 160)
-                                                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                                                    RoundedRectangle(cornerRadius: 12)
+                                                        .fill(Color.brandPrimary.opacity(0.2))
+                                                        .frame(width: 200, height: 160)
                                                     
                                                     // Text content
                                                     VStack(alignment: .leading, spacing: 4) {
-                                                        Text(plan.title)
+                                                        Text(routine.name)
                                                             .font(.headline)
                                                             .foregroundStyle(Color.baseWhite)
-                                                        Text(plan.duration)
+                                                        
+                                                        Text("\(Dictionary.mockRoutineExercises[routine.id]?.count ?? 0) exercises • 5 min")
                                                             .font(.subheadline)
                                                             .foregroundStyle(Color.baseWhite.opacity(0.6))
                                                     }
@@ -255,5 +249,6 @@ struct HomeView: View {
 
 #Preview {
     HomeView()
+        .preferredColorScheme(.dark)
 } 
 

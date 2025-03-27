@@ -2,11 +2,11 @@ import SwiftUI
 import SupabaseKit
 
 struct BookmarkedRoutinesView: View {
-    @State private var bookmarkedRoutines: [(Routine, [Exercise])] = [
-        // Mock data for now - would come from database/user defaults
-        (Routine.mockWakeAndShake, Dictionary.mockRoutineExercises[Routine.mockWakeAndShake.id] ?? []),
-        (Routine.mockEveningUnwind, Dictionary.mockRoutineExercises[Routine.mockEveningUnwind.id] ?? [])
-    ]
+    @StateObject private var bookmarkManager = BookmarkManager.shared
+    
+    private var bookmarkedRoutines: [(Routine, [Exercise])] {
+        bookmarkManager.getBookmarkedRoutines()
+    }
     
     var body: some View {
         ZStack {

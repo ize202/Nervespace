@@ -32,6 +32,36 @@ public extension Routine {
     )
     
     static let allMocks = [mockWakeAndShake, mockEveningUnwind, mockQuickReset]
+    
+    static let mockPlans = [
+        Routine(
+            id: UUID(),
+            name: "Beginner Series",
+            description: "A 3-day series designed to introduce you to basic somatic practices",
+            thumbnailURL: nil,
+            isPremium: false,
+            createdAt: Date(),
+            updatedAt: Date()
+        ),
+        Routine(
+            id: UUID(),
+            name: "Stress Relief",
+            description: "A 5-day series focused on reducing stress and anxiety",
+            thumbnailURL: nil,
+            isPremium: true,
+            createdAt: Date(),
+            updatedAt: Date()
+        ),
+        Routine(
+            id: UUID(),
+            name: "Better Sleep",
+            description: "A 7-day series to improve your sleep quality",
+            thumbnailURL: nil,
+            isPremium: true,
+            createdAt: Date(),
+            updatedAt: Date()
+        )
+    ]
 }
 
 public extension Exercise {
@@ -131,6 +161,21 @@ public extension Dictionary where Key == UUID, Value == [Exercise] {
         Routine.mockQuickReset.id: [
             Exercise.mockTrunkTwist,
             Exercise.mockArmCircles
+        ],
+        Routine.mockPlans[0].id: [ // Beginner Series
+            Exercise.mockNeckRoll,
+            Exercise.mockArmCircles,
+            Exercise.mockDynamicSideBends
+        ],
+        Routine.mockPlans[1].id: [ // Stress Relief
+            Exercise.mockHipCircles,
+            Exercise.mockNeckRoll,
+            Exercise.mockTrunkTwist
+        ],
+        Routine.mockPlans[2].id: [ // Better Sleep
+            Exercise.mockDynamicSideBends,
+            Exercise.mockHipCircles,
+            Exercise.mockNeckRoll
         ]
     ]
 }

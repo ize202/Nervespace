@@ -8,7 +8,7 @@ public struct RoutineDetailView: View {
     @State private var exerciseDurations: [UUID: Int]
     @State private var showingActiveSession = false
     @State private var selectedExercise: Exercise?
-    @State private var isBookmarked = false
+    @StateObject private var bookmarkManager = BookmarkManager.shared
     
     public init(routine: Routine, exercises: [Exercise], previewMode: Bool = false) {
         self.routine = routine
@@ -89,10 +89,9 @@ public struct RoutineDetailView: View {
             if !previewMode {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: {
-                        isBookmarked.toggle()
-                        // TODO: Persist bookmark state
+                        bookmarkManager.toggleBookmark(for: routine)
                     }) {
-                        Image(systemName: isBookmarked ? "bookmark.fill" : "bookmark")
+                        Image(systemName: bookmarkManager.isBookmarked(routine) ? "bookmark.fill" : "bookmark")
                             .foregroundColor(.brandPrimary)
                             .font(.system(size: 20))
                             .frame(width: 44, height: 44)
