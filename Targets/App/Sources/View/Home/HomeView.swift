@@ -43,7 +43,7 @@ struct HomeView: View {
                             Text("Nervespace")
                                 .font(.largeTitle)
                                 .fontWeight(.bold)
-                                .foregroundStyle(.primary)
+                                .foregroundStyle(Color.baseWhite)
                             
                             Spacer()
                             
@@ -53,6 +53,7 @@ struct HomeView: View {
                                 Text("4")
                                     .font(.subheadline)
                                     .fontWeight(.semibold)
+                                    .foregroundStyle(Color.baseWhite)
                             }
                             .padding(.horizontal, 12)
                             .padding(.vertical, 6)
@@ -100,14 +101,14 @@ struct HomeView: View {
                                     VStack(alignment: .leading) {
                                         Text(routine.title)
                                             .font(.system(size: 28, weight: .bold))
-                                            .foregroundStyle(Color.baseBlack)
+                                            .foregroundStyle(Color.baseWhite)
                                         
                                         Spacer()
                                         
                                         Text(routine.duration.replacingOccurrences(of: "MINUTES", with: "mins"))
                                             .font(.subheadline)
                                             .fontWeight(.medium)
-                                            .foregroundStyle(.white)
+                                            .foregroundStyle(Color.baseWhite)
                                             .padding(.horizontal, 12)
                                             .padding(.vertical, 6)
                                             .background(
@@ -129,7 +130,7 @@ struct HomeView: View {
                                 Text("Quick Routines")
                                     .font(.title2)
                                     .fontWeight(.bold)
-                                    .foregroundStyle(.primary)
+                                    .foregroundStyle(Color.baseWhite)
                                     .padding(.horizontal)
                                 
                                 ScrollView(.horizontal, showsIndicators: false) {
@@ -168,10 +169,10 @@ struct HomeView: View {
                                                     VStack(alignment: .leading, spacing: 4) {
                                                         Text(session.title)
                                                             .font(.headline)
-                                                            .foregroundStyle(.primary)
+                                                            .foregroundStyle(Color.baseWhite)
                                                         Text(session.duration)
                                                             .font(.subheadline)
-                                                            .foregroundStyle(.secondary)
+                                                            .foregroundStyle(Color.baseWhite.opacity(0.6))
                                                     }
                                                     .padding(.horizontal, 4)
                                                 }
@@ -188,7 +189,7 @@ struct HomeView: View {
                                 Text("Plans")
                                     .font(.title2)
                                     .fontWeight(.bold)
-                                    .foregroundStyle(.primary)
+                                    .foregroundStyle(Color.baseWhite)
                                     .padding(.horizontal)
                                 
                                 ScrollView(.horizontal, showsIndicators: false) {
@@ -225,10 +226,10 @@ struct HomeView: View {
                                                     VStack(alignment: .leading, spacing: 4) {
                                                         Text(plan.title)
                                                             .font(.headline)
-                                                            .foregroundStyle(.primary)
+                                                            .foregroundStyle(Color.baseWhite)
                                                         Text(plan.duration)
                                                             .font(.subheadline)
-                                                            .foregroundStyle(.secondary)
+                                                            .foregroundStyle(Color.baseWhite.opacity(0.6))
                                                     }
                                                     .padding(.horizontal, 4)
                                                 }

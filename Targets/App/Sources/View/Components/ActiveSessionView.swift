@@ -41,7 +41,7 @@ public struct ActiveSessionView: View {
                     Button(action: { dismiss() }) {
                         Image(systemName: "xmark")
                             .font(.system(size: 20))
-                            .foregroundColor(.white)
+                            .foregroundColor(Color.baseWhite)
                             .frame(width: 44, height: 44)
                     }
                     
@@ -49,7 +49,7 @@ public struct ActiveSessionView: View {
                     
                     Text(progressText)
                         .font(.system(size: 17, weight: .semibold))
-                        .foregroundColor(.white)
+                        .foregroundColor(Color.baseWhite)
                     
                     Spacer()
                     
@@ -58,7 +58,7 @@ public struct ActiveSessionView: View {
                     }) {
                         Image(systemName: "gear")
                             .font(.system(size: 20))
-                            .foregroundColor(.white)
+                            .foregroundColor(Color.baseWhite)
                             .frame(width: 44, height: 44)
                     }
                 }
@@ -108,21 +108,21 @@ public struct ActiveSessionView: View {
                 HStack {
                     Text(currentExercise?.name ?? "")
                         .font(.system(size: 28, weight: .bold))
-                        .foregroundColor(.white)
+                        .foregroundColor(Color.baseWhite)
                     
                     Button(action: {
                         // TODO: Show exercise info
                     }) {
                         Image(systemName: "info.circle")
                             .font(.system(size: 20))
-                            .foregroundColor(.white.opacity(0.6))
+                            .foregroundColor(Color.baseWhite.opacity(0.6))
                     }
                 }
                 
                 // Timer
                 Text(timeString(from: timeRemaining))
                     .font(.system(size: 72, weight: .medium, design: .monospaced))
-                    .foregroundColor(.white)
+                    .foregroundColor(Color.baseWhite)
                     .padding(.top, 32)
                 
                 Spacer()

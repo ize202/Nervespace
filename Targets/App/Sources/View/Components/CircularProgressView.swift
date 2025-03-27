@@ -34,11 +34,11 @@ struct CircularProgressView: View {
             VStack(spacing: 8) {
                 Text("\(current)/\(goal)")
                     .font(.system(size: 34, weight: .medium, design: .rounded))
-                    .foregroundColor(.white)
+                    .foregroundColor(Color.baseWhite)
                 
                 Text("minutes")
                     .font(.system(size: 17))
-                    .foregroundColor(.white.opacity(0.5))
+                    .foregroundColor(Color.baseWhite.opacity(0.5))
             }
         }
         .aspectRatio(1, contentMode: .fit)

@@ -61,13 +61,13 @@ public extension Color {
     static let brandSecondary = Color(hex: "503370")
     
     /// Base black color
-    static let baseBlack = Color(hex: "141414")
+    static let baseBlack = Color(hex: "#000000")
     
     /// Pure white color
     static let baseWhite = Color(hex: "ffffff")
     
     /// Light gray color
-    static let baseGray = Color(hex: "#EBEBEB")
+    static let baseGray = Color(hex: "#cccccc")
 ```
 - User Onboarding: Brief tutorial introducing app features.
 - User Authentication: Simple Sign-up/login via email/password form like bend.

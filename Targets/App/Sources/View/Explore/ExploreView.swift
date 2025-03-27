@@ -7,17 +7,17 @@ struct SearchBar: View {
     var body: some View {
         HStack {
             Image(systemName: "magnifyingglass")
-                .foregroundColor(.white.opacity(0.6))
+                .foregroundColor(Color.baseWhite.opacity(0.6))
             
             TextField("Areas, Exercises, Categories, and More", text: $text)
                 .textFieldStyle(PlainTextFieldStyle())
-                .foregroundColor(.white)
+                .foregroundColor(Color.baseWhite)
                 .tint(.brandPrimary)
             
             if !text.isEmpty {
                 Button(action: { text = "" }) {
                     Image(systemName: "xmark.circle.fill")
-                        .foregroundColor(.white.opacity(0.6))
+                        .foregroundColor(Color.baseWhite.opacity(0.6))
                 }
             }
         }

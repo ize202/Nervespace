@@ -61,7 +61,7 @@ struct ProgressView: View {
                                     Text(monthYearString)
                                         .font(.title3)
                                         .fontWeight(.semibold)
-                                        .foregroundColor(.white)
+                                        .foregroundColor(Color.baseWhite)
                                     
                                     // Days of week header
                                     HStack {
@@ -69,7 +69,7 @@ struct ProgressView: View {
                                             Text(day)
                                                 .font(.caption)
                                                 .fontWeight(.medium)
-                                                .foregroundColor(.white.opacity(0.7))
+                                                .foregroundColor(Color.baseWhite.opacity(0.7))
                                                 .frame(maxWidth: .infinity)
                                         }
                                     }
