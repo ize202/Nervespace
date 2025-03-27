@@ -133,4 +133,14 @@ public extension Dictionary where Key == UUID, Value == [Exercise] {
             Exercise.mockArmCircles
         ]
     ]
+}
+
+public extension Dictionary where Key == UUID, Value == [String] {
+    static let mockExerciseTags: [UUID: [String]] = [
+        Exercise.mockDynamicSideBends.id: ["Movement", "Stress Relief", "Focus & Clarity"],
+        Exercise.mockArmCircles.id: ["Movement", "Energy Boost", "Quick Reset"],
+        Exercise.mockNeckRoll.id: ["Movement", "Stress Relief", "Better Sleep"],
+        Exercise.mockTrunkTwist.id: ["Movement", "Energy Boost", "Quick Reset"],
+        Exercise.mockHipCircles.id: ["Movement", "Stress Relief", "Anxiety"]
+    ]
 } 

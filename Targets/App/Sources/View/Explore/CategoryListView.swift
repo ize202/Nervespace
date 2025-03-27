@@ -86,7 +86,9 @@ struct CategoryListView: View {
             // Simulate API call with mock data for now
             try? await Task.sleep(for: .seconds(1))
             routines = [.mockWakeAndShake, .mockEveningUnwind]
-            exercises = Exercise.allMocks.filter { $0.name.contains(category) }
+            exercises = Exercise.allMocks.filter { exercise in
+                Dictionary.mockExerciseTags[exercise.id]?.contains(category) ?? false
+            }
             isLoading = false
         }
     }
