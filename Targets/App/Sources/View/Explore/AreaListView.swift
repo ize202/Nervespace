@@ -46,7 +46,7 @@ struct AreaListView: View {
                                     .frame(maxWidth: .infinity, alignment: .leading)
                                     .padding(.horizontal)
                                 
-                                ForEach(exercises) { exercise in
+                                ForEach(exercises, id: \.id) { exercise in
                                     Button(action: { selectedExercise = exercise }) {
                                         ExerciseRow(exercise: exercise)
                                             .padding(.horizontal)
@@ -63,7 +63,7 @@ struct AreaListView: View {
                                     .padding(.horizontal)
                                     .padding(.top, exercises.isEmpty ? 0 : 16)
                                 
-                                ForEach(routines) { routine in
+                                ForEach(routines, id: \.id) { routine in
                                     NavigationLink(destination: RoutineDetailView(
                                         routine: routine,
                                         exercises: Dictionary.mockRoutineExercises[routine.id] ?? []
@@ -84,12 +84,14 @@ struct AreaListView: View {
             ExerciseDetailView(exercise: exercise)
         }
         .task {
-            // Simulate API call with mock data for now
-            try? await Task.sleep(for: .seconds(1))
+            print("DEBUG: Loading data for area: \(title)")
+            // Load data immediately without artificial delay
             routines = [.mockWakeAndShake, .mockEveningUnwind]
             exercises = Exercise.allMocks.filter { exercise in
                 Dictionary.mockExerciseTags[exercise.id]?.contains(title) ?? false
             }
+            print("DEBUG: Loaded \(exercises.count) exercises with IDs: \(exercises.map { $0.id })")
+            print("DEBUG: Loaded \(routines.count) routines with IDs: \(routines.map { $0.id })")
             isLoading = false
         }
     }
