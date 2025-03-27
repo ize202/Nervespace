@@ -42,9 +42,7 @@ struct ProgressView: View {
                                     
                                     Spacer()
                                     
-                                    Button(action: {
-                                        // History action
-                                    }) {
+                                    NavigationLink(destination: HistoryView()) {
                                         HStack(spacing: 4) {
                                             Text("History")
                                                 .font(.headline)
@@ -52,6 +50,7 @@ struct ProgressView: View {
                                                 .font(.headline)
                                         }
                                         .foregroundColor(.brandPrimary)
+                                        .frame(width: 100, height: 44) // Minimum touch target
                                     }
                                 }
                                 
