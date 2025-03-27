@@ -59,7 +59,7 @@ struct HomeView: View {
                             .padding(.vertical, 6)
                             .background(
                                 Capsule()
-                                    .fill(Color.orange.opacity(0.1))
+                                    .fill(Color.orange.opacity(0.25))
                             )
                             
                             Button {
