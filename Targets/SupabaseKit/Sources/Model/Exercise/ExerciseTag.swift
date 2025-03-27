@@ -10,7 +10,7 @@ public struct ExerciseTag: Identifiable, Codable, Hashable {
         self.tag = tag
     }
     
-    enum CodingKeys: String, CodingKey {
+    public enum CodingKeys: String, CodingKey {
         case exerciseId = "exercise_id"
         case tag
     }

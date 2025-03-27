@@ -45,19 +45,23 @@ public final class SupabaseExerciseService: ExerciseService {
     }
     
     public func fetchExercisesByTag(_ tag: String) async throws -> [Exercise] {
-        let exerciseIds: [UUID] = try await supabase
+        // Create a struct to represent the response data
+        struct ExerciseIdResponse: Decodable {
+            let exercise_id: String
+        }
+        
+        let responses: [ExerciseIdResponse] = try await supabase
             .from("exercise_tags")
             .select("exercise_id")
             .eq("tag", value: tag)
             .execute()
             .value
-            .compactMap { dict in
-                guard let idString = dict["exercise_id"] as? String,
-                      let id = UUID(uuidString: idString) else {
-                    return nil
-                }
-                return id
-            }
+        
+        let exerciseIds = responses.compactMap { UUID(uuidString: $0.exercise_id) }
+        
+        if exerciseIds.isEmpty {
+            return []
+        }
         
         return try await fetchExercisesByIds(exerciseIds)
     }

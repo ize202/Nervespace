@@ -27,7 +27,7 @@ public struct Routine: Identifiable, Codable, Hashable {
         self.updatedAt = updatedAt
     }
     
-    enum CodingKeys: String, CodingKey {
+    public enum CodingKeys: String, CodingKey {
         case id
         case name
         case description

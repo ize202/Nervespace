@@ -24,7 +24,7 @@ public struct UserProgress: Identifiable, Codable, Hashable {
         self.duration = duration
     }
     
-    enum CodingKeys: String, CodingKey {
+    public enum CodingKeys: String, CodingKey {
         case id
         case userId = "user_id"
         case exerciseId = "exercise_id"

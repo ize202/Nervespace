@@ -19,12 +19,17 @@ public final class SupabaseUserService: UserService {
     }
     
     public func updateProfile(userId: UUID, firstName: String?, lastName: String?) async throws -> UserProfile {
-        try await supabase
+        // Create a struct to represent the update data
+        struct ProfileUpdate: Encodable {
+            let first_name: String?
+            let last_name: String?
+        }
+        
+        let update = ProfileUpdate(first_name: firstName, last_name: lastName)
+        
+        return try await supabase
             .from("user_profiles")
-            .update([
-                "first_name": firstName as Any,
-                "last_name": lastName as Any
-            ])
+            .update(update)
             .eq("id", value: userId)
             .single()
             .execute()
@@ -42,14 +47,24 @@ public final class SupabaseUserService: UserService {
     }
     
     public func recordProgress(userId: UUID, exerciseId: UUID?, routineId: UUID?, duration: Int) async throws -> UserProgress {
-        try await supabase
+        // Create a struct to represent the insert data
+        struct ProgressInsert: Encodable {
+            let user_id: UUID
+            let exercise_id: UUID?
+            let routine_id: UUID?
+            let duration: Int
+        }
+        
+        let insert = ProgressInsert(
+            user_id: userId,
+            exercise_id: exerciseId,
+            routine_id: routineId,
+            duration: duration
+        )
+        
+        return try await supabase
             .from("user_progress")
-            .insert([
-                "user_id": userId,
-                "exercise_id": exerciseId as Any,
-                "routine_id": routineId as Any,
-                "duration": duration
-            ])
+            .insert(insert)
             .single()
             .execute()
             .value
