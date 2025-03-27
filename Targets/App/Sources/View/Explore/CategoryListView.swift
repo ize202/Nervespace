@@ -116,18 +116,9 @@ private struct ExerciseRow: View {
                     .frame(width: 56, height: 56)
             }
             
-            VStack(alignment: .leading, spacing: 4) {
-                Text(exercise.name)
-                    .font(.headline)
-                    .foregroundColor(.white)
-                
-                if let description = exercise.description {
-                    Text(description)
-                        .font(.subheadline)
-                        .foregroundColor(.white.opacity(0.7))
-                        .lineLimit(2)
-                }
-            }
+            Text(exercise.name)
+                .font(.headline)
+                .foregroundColor(.white)
             
             Spacer()
             
@@ -166,18 +157,9 @@ private struct RoutineRow: View {
                     .frame(width: 56, height: 56)
             }
             
-            VStack(alignment: .leading, spacing: 4) {
-                Text(routine.name)
-                    .font(.headline)
-                    .foregroundColor(.white)
-                
-                if let description = routine.description {
-                    Text(description)
-                        .font(.subheadline)
-                        .foregroundColor(.white.opacity(0.7))
-                        .lineLimit(2)
-                }
-            }
+            Text(routine.name)
+                .font(.headline)
+                .foregroundColor(.white)
             
             Spacer()
         }
