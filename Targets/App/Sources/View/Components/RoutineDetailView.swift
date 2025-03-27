@@ -7,6 +7,7 @@ public struct RoutineDetailView: View {
     let previewMode: Bool
     @State private var exerciseDurations: [UUID: Int]
     @State private var showingActiveSession = false
+    @State private var selectedExercise: Exercise?
     
     public init(routine: Routine, exercises: [Exercise], previewMode: Bool = false) {
         self.routine = routine
@@ -31,11 +32,13 @@ public struct RoutineDetailView: View {
                     Text(routine.name)
                         .font(.system(size: 34, weight: .bold))
                         .foregroundColor(.white)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                     
                     Text("\(totalDuration / 60) MINUTES")
                         .font(.system(size: 15, weight: .medium))
                         .foregroundColor(.white.opacity(0.6))
                         .textCase(.uppercase)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                     
                     if let description = routine.description {
                         Text(description)
@@ -43,9 +46,9 @@ public struct RoutineDetailView: View {
                             .foregroundColor(.white.opacity(0.7))
                             .lineSpacing(4)
                             .padding(.top, 8)
+                            .frame(maxWidth: .infinity, alignment: .leading)
                     }
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal)
                 .padding(.vertical, 24)
                 
@@ -55,7 +58,8 @@ public struct RoutineDetailView: View {
                         ForEach(exercises) { exercise in
                             ExerciseRow(
                                 exercise: exercise,
-                                duration: exerciseDurationBinding(for: exercise)
+                                duration: exerciseDurationBinding(for: exercise),
+                                onTap: { selectedExercise = exercise }
                             )
                         }
                     }
@@ -94,6 +98,9 @@ public struct RoutineDetailView: View {
                 }
             }
         }
+        .sheet(item: $selectedExercise) { exercise in
+            ExerciseDetailView(exercise: exercise)
+        }
         .fullScreenCover(isPresented: $showingActiveSession) {
             ActiveSessionView(
                 routine: routine,
@@ -114,66 +121,76 @@ public struct RoutineDetailView: View {
 private struct ExerciseRow: View {
     let exercise: Exercise
     @Binding var duration: Int
+    let onTap: () -> Void
     
     var body: some View {
-        HStack(spacing: 12) {
-            // Thumbnail
-            if let thumbnailURL = exercise.thumbnailURL {
-                AsyncImage(url: thumbnailURL) { image in
-                    image
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                } placeholder: {
-                    Color.gray.opacity(0.2)
-                }
-                .frame(width: 56, height: 56)
-                .clipShape(RoundedRectangle(cornerRadius: 8))
-            } else {
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(Color.gray.opacity(0.2))
+        Button(action: onTap) {
+            HStack(spacing: 12) {
+                // Thumbnail
+                if let thumbnailURL = exercise.thumbnailURL {
+                    AsyncImage(url: thumbnailURL) { image in
+                        image
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                    } placeholder: {
+                        Color.gray.opacity(0.2)
+                    }
                     .frame(width: 56, height: 56)
-            }
-            
-            // Exercise Name
-            Text(exercise.name)
-                .font(.headline)
-                .foregroundColor(.white)
-            
-            Spacer()
-            
-            // Duration Controls
-            HStack(spacing: 8) {
-                Button(action: { duration = max(0, duration - 30) }) {
-                    Image(systemName: "minus")
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundColor(.white)
-                        .frame(width: 28, height: 28)
-                        .background(Color.white.opacity(0.2))
-                        .clipShape(Circle())
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                } else {
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(Color.gray.opacity(0.2))
+                        .frame(width: 56, height: 56)
                 }
                 
-                Text("\(duration / 60):\(String(format: "%02d", duration % 60))")
-                    .font(.system(.subheadline, design: .monospaced))
-                    .fontWeight(.medium)
+                // Exercise Name
+                Text(exercise.name)
+                    .font(.headline)
                     .foregroundColor(.white)
-                    .frame(minWidth: 45)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 
-                Button(action: { duration += 30 }) {
-                    Image(systemName: "plus")
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundColor(.white)
-                        .frame(width: 28, height: 28)
-                        .background(Color.white.opacity(0.2))
-                        .clipShape(Circle())
-                }
+                // Duration Controls
+                DurationControls(duration: $duration)
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+            .background {
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(.ultraThinMaterial)
             }
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 12)
-        .background {
-            RoundedRectangle(cornerRadius: 12)
-                .fill(.ultraThinMaterial)
+        .buttonStyle(PlainButtonStyle())
+    }
+}
+
+private struct DurationControls: View {
+    @Binding var duration: Int
+    
+    var body: some View {
+        HStack(spacing: 8) {
+            Button(action: { duration = max(0, duration - 30) }) {
+                Image(systemName: "minus")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundColor(.white)
+                    .frame(width: 44, height: 44) // Increased touch target
+                    .background(Circle().fill(Color.white.opacity(0.2)).frame(width: 28, height: 28))
+            }
+            
+            Text("\(duration / 60):\(String(format: "%02d", duration % 60))")
+                .font(.system(.subheadline, design: .monospaced))
+                .fontWeight(.medium)
+                .foregroundColor(.white)
+                .frame(minWidth: 45)
+            
+            Button(action: { duration += 30 }) {
+                Image(systemName: "plus")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundColor(.white)
+                    .frame(width: 44, height: 44) // Increased touch target
+                    .background(Circle().fill(Color.white.opacity(0.2)).frame(width: 28, height: 28))
+            }
         }
+        .contentShape(Rectangle()) // Make the entire control tappable
     }
 }
 
