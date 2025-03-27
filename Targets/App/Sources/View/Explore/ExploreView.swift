@@ -126,10 +126,11 @@ struct ExploreView: View {
                             
                             Spacer()
                             
-                            Button(action: {}) {
+                            NavigationLink(destination: BookmarkedRoutinesView()) {
                                 Image(systemName: "bookmark")
                                     .foregroundColor(.brandPrimary)
                                     .font(.system(size: 24))
+                                    .frame(width: 44, height: 44)
                             }
                         }
                         .padding(.horizontal)
