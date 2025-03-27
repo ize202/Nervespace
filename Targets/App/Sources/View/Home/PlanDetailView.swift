@@ -14,7 +14,7 @@ struct PlanDetailView: View {
             
             VStack(spacing: 0) {
                 // Header
-                VStack(alignment: .center, spacing: 8) {
+                VStack(alignment: .leading, spacing: 8) {
                     Text(title)
                         .font(.system(size: 34, weight: .bold))
                         .foregroundColor(.white)
@@ -27,18 +27,12 @@ struct PlanDetailView: View {
                     Text(description)
                         .font(.system(size: 17))
                         .foregroundColor(.white.opacity(0.7))
-                        .multilineTextAlignment(.center)
                         .lineSpacing(4)
                         .padding(.top, 8)
-                        .padding(.horizontal, 24)
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal)
                 .padding(.vertical, 24)
-                
-                // Divider
-                Rectangle()
-                    .fill(Color.white.opacity(0.1))
-                    .frame(height: 1)
-                    .padding(.horizontal)
                 
                 // Routines List
                 ScrollView {
@@ -47,9 +41,7 @@ struct PlanDetailView: View {
                             NavigationLink(destination: RoutineDetailView(routine: routine, exercises: [])) {
                                 PlanRoutineRow(
                                     routine: routine,
-                                    dayNumber: index + 1,
-                                    isFirst: index == 0,
-                                    isLast: index == routines.count - 1
+                                    dayNumber: index + 1
                                 )
                             }
                         }
@@ -87,31 +79,9 @@ struct PlanDetailView: View {
 struct PlanRoutineRow: View {
     let routine: Routine
     let dayNumber: Int
-    let isFirst: Bool
-    let isLast: Bool
     
     var body: some View {
         HStack(spacing: 16) {
-            // Progress Line
-            VStack(spacing: 0) {
-                Rectangle()
-                    .fill(Color.white.opacity(0.3))
-                    .frame(width: 2)
-                    .frame(maxHeight: .infinity)
-                    .opacity(isFirst ? 0 : 1)
-                
-                Circle()
-                    .stroke(Color.white.opacity(0.3), lineWidth: 2)
-                    .frame(width: 16, height: 16)
-                
-                Rectangle()
-                    .fill(Color.white.opacity(0.3))
-                    .frame(width: 2)
-                    .frame(maxHeight: .infinity)
-                    .opacity(isLast ? 0 : 1)
-            }
-            .frame(height: 72)
-            
             // Thumbnail
             if let thumbnailURL = routine.thumbnailURL {
                 AsyncImage(url: thumbnailURL) { image in
