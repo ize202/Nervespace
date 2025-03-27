@@ -9,6 +9,7 @@ public struct ActiveSessionView: View {
     @State private var timeRemaining: Int
     @State private var isPaused: Bool = false
     @State private var timer: Timer?
+    @State private var animationId: UUID = UUID()
     @Environment(\.dismiss) private var dismiss
     
     public init(routine: Routine, exercises: [Exercise], customDurations: [UUID: Int]) {
@@ -66,35 +67,33 @@ public struct ActiveSessionView: View {
                 
                 // Exercise Animation/Image
                 ZStack {
-                    Circle()
-                        .stroke(Color.white.opacity(0.1), lineWidth: 4)
-                        .frame(width: 280, height: 280)
-                    
+                    // Exercise Image
                     if let thumbnailURL = currentExercise?.thumbnailURL {
                         AsyncImage(url: thumbnailURL) { image in
                             image
                                 .resizable()
                                 .aspectRatio(contentMode: .fill)
-                                .frame(width: 260, height: 260)
-                                .clipShape(Circle())
+                                .frame(width: 280, height: 280)
+                                .clipShape(RoundedRectangle(cornerRadius: 24))
                         } placeholder: {
-                            Circle()
+                            RoundedRectangle(cornerRadius: 24)
                                 .fill(Color.gray.opacity(0.2))
-                                .frame(width: 260, height: 260)
+                                .frame(width: 280, height: 280)
                         }
                     } else {
-                        Circle()
+                        RoundedRectangle(cornerRadius: 24)
                             .fill(Color.gray.opacity(0.2))
-                            .frame(width: 260, height: 260)
+                            .frame(width: 280, height: 280)
                     }
                     
-                    // Switch sides indicator
-                    Image(systemName: "arrow.left.arrow.right")
-                        .font(.system(size: 24, weight: .bold))
-                        .foregroundColor(.white)
-                        .frame(width: 48, height: 48)
-                        .background(Circle().fill(Color.black.opacity(0.6)))
-                        .position(x: 280 * 0.5 + 24, y: 280 * 0.5)
+                    // Timer Progress Indicator
+                    RoundedRectangle(cornerRadius: 24)
+                        .trim(from: 0, to: timeRemaining > 0 ? 1 - (Double(timeRemaining) / Double(currentExercise?.baseDuration ?? 30)) : 0)
+                        .stroke(Color.brandPrimary, lineWidth: 12)
+                        .frame(width: 280, height: 280)
+                        .rotationEffect(.degrees(-90))
+                        .animation(.linear(duration: 1), value: timeRemaining)
+                        .id(animationId) // Force new animation context when exercise changes
                 }
                 
                 // Exercise Name
@@ -200,12 +199,14 @@ public struct ActiveSessionView: View {
     private func nextExercise() {
         guard currentExerciseIndex < exercises.count - 1 else { return }
         currentExerciseIndex += 1
+        animationId = UUID() // Reset animation context
         timeRemaining = customDurations[exercises[currentExerciseIndex].id] ?? exercises[currentExerciseIndex].baseDuration
     }
     
     private func previousExercise() {
         guard currentExerciseIndex > 0 else { return }
         currentExerciseIndex -= 1
+        animationId = UUID() // Reset animation context
         timeRemaining = customDurations[exercises[currentExerciseIndex].id] ?? exercises[currentExerciseIndex].baseDuration
     }
 }
