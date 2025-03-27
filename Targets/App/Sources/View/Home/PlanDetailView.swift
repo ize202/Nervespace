@@ -58,7 +58,7 @@ struct PlanDetailView: View {
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(Color(white: 0.3))
+                        .background(Color.brandPrimary)
                         .cornerRadius(12)
                 }
                 .padding()
@@ -92,9 +92,9 @@ struct PlanRoutineRow: View {
                     Color.gray.opacity(0.2)
                 }
                 .frame(width: 56, height: 56)
-                .clipShape(Circle())
+                .clipShape(RoundedRectangle(cornerRadius: 8))
             } else {
-                Circle()
+                RoundedRectangle(cornerRadius: 8)
                     .fill(Color.gray.opacity(0.2))
                     .frame(width: 56, height: 56)
             }
