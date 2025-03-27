@@ -82,7 +82,8 @@ public struct RoutineDetailView: View {
                 }) {
                     Image(systemName: "bookmark")
                         .foregroundColor(.brandPrimary)
-                        .font(.system(size: 24))
+                        .font(.system(size: 20))
+                        .frame(width: 44, height: 44)
                 }
             }
         }
