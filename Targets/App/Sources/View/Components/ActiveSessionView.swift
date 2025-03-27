@@ -33,7 +33,7 @@ public struct ActiveSessionView: View {
     public var body: some View {
         ZStack {
             // Background
-            Color.black.ignoresSafeArea()
+            Color.baseBlack.ignoresSafeArea()
             
             VStack(spacing: 24) {
                 // Top Bar
