@@ -1,15 +1,15 @@
 import SwiftUI
 import SupabaseKit
 
-struct RoutineDetailView: View {
+public struct RoutineDetailView: View {
     let routine: Routine
-    @State private var exercises: [Exercise]
+    let exercises: [Exercise]
     @State private var exerciseDurations: [UUID: Int]
     @Environment(\.dismiss) private var dismiss
     
-    init(routine: Routine, exercises: [Exercise]) {
+    public init(routine: Routine, exercises: [Exercise]) {
         self.routine = routine
-        _exercises = State(initialValue: exercises)
+        self.exercises = exercises
         // Initialize with base durations from exercises
         _exerciseDurations = State(initialValue: Dictionary(
             uniqueKeysWithValues: exercises.map { ($0.id, $0.baseDuration) }
@@ -20,7 +20,7 @@ struct RoutineDetailView: View {
         exerciseDurations.values.reduce(0, +)
     }
     
-    var body: some View {
+    public var body: some View {
         ZStack {
             Color.baseBlack.ignoresSafeArea()
             
@@ -105,13 +105,13 @@ struct RoutineDetailView: View {
     }
 }
 
-struct ExerciseRow: View {
+private struct ExerciseRow: View {
     let exercise: Exercise
     @Binding var duration: Int
     
     var body: some View {
         HStack(spacing: 12) {
-            // Exercise Icon/Thumbnail
+            // Thumbnail
             if let thumbnailURL = exercise.thumbnailURL {
                 AsyncImage(url: thumbnailURL) { image in
                     image
@@ -179,4 +179,4 @@ struct ExerciseRow: View {
         )
     }
     .preferredColorScheme(.dark)
-}
+} 

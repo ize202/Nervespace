@@ -38,7 +38,10 @@ struct PlanDetailView: View {
                 ScrollView {
                     VStack(spacing: 16) {
                         ForEach(Array(routines.enumerated()), id: \.element.id) { index, routine in
-                            NavigationLink(destination: RoutineDetailView(routine: routine, exercises: [])) {
+                            NavigationLink(destination: RoutineDetailView(
+                                routine: routine,
+                                exercises: Dictionary.mockRoutineExercises[routine.id] ?? []
+                            )) {
                                 PlanRoutineRow(
                                     routine: routine,
                                     dayNumber: index + 1
