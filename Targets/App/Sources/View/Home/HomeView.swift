@@ -167,13 +167,12 @@ struct HomeView: View {
                                                     // Image container
                                                     RoundedRectangle(cornerRadius: 12)
                                                         .fill(Color.brandPrimary.opacity(0.2))
-                                                        .frame(width: 320, height: 200)
+                                                        .frame(width: 200, height: 160)
                                                     
                                                     // Text content
                                                     VStack(alignment: .leading, spacing: 4) {
                                                         Text(plan.name)
-                                                            .font(.title3)
-                                                            .fontWeight(.bold)
+                                                            .font(.headline)
                                                             .foregroundStyle(Color.baseWhite)
                                                         
                                                         Text(plan.duration.lowercased())
@@ -182,7 +181,7 @@ struct HomeView: View {
                                                     }
                                                     .padding(.horizontal, 4)
                                                 }
-                                                .frame(width: 320)
+                                                .frame(width: 200)
                                             }
                                         }
                                     }
