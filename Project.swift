@@ -36,7 +36,8 @@ func tuistProject() -> Project {
 		"NSPhotoLibraryUsageDescription": "We need Photo Library Access for the App to work.",
 		"UILaunchStoryboardName": "LaunchScreen",
 		"UISupportedInterfaceOrientations": .array(["UIInterfaceOrientationPortrait"]),  //Only Support Portrait on iphone
-	]
+        "ITSAppUsesNonExemptEncryption": .boolean(false),
+    ]
 
 	let sharedKit = TargetDependency.target(name: "SharedKit")
 
