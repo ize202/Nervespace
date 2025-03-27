@@ -93,6 +93,12 @@ public struct ActiveSessionView: View {
                         .stroke(Color.brandPrimary, lineWidth: 12)
                         .frame(width: 280, height: 280)
                         .rotationEffect(.degrees(-90))
+                        .transaction { transaction in
+                            if transaction.animation != nil {
+                                // Only animate when updating progress, not during resets
+                                transaction.animation = transaction.animation?.speed(progressValue == 0 ? 100 : 1)
+                            }
+                        }
                         .animation(.none, value: currentExerciseIndex)
                         .animation(.linear(duration: 1), value: progressValue)
                         .id(animationId)
@@ -213,22 +219,24 @@ public struct ActiveSessionView: View {
     
     private func nextExercise() {
         guard currentExerciseIndex < exercises.count - 1 else { return }
-        withAnimation(.none) {
-            progressValue = 0 // Reset progress with no animation
-        }
+        progressValue = 0 // Reset progress immediately without animation wrapper
         currentExerciseIndex += 1
         timeRemaining = customDurations[exercises[currentExerciseIndex].id] ?? exercises[currentExerciseIndex].baseDuration
-        updateProgress() // Start new progress animation
+        // Small delay to ensure reset is complete before starting new animation
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
+            updateProgress()
+        }
     }
     
     private func previousExercise() {
         guard currentExerciseIndex > 0 else { return }
-        withAnimation(.none) {
-            progressValue = 0 // Reset progress with no animation
-        }
+        progressValue = 0 // Reset progress immediately without animation wrapper
         currentExerciseIndex -= 1
         timeRemaining = customDurations[exercises[currentExerciseIndex].id] ?? exercises[currentExerciseIndex].baseDuration
-        updateProgress() // Start new progress animation
+        // Small delay to ensure reset is complete before starting new animation
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
+            updateProgress()
+        }
     }
 }
 
