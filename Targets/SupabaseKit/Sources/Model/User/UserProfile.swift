@@ -2,9 +2,9 @@ import Foundation
 
 public struct UserProfile: Identifiable, Codable, Hashable {
     public let id: UUID
-    public let email: String
-    public let firstName: String?
-    public let lastName: String?
+    public let appleId: String
+    public let email: String?
+    public let name: String?
     public let avatarURL: URL?
     public let isPremium: Bool
     public let premiumUntil: Date?
@@ -12,20 +12,20 @@ public struct UserProfile: Identifiable, Codable, Hashable {
     public let updatedAt: Date
     
     public init(
-        id: UUID,
-        email: String,
-        firstName: String?,
-        lastName: String?,
-        avatarURL: URL?,
-        isPremium: Bool,
-        premiumUntil: Date?,
-        createdAt: Date,
-        updatedAt: Date
+        id: UUID = UUID(),
+        appleId: String,
+        email: String? = nil,
+        name: String? = nil,
+        avatarURL: URL? = nil,
+        isPremium: Bool = false,
+        premiumUntil: Date? = nil,
+        createdAt: Date = Date(),
+        updatedAt: Date = Date()
     ) {
         self.id = id
+        self.appleId = appleId
         self.email = email
-        self.firstName = firstName
-        self.lastName = lastName
+        self.name = name
         self.avatarURL = avatarURL
         self.isPremium = isPremium
         self.premiumUntil = premiumUntil
@@ -35,9 +35,9 @@ public struct UserProfile: Identifiable, Codable, Hashable {
     
     public enum CodingKeys: String, CodingKey {
         case id
+        case appleId = "apple_id"
         case email
-        case firstName = "first_name"
-        case lastName = "last_name"
+        case name
         case avatarURL = "avatar_url"
         case isPremium = "is_premium"
         case premiumUntil = "premium_until"

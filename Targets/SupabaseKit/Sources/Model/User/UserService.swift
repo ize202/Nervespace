@@ -1,10 +1,26 @@
 import Foundation
 
 public protocol UserService {
+    // Profile management
     func fetchProfile(userId: UUID) async throws -> UserProfile
-    func updateProfile(userId: UUID, firstName: String?, lastName: String?) async throws -> UserProfile
-    func fetchProgress(userId: UUID) async throws -> [UserProgress]
-    func recordProgress(userId: UUID, exerciseId: UUID?, routineId: UUID?, duration: Int) async throws -> UserProgress
-    func fetchProgressForExercise(userId: UUID, exerciseId: UUID) async throws -> [UserProgress]
-    func fetchProgressForRoutine(userId: UUID, routineId: UUID) async throws -> [UserProgress]
+    func createProfile(appleId: String, email: String?, name: String?) async throws -> UserProfile
+    func updateProfile(userId: UUID, name: String?, avatarURL: URL?) async throws -> UserProfile
+    func deleteProfile(userId: UUID) async throws
+    
+    // Progress tracking
+    func fetchProgress(userId: UUID) async throws -> UserProgress
+    func initializeProgress(userId: UUID) async throws -> UserProgress
+    func updateProgress(
+        userId: UUID,
+        streak: Int?,
+        routineCompletions: Int?,
+        totalMinutes: Int?,
+        lastActivity: Date?
+    ) async throws -> UserProgress
+    
+    // Premium status
+    func updatePremiumStatus(userId: UUID, isPremium: Bool, premiumUntil: Date?) async throws -> UserProfile
+    
+    // Utility methods
+    func findProfileByAppleId(_ appleId: String) async throws -> UserProfile?
 } 
