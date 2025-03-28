@@ -1,17 +1,15 @@
 import Foundation
 import Supabase
 
-public final class SupabaseRoutineService: RoutineService {
-    private let supabase: SupabaseClient
-    private let exerciseService: ExerciseService
+public class SupabaseRoutineService: RoutineService {
+    private let client: SupabaseClient
     
-    public init(supabase: SupabaseClient, exerciseService: ExerciseService) {
-        self.supabase = supabase
-        self.exerciseService = exerciseService
+    public init(client: SupabaseClient) {
+        self.client = client
     }
     
     public func fetchRoutines() async throws -> [Routine] {
-        try await supabase
+        return try await client.database
             .from("routines")
             .select()
             .execute()
@@ -19,17 +17,65 @@ public final class SupabaseRoutineService: RoutineService {
     }
     
     public func fetchRoutine(id: UUID) async throws -> Routine {
-        try await supabase
+        let routines: [Routine] = try await client.database
             .from("routines")
             .select()
             .eq("id", value: id)
-            .single()
             .execute()
             .value
+        
+        guard let routine = routines.first else {
+            throw NSError(domain: "RoutineService", code: 404, userInfo: [
+                NSLocalizedDescriptionKey: "Routine not found"
+            ])
+        }
+        
+        return routine
+    }
+    
+    public func createRoutine(_ routine: Routine) async throws -> Routine {
+        let routines: [Routine] = try await client.database
+            .from("routines")
+            .insert(routine)
+            .execute()
+            .value
+        
+        guard let created = routines.first else {
+            throw NSError(domain: "RoutineService", code: 500, userInfo: [
+                NSLocalizedDescriptionKey: "Failed to create routine"
+            ])
+        }
+        
+        return created
+    }
+    
+    public func updateRoutine(_ routine: Routine) async throws -> Routine {
+        let routines: [Routine] = try await client.database
+            .from("routines")
+            .update(routine)
+            .eq("id", value: routine.id)
+            .execute()
+            .value
+        
+        guard let updated = routines.first else {
+            throw NSError(domain: "RoutineService", code: 500, userInfo: [
+                NSLocalizedDescriptionKey: "Failed to update routine"
+            ])
+        }
+        
+        return updated
+    }
+    
+    public func deleteRoutine(id: UUID) async throws {
+        try await client.database
+            .from("routines")
+            .delete()
+            .eq("id", value: id)
+            .execute()
     }
     
     public func fetchRoutineExercises(routineId: UUID) async throws -> [RoutineExercise] {
-        try await supabase
+        return try await client.database
             .from("routine_exercises")
             .select()
             .eq("routine_id", value: routineId)
@@ -38,29 +84,74 @@ public final class SupabaseRoutineService: RoutineService {
             .value
     }
     
-    public func fetchRoutineWithExercises(id: UUID) async throws -> (Routine, [Exercise]) {
-        async let routineTask = fetchRoutine(id: id)
-        async let routineExercisesTask = fetchRoutineExercises(routineId: id)
+    public func addExerciseToRoutine(
+        routineId: UUID,
+        exerciseId: UUID,
+        sequenceOrder: Int,
+        duration: Int
+    ) async throws -> RoutineExercise {
+        let routineExercise = RoutineExercise(
+            routineId: routineId,
+            exerciseId: exerciseId,
+            sequenceOrder: sequenceOrder,
+            duration: duration
+        )
         
-        let (routine, routineExercises) = try await (routineTask, routineExercisesTask)
-        let exerciseIds = routineExercises.map { $0.exerciseId }
-        let exercises = try await exerciseService.fetchExercisesByIds(exerciseIds)
+        let routineExercises: [RoutineExercise] = try await client.database
+            .from("routine_exercises")
+            .insert(routineExercise)
+            .execute()
+            .value
         
-        // Sort exercises according to sequence_order
-        let sortedExercises = routineExercises
-            .sorted { $0.sequenceOrder < $1.sequenceOrder }
-            .compactMap { routineExercise in
-                exercises.first { $0.id == routineExercise.exerciseId }
-            }
+        guard let created = routineExercises.first else {
+            throw NSError(domain: "RoutineService", code: 500, userInfo: [
+                NSLocalizedDescriptionKey: "Failed to add exercise to routine"
+            ])
+        }
         
-        return (routine, sortedExercises)
+        return created
     }
     
-    public func fetchRoutinesByIds(_ ids: [UUID]) async throws -> [Routine] {
-        try await supabase
+    public func updateRoutineExercise(_ routineExercise: RoutineExercise) async throws -> RoutineExercise {
+        let routineExercises: [RoutineExercise] = try await client.database
+            .from("routine_exercises")
+            .update(routineExercise)
+            .eq("id", value: routineExercise.id)
+            .execute()
+            .value
+        
+        guard let updated = routineExercises.first else {
+            throw NSError(domain: "RoutineService", code: 500, userInfo: [
+                NSLocalizedDescriptionKey: "Failed to update routine exercise"
+            ])
+        }
+        
+        return updated
+    }
+    
+    public func removeExerciseFromRoutine(routineId: UUID, exerciseId: UUID) async throws {
+        try await client.database
+            .from("routine_exercises")
+            .delete()
+            .eq("routine_id", value: routineId)
+            .eq("exercise_id", value: exerciseId)
+            .execute()
+    }
+    
+    public func fetchPremiumRoutines() async throws -> [Routine] {
+        return try await client.database
             .from("routines")
             .select()
-            .in("id", values: ids)
+            .eq("is_premium", value: true)
+            .execute()
+            .value
+    }
+    
+    public func fetchFreeRoutines() async throws -> [Routine] {
+        return try await client.database
+            .from("routines")
+            .select()
+            .eq("is_premium", value: false)
             .execute()
             .value
     }

@@ -8,7 +8,7 @@ public struct RoutineExercise: Identifiable, Codable, Hashable {
     public let duration: Int
     
     public init(
-        id: UUID,
+        id: UUID = UUID(),
         routineId: UUID,
         exerciseId: UUID,
         sequenceOrder: Int,
@@ -21,7 +21,7 @@ public struct RoutineExercise: Identifiable, Codable, Hashable {
         self.duration = duration
     }
     
-    enum CodingKeys: String, CodingKey {
+    public enum CodingKeys: String, CodingKey {
         case id
         case routineId = "routine_id"
         case exerciseId = "exercise_id"
