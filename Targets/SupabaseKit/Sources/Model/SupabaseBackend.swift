@@ -24,17 +24,22 @@ public class DB: ObservableObject {
 	
 	/// Exercise service for handling exercise-related operations
 	public private(set) lazy var exerciseService: ExerciseService = {
-		SupabaseExerciseService(supabase: _db)
+		SupabaseExerciseService(client: _db)
 	}()
 	
 	/// Routine service for handling routine-related operations
 	public private(set) lazy var routineService: RoutineService = {
-		SupabaseRoutineService(supabase: _db, exerciseService: exerciseService)
+		SupabaseRoutineService(client: _db)
+	}()
+	
+	/// Plan service for handling plan-related operations
+	public private(set) lazy var planService: PlanService = {
+		SupabasePlanService(client: _db)
 	}()
 	
 	/// User service for handling user-related operations
 	public private(set) lazy var userService: UserService = {
-		SupabaseUserService(supabase: _db)
+		SupabaseUserService(client: _db)
 	}()
 	
 	/// SupabaseAuth user state, nil if not logged in
