@@ -25,15 +25,9 @@ func tuistProject() -> Project {
 	var appInfoPlist: [String: Plist.Value] = [
 		"CFBundleShortVersionString": "$(MARKETING_VERSION)",
 		"CFBundleVersion": "$(CURRENT_PROJECT_VERSION)",
+		"CFBundleDisplayName": "Form",
+		"LSApplicationCategoryType": "public.app-category.healthcare-fitness",
 		"NSFaceIDUsageDescription": "We will use FaceID to authenticate you",
-		"NSCameraUsageDescription": "We need Camera Access for the App to work.",
-		"NSLocationAlwaysAndWhenInUseUsageDescription": "We need Location Access for the App to work.",
-		"NSLocationWhenInUseUsageDescription": "We need Location Access for the App to work.",
-		"NSContactsUsageDescription": "We need Contacts Access for the App to work.",
-		"NSMicrophoneUsageDescription": "We need Microhone Access for the App to work.",
-		"NSCalendarsFullAccessUsageDescription": "We need Calendar Access for the App to work.",
-		"NSRemindersFullAccessUsageDescription": "We need Reminders Access for the App to work.",
-		"NSPhotoLibraryUsageDescription": "We need Photo Library Access for the App to work.",
 		"UILaunchStoryboardName": "LaunchScreen",
 		"UISupportedInterfaceOrientations": .array(["UIInterfaceOrientationPortrait"]),  //Only Support Portrait on iphone
         "ITSAppUsesNonExemptEncryption": .boolean(false),

@@ -4,6 +4,8 @@
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>CFBundleDisplayName</key>
+	<string>Form</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -20,26 +22,12 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.healthcare-fitness</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
-	<key>NSCalendarsFullAccessUsageDescription</key>
-	<string>We need Calendar Access for the App to work.</string>
-	<key>NSCameraUsageDescription</key>
-	<string>We need Camera Access for the App to work.</string>
-	<key>NSContactsUsageDescription</key>
-	<string>We need Contacts Access for the App to work.</string>
 	<key>NSFaceIDUsageDescription</key>
 	<string>We will use FaceID to authenticate you</string>
-	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>We need Location Access for the App to work.</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>We need Location Access for the App to work.</string>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>We need Microhone Access for the App to work.</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>We need Photo Library Access for the App to work.</string>
-	<key>NSRemindersFullAccessUsageDescription</key>
-	<string>We need Reminders Access for the App to work.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
