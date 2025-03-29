@@ -47,4 +47,34 @@ public enum ExerciseArea: String, Codable {
     case triceps = "Triceps"
     case upperBack = "Upper Back"
     case wrists = "Wrists"
+}
+
+public struct ExerciseTag: Identifiable, Codable, Hashable {
+    public let id: UUID
+    public let exerciseId: UUID
+    public let tag: String
+    public let createdAt: Date
+    public let updatedAt: Date
+    
+    public init(
+        id: UUID = UUID(),
+        exerciseId: UUID,
+        tag: String,
+        createdAt: Date = Date(),
+        updatedAt: Date = Date()
+    ) {
+        self.id = id
+        self.exerciseId = exerciseId
+        self.tag = tag
+        self.createdAt = createdAt
+        self.updatedAt = updatedAt
+    }
+    
+    public enum CodingKeys: String, CodingKey {
+        case id
+        case exerciseId = "exercise_id"
+        case tag
+        case createdAt = "created_at"
+        case updatedAt = "updated_at"
+    }
 } 

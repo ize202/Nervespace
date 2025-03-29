@@ -1,6 +1,41 @@
 import Foundation
 import Supabase
 
+// Update types for encoding
+private struct ProfileUpdate: Encodable {
+    let name: String?
+    let avatarURL: String?
+    
+    enum CodingKeys: String, CodingKey {
+        case name
+        case avatarURL = "avatar_url"
+    }
+}
+
+private struct ProgressUpdate: Encodable {
+    let streak: Int?
+    let routineCompletions: Int?
+    let totalMinutes: Int?
+    let lastActivity: Date?
+    
+    enum CodingKeys: String, CodingKey {
+        case streak
+        case routineCompletions = "routine_completions"
+        case totalMinutes = "total_minutes"
+        case lastActivity = "last_activity"
+    }
+}
+
+private struct PremiumStatusUpdate: Encodable {
+    let isPremium: Bool
+    let premiumUntil: Date?
+    
+    enum CodingKeys: String, CodingKey {
+        case isPremium = "is_premium"
+        case premiumUntil = "premium_until"
+    }
+}
+
 public class SupabaseUserService: UserService {
     private let client: SupabaseClient
     
@@ -53,13 +88,14 @@ public class SupabaseUserService: UserService {
     }
     
     public func updateProfile(userId: UUID, name: String?, avatarURL: URL?) async throws -> UserProfile {
-        var updates: [String: Any] = [:]
-        if let name = name { updates["name"] = name }
-        if let avatarURL = avatarURL { updates["avatar_url"] = avatarURL.absoluteString }
+        let update = ProfileUpdate(
+            name: name,
+            avatarURL: avatarURL?.absoluteString
+        )
         
         let profiles: [UserProfile] = try await client.database
             .from("user_profiles")
-            .update(updates)
+            .update(update)
             .eq("id", value: userId)
             .execute()
             .value
@@ -125,15 +161,16 @@ public class SupabaseUserService: UserService {
         totalMinutes: Int?,
         lastActivity: Date?
     ) async throws -> UserProgress {
-        var updates: [String: Any] = [:]
-        if let streak = streak { updates["streak"] = streak }
-        if let routineCompletions = routineCompletions { updates["routine_completions"] = routineCompletions }
-        if let totalMinutes = totalMinutes { updates["total_minutes"] = totalMinutes }
-        if let lastActivity = lastActivity { updates["last_activity"] = lastActivity }
+        let update = ProgressUpdate(
+            streak: streak,
+            routineCompletions: routineCompletions,
+            totalMinutes: totalMinutes,
+            lastActivity: lastActivity
+        )
         
         let progresses: [UserProgress] = try await client.database
             .from("user_progress")
-            .update(updates)
+            .update(update)
             .eq("user_id", value: userId)
             .execute()
             .value
@@ -150,14 +187,14 @@ public class SupabaseUserService: UserService {
     // MARK: - Premium Status
     
     public func updatePremiumStatus(userId: UUID, isPremium: Bool, premiumUntil: Date?) async throws -> UserProfile {
-        var updates: [String: Any] = ["is_premium": isPremium]
-        if let premiumUntil = premiumUntil {
-            updates["premium_until"] = premiumUntil
-        }
+        let update = PremiumStatusUpdate(
+            isPremium: isPremium,
+            premiumUntil: premiumUntil
+        )
         
         let profiles: [UserProfile] = try await client.database
             .from("user_profiles")
-            .update(updates)
+            .update(update)
             .eq("id", value: userId)
             .execute()
             .value
