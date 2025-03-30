@@ -22,21 +22,6 @@ public class DB: ObservableObject {
 	/// Variable reference to access Supabase.
 	internal let _db: SupabaseClient
 	
-	/// Exercise service for handling exercise-related operations
-	public private(set) lazy var exerciseService: ExerciseService = {
-		SupabaseExerciseService(client: _db)
-	}()
-	
-	/// Routine service for handling routine-related operations
-	public private(set) lazy var routineService: RoutineService = {
-		SupabaseRoutineService(client: _db)
-	}()
-	
-	/// Plan service for handling plan-related operations
-	public private(set) lazy var planService: PlanService = {
-		SupabasePlanService(client: _db)
-	}()
-	
 	/// User service for handling user-related operations
 	public private(set) lazy var userService: UserService = {
 		SupabaseUserService(client: _db)

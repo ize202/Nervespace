@@ -1,6 +1,6 @@
 import Foundation
 
-public enum ExerciseCategory: String, Codable {
+public enum ExerciseCategory: String, CaseIterable {
     case staticStretching = "Static stretching"
     case dynamicStretching = "Dynamic stretching"
     case isometrics = "Isometrics"
@@ -11,13 +11,13 @@ public enum ExerciseCategory: String, Codable {
     case cardio = "Cardio"
 }
 
-public enum ExercisePosition: String, Codable {
+public enum ExercisePosition: String, CaseIterable {
     case standing = "Standing"
     case seated = "Seated"
     case floor = "Floor"
 }
 
-public enum ExerciseArea: String, Codable {
+public enum ExerciseArea: String, CaseIterable {
     case abdomen = "Abdomen"
     case ankles = "Ankles"
     case biceps = "Biceps"
@@ -47,34 +47,4 @@ public enum ExerciseArea: String, Codable {
     case triceps = "Triceps"
     case upperBack = "Upper Back"
     case wrists = "Wrists"
-}
-
-public struct ExerciseTag: Identifiable, Codable, Hashable {
-    public let id: UUID
-    public let exerciseId: UUID
-    public let tag: String
-    public let createdAt: Date
-    public let updatedAt: Date
-    
-    public init(
-        id: UUID = UUID(),
-        exerciseId: UUID,
-        tag: String,
-        createdAt: Date = Date(),
-        updatedAt: Date = Date()
-    ) {
-        self.id = id
-        self.exerciseId = exerciseId
-        self.tag = tag
-        self.createdAt = createdAt
-        self.updatedAt = updatedAt
-    }
-    
-    public enum CodingKeys: String, CodingKey {
-        case id
-        case exerciseId = "exercise_id"
-        case tag
-        case createdAt = "created_at"
-        case updatedAt = "updated_at"
-    }
 } 
