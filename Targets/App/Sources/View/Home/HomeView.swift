@@ -136,7 +136,7 @@ private struct PlanCard: View {
             Image(plan.thumbnailName)
                 .resizable()
                 .aspectRatio(contentMode: .fill)
-                .frame(width: 200, height: 160)
+                .frame(width: 280, height: 180)
                 .clipShape(RoundedRectangle(cornerRadius: 12))
             
             VStack(alignment: .leading, spacing: 4) {
@@ -150,7 +150,7 @@ private struct PlanCard: View {
             }
             .padding(.horizontal, 4)
         }
-        .frame(width: 200)
+        .frame(width: 280)
     }
 }
 
