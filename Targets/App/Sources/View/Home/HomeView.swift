@@ -210,31 +210,48 @@ private struct CarouselCard: View {
     let routine: Routine
     
     var body: some View {
-        ZStack(alignment: .topLeading) {
-            Color.brandPrimary.opacity(0.2)
-            
-            VStack(alignment: .leading) {
-                Text(routine.name)
-                    .font(.system(size: 28, weight: .bold))
-                    .foregroundStyle(Color.baseWhite)
+        GeometryReader { geometry in
+            ZStack(alignment: .topLeading) {
+                Image(routine.thumbnailName)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: geometry.size.width, height: geometry.size.height)
+                    .clipped()
                 
-                Spacer()
+                // Gradient overlay for text visibility
+                LinearGradient(
+                    gradient: Gradient(colors: [
+                        .black.opacity(0.4),
+                        .clear,
+                        .black.opacity(0.2)
+                    ]),
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .frame(width: geometry.size.width, height: geometry.size.height)
                 
-                Text("\(routine.exercises.count) exercises • \(routine.totalDuration / 60) min")
-                    .font(.subheadline)
-                    .fontWeight(.medium)
-                    .foregroundStyle(Color.baseWhite)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
-                    .background(
-                        Capsule()
-                            .fill(Color.black.opacity(0.8))
-                    )
+                VStack(alignment: .leading) {
+                    Text(routine.name)
+                        .font(.system(size: 28, weight: .bold))
+                        .foregroundStyle(Color.baseWhite)
+                    
+                    Spacer()
+                    
+                    Text("\(routine.exercises.count) exercises • \(routine.totalDuration / 60) min")
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                        .foregroundStyle(Color.baseWhite)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(
+                            Capsule()
+                                .fill(Color.black.opacity(0.8))
+                        )
+                }
+                .padding(20)
             }
-            .padding(20)
+            .clipShape(RoundedRectangle(cornerRadius: 20))
         }
-        .background(Color.baseGray)
-        .clipShape(RoundedRectangle(cornerRadius: 20))
     }
 }
 
