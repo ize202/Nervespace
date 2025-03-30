@@ -1,25 +1,20 @@
 import SwiftUI
 import SharedKit
-import SupabaseKit
 
 struct HomeView: View {
     @State private var currentIndex: Int = 0
     @State private var showingProfile = false
     @StateObject private var bookmarkManager = BookmarkManager.shared
     
-    // Common Routines for Carousel
-    private let commonRoutines: [Routine] = [
-        .mockWakeAndShake,
-        .mockEveningUnwind,
-        .mockQuickReset
-    ]
+    // Common Routines for Carousel (first 3 routines)
+    private var commonRoutines: [Routine] {
+        Array(RoutineLibrary.routines.prefix(3))
+    }
     
     // Quick Sessions (under 5 minutes)
-    private let quickSessions: [Routine] = [
-        .mockWakeAndShake,
-        .mockEveningUnwind,
-        .mockQuickReset
-    ]
+    private var quickSessions: [Routine] {
+        RoutineLibrary.quickRoutines
+    }
     
     var body: some View {
         NavigationStack {
@@ -68,10 +63,7 @@ struct HomeView: View {
                         SnapCarousel(spacing: 9,
                                    index: $currentIndex,
                                    items: commonRoutines) { routine in
-                            NavigationLink(destination: RoutineDetailView(
-                                routine: routine,
-                                exercises: Dictionary.mockRoutineExercises[routine.id] ?? []
-                            )) {
+                            NavigationLink(destination: RoutineDetailView(routine: routine)) {
                                 // Carousel Card Style
                                 ZStack(alignment: .topLeading) {
                                     Color.brandPrimary.opacity(0.2)
@@ -83,7 +75,7 @@ struct HomeView: View {
                                         
                                         Spacer()
                                         
-                                        Text("\(Dictionary.mockRoutineExercises[routine.id]?.count ?? 0) exercises • 5 min")
+                                        Text("\(routine.exercises.count) exercises • \(routine.totalDuration / 60) min")
                                             .font(.subheadline)
                                             .fontWeight(.medium)
                                             .foregroundStyle(Color.baseWhite)
@@ -114,16 +106,15 @@ struct HomeView: View {
                                 ScrollView(.horizontal, showsIndicators: false) {
                                     LazyHStack(spacing: 16) {
                                         ForEach(quickSessions) { routine in
-                                            NavigationLink(destination: RoutineDetailView(
-                                                routine: routine,
-                                                exercises: Dictionary.mockRoutineExercises[routine.id] ?? []
-                                            )) {
+                                            NavigationLink(destination: RoutineDetailView(routine: routine)) {
                                                 // Quick Session Card Style
                                                 VStack(alignment: .leading, spacing: 12) {
                                                     // Image container
-                                                    RoundedRectangle(cornerRadius: 12)
-                                                        .fill(Color.brandPrimary.opacity(0.2))
+                                                    Image(routine.thumbnailName)
+                                                        .resizable()
+                                                        .aspectRatio(contentMode: .fill)
                                                         .frame(width: 200, height: 160)
+                                                        .clipShape(RoundedRectangle(cornerRadius: 12))
                                                     
                                                     // Text content
                                                     VStack(alignment: .leading, spacing: 4) {
@@ -131,7 +122,7 @@ struct HomeView: View {
                                                             .font(.headline)
                                                             .foregroundStyle(Color.baseWhite)
                                                         
-                                                        Text("\(Dictionary.mockRoutineExercises[routine.id]?.count ?? 0) exercises • 5 min")
+                                                        Text("\(routine.exercises.count) exercises • \(routine.totalDuration / 60) min")
                                                             .font(.subheadline)
                                                             .foregroundStyle(Color.baseWhite.opacity(0.6))
                                                     }
@@ -155,19 +146,16 @@ struct HomeView: View {
                                 
                                 ScrollView(.horizontal, showsIndicators: false) {
                                     LazyHStack(spacing: 16) {
-                                        ForEach(Plan.allMockPlans) { plan in
-                                            NavigationLink(destination: PlanDetailView(
-                                                title: plan.name,
-                                                description: plan.description,
-                                                duration: plan.duration,
-                                                routines: plan.routines
-                                            )) {
+                                        ForEach(PlanLibrary.plans) { plan in
+                                            NavigationLink(destination: PlanDetailView(plan: plan)) {
                                                 // Plan Card Style
                                                 VStack(alignment: .leading, spacing: 12) {
                                                     // Image container
-                                                    RoundedRectangle(cornerRadius: 12)
-                                                        .fill(Color.brandPrimary.opacity(0.2))
+                                                    Image(plan.thumbnailName)
+                                                        .resizable()
+                                                        .aspectRatio(contentMode: .fill)
                                                         .frame(width: 200, height: 160)
+                                                        .clipShape(RoundedRectangle(cornerRadius: 12))
                                                     
                                                     // Text content
                                                     VStack(alignment: .leading, spacing: 4) {
@@ -175,7 +163,7 @@ struct HomeView: View {
                                                             .font(.headline)
                                                             .foregroundStyle(Color.baseWhite)
                                                         
-                                                        Text(plan.duration.lowercased())
+                                                        Text("\(plan.routines.count) routines")
                                                             .font(.subheadline)
                                                             .foregroundStyle(Color.baseWhite.opacity(0.6))
                                                     }

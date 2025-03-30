@@ -1,5 +1,5 @@
 import SwiftUI
-import SupabaseKit
+import SharedKit
 
 struct PlanDetailView: View {
     let title: String
@@ -50,10 +50,7 @@ struct PlanDetailView: View {
                 }
                 
                 // Select Plan Button
-                NavigationLink(destination: RoutineDetailView(
-                    routine: routines[0],
-                    exercises: Dictionary.mockRoutineExercises[routines[0].id] ?? []
-                )) {
+                NavigationLink(destination: RoutineDetailView(routine: routines[0])) {
                     Text("SELECT PLAN")
                         .font(.headline)
                         .foregroundColor(.white)
@@ -70,7 +67,6 @@ struct PlanDetailView: View {
             NavigationView {
                 RoutineDetailView(
                     routine: routine,
-                    exercises: Dictionary.mockRoutineExercises[routine.id] ?? [],
                     previewMode: true
                 )
             }
@@ -85,21 +81,11 @@ struct PlanRoutineRow: View {
     var body: some View {
         HStack(spacing: 16) {
             // Thumbnail
-            if let thumbnailURL = routine.thumbnailURL {
-                AsyncImage(url: thumbnailURL) { image in
-                    image
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                } placeholder: {
-                    Color.gray.opacity(0.2)
-                }
+            Image(routine.thumbnailName)
+                .resizable()
+                .aspectRatio(contentMode: .fill)
                 .frame(width: 56, height: 56)
                 .clipShape(RoundedRectangle(cornerRadius: 8))
-            } else {
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(Color.gray.opacity(0.2))
-                    .frame(width: 56, height: 56)
-            }
             
             // Info
             VStack(alignment: .leading, spacing: 4) {
@@ -107,7 +93,7 @@ struct PlanRoutineRow: View {
                     .font(.headline)
                     .foregroundColor(.white)
                 
-                Text("5 MINUTES")
+                Text("\(routine.totalDuration / 60) min")
                     .font(.subheadline)
                     .foregroundColor(.white.opacity(0.6))
             }
@@ -134,11 +120,7 @@ struct PlanRoutineRow: View {
             title: "Beginner",
             description: "A beginner series designed to increase overall flexibility by covering key areas throughout your entire body.",
             duration: "3 DAY SERIES",
-            routines: [
-                .mockWakeAndShake,
-                .mockEveningUnwind,
-                .mockQuickReset
-            ]
+            routines: Array(RoutineLibrary.routines.prefix(3))
         )
     }
     .preferredColorScheme(.dark)

@@ -1,13 +1,21 @@
 import SwiftUI
-import SupabaseKit
+import SharedKit
 
 struct CategoryListView: View {
-    let category: String
+    let category: ExerciseCategory
     let systemImage: String
-    @State private var routines: [Routine] = []
-    @State private var exercises: [Exercise] = []
     @State private var isLoading = true
     @State private var selectedExercise: Exercise?
+    
+    private var exercises: [Exercise] {
+        ExerciseLibrary.exercises.filter { exercise in
+            exercise.categories.contains(category)
+        }
+    }
+    
+    private var routines: [Routine] {
+        RoutineLibrary.routines(containing: category)
+    }
     
     var body: some View {
         ZStack {
@@ -16,7 +24,7 @@ struct CategoryListView: View {
             VStack(spacing: 0) {
                 // Header
                 VStack(alignment: .leading, spacing: 8) {
-                    Text(category)
+                    Text(category.rawValue)
                         .font(.system(size: 34, weight: .bold))
                         .foregroundColor(.white)
                     
@@ -29,69 +37,48 @@ struct CategoryListView: View {
                 .padding(.horizontal)
                 .padding(.vertical, 24)
                 
-                if isLoading {
-                    Spacer()
-                    ProgressView()
-                        .tint(.brandPrimary)
-                    Spacer()
-                } else {
-                    ScrollView {
-                        LazyVStack(spacing: 16) {
-                            if !exercises.isEmpty {
-                                Text("Exercises")
-                                    .font(.title2)
-                                    .bold()
-                                    .foregroundColor(.white)
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                    .padding(.horizontal)
-                                
-                                ForEach(exercises, id: \.id) { exercise in
-                                    Button(action: { selectedExercise = exercise }) {
-                                        ExerciseRow(exercise: exercise)
-                                            .padding(.horizontal)
-                                    }
-                                }
-                            }
+                ScrollView {
+                    LazyVStack(spacing: 16) {
+                        if !exercises.isEmpty {
+                            Text("Exercises")
+                                .font(.title2)
+                                .bold()
+                                .foregroundColor(.white)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(.horizontal)
                             
-                            if !routines.isEmpty {
-                                Text("Routines")
-                                    .font(.title2)
-                                    .bold()
-                                    .foregroundColor(.white)
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                    .padding(.horizontal)
-                                    .padding(.top, exercises.isEmpty ? 0 : 16)
-                                
-                                ForEach(routines, id: \.id) { routine in
-                                    NavigationLink(destination: RoutineDetailView(
-                                        routine: routine,
-                                        exercises: Dictionary.mockRoutineExercises[routine.id] ?? []
-                                    )) {
-                                        RoutineRow(routine: routine)
-                                            .padding(.horizontal)
-                                    }
+                            ForEach(exercises) { exercise in
+                                Button(action: { selectedExercise = exercise }) {
+                                    ExerciseRow(exercise: exercise)
+                                        .padding(.horizontal)
                                 }
                             }
                         }
-                        .padding(.vertical)
+                        
+                        if !routines.isEmpty {
+                            Text("Routines")
+                                .font(.title2)
+                                .bold()
+                                .foregroundColor(.white)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(.horizontal)
+                                .padding(.top, exercises.isEmpty ? 0 : 16)
+                            
+                            ForEach(routines) { routine in
+                                NavigationLink(destination: RoutineDetailView(routine: routine)) {
+                                    RoutineRow(routine: routine)
+                                        .padding(.horizontal)
+                                }
+                            }
+                        }
                     }
+                    .padding(.vertical)
                 }
             }
         }
         .navigationBarTitleDisplayMode(.inline)
         .sheet(item: $selectedExercise) { exercise in
             ExerciseDetailView(exercise: exercise)
-        }
-        .task {
-            print("DEBUG: Loading data for category: \(category)")
-            // Load data immediately without artificial delay
-            routines = [.mockWakeAndShake, .mockEveningUnwind]
-            exercises = Exercise.allMocks.filter { exercise in
-                Dictionary.mockExerciseTags[exercise.id]?.contains(category) ?? false
-            }
-            print("DEBUG: Loaded \(exercises.count) exercises with IDs: \(exercises.map { $0.id })")
-            print("DEBUG: Loaded \(routines.count) routines with IDs: \(routines.map { $0.id })")
-            isLoading = false
         }
     }
 }
@@ -102,21 +89,11 @@ private struct ExerciseRow: View {
     var body: some View {
         HStack(spacing: 12) {
             // Thumbnail
-            if let thumbnailURL = exercise.thumbnailURL {
-                AsyncImage(url: thumbnailURL) { image in
-                    image
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                } placeholder: {
-                    Color.gray.opacity(0.2)
-                }
+            Image(exercise.thumbnailName)
+                .resizable()
+                .aspectRatio(contentMode: .fill)
                 .frame(width: 56, height: 56)
                 .clipShape(RoundedRectangle(cornerRadius: 8))
-            } else {
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(Color.gray.opacity(0.2))
-                    .frame(width: 56, height: 56)
-            }
             
             Text(exercise.name)
                 .font(.headline)
@@ -124,7 +101,7 @@ private struct ExerciseRow: View {
             
             Spacer()
             
-            Text("\(exercise.baseDuration / 60) min")
+            Text("\(exercise.duration / 60) min")
                 .font(.subheadline)
                 .foregroundColor(.white.opacity(0.6))
         }
@@ -143,25 +120,21 @@ private struct RoutineRow: View {
     var body: some View {
         HStack(spacing: 12) {
             // Thumbnail
-            if let thumbnailURL = routine.thumbnailURL {
-                AsyncImage(url: thumbnailURL) { image in
-                    image
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                } placeholder: {
-                    Color.gray.opacity(0.2)
-                }
+            Image(routine.thumbnailName)
+                .resizable()
+                .aspectRatio(contentMode: .fill)
                 .frame(width: 56, height: 56)
                 .clipShape(RoundedRectangle(cornerRadius: 8))
-            } else {
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(Color.gray.opacity(0.2))
-                    .frame(width: 56, height: 56)
-            }
             
-            Text(routine.name)
-                .font(.headline)
-                .foregroundColor(.white)
+            VStack(alignment: .leading, spacing: 4) {
+                Text(routine.name)
+                    .font(.headline)
+                    .foregroundColor(.white)
+                
+                Text("\(routine.exercises.count) exercises • \(routine.totalDuration / 60) min")
+                    .font(.subheadline)
+                    .foregroundColor(.white.opacity(0.6))
+            }
             
             Spacer()
         }
@@ -176,7 +149,7 @@ private struct RoutineRow: View {
 
 #Preview {
     NavigationView {
-        CategoryListView(category: "Meditation", systemImage: "heart.circle.fill")
+        CategoryListView(category: .somatic, systemImage: "heart.circle.fill")
     }
     .preferredColorScheme(.dark)
 } 

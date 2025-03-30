@@ -1,5 +1,5 @@
 import SwiftUI
-import SupabaseKit
+import SharedKit
 
 struct ExerciseDetailView: View {
     let exercise: Exercise
@@ -11,23 +11,13 @@ struct ExerciseDetailView: View {
             
             ScrollView {
                 VStack(spacing: 24) {
-                    // Thumbnail/Video Area
-                    Group {
-                        if let previewURL = exercise.previewURL {
-                            AsyncImage(url: previewURL) { image in
-                                image
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fill)
-                            } placeholder: {
-                                Color.gray.opacity(0.2)
-                            }
-                        } else {
-                            Color.gray.opacity(0.2)
-                        }
-                    }
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 280)
-                    .clipped()
+                    // Thumbnail Image
+                    Image(exercise.thumbnailName)
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 280)
+                        .clipped()
                     
                     VStack(spacing: 32) {
                         // Title and Duration
@@ -36,7 +26,7 @@ struct ExerciseDetailView: View {
                                 .font(.system(size: 34, weight: .bold))
                                 .foregroundColor(.white)
                             
-                            Text("\(exercise.baseDuration / 60) min")
+                            Text("\(exercise.duration / 60) min")
                                 .font(.system(size: 15, weight: .medium))
                                 .foregroundColor(.white.opacity(0.6))
                                 .textCase(.uppercase)
@@ -45,31 +35,27 @@ struct ExerciseDetailView: View {
                         .padding(.horizontal)
                         
                         // Instructions Section
-                        if let instructions = exercise.instructions?.components(separatedBy: "\n") {
-                            VStack(alignment: .leading, spacing: 24) {
-                                Text("INSTRUCTIONS")
-                                    .font(.system(size: 15, weight: .medium))
-                                    .foregroundColor(.white.opacity(0.6))
-                                    .textCase(.uppercase)
-                                    .padding(.horizontal)
-                                
-                                TimelineView(items: instructions)
-                            }
-                        }
-                        
-                        // Modifications Section
                         VStack(alignment: .leading, spacing: 24) {
-                            Text("MODIFICATIONS")
+                            Text("INSTRUCTIONS")
                                 .font(.system(size: 15, weight: .medium))
                                 .foregroundColor(.white.opacity(0.6))
                                 .textCase(.uppercase)
                                 .padding(.horizontal)
                             
-                            TimelineView(items: [
-                                "For less intensity, keep your hands on your front thigh.",
-                                "Place a towel or cushion under your back knee for support.",
-                                "Hold onto a wall or chair for balance if needed."
-                            ])
+                            TimelineView(items: exercise.instructions.components(separatedBy: "\n"))
+                        }
+                        
+                        // Modifications Section
+                        if let modifications = exercise.modifications?.components(separatedBy: "\n") {
+                            VStack(alignment: .leading, spacing: 24) {
+                                Text("MODIFICATIONS")
+                                    .font(.system(size: 15, weight: .medium))
+                                    .foregroundColor(.white.opacity(0.6))
+                                    .textCase(.uppercase)
+                                    .padding(.horizontal)
+                                
+                                TimelineView(items: modifications)
+                            }
                         }
                         
                         // Benefits Section
@@ -80,7 +66,22 @@ struct ExerciseDetailView: View {
                                 .textCase(.uppercase)
                                 .padding(.horizontal)
                             
-                            Text("Abdomen, Hips, Lower Back, Psoas, Quadriceps")
+                            Text(exercise.benefits)
+                                .font(.system(size: 17))
+                                .foregroundColor(.white)
+                                .lineSpacing(4)
+                                .padding(.horizontal)
+                        }
+                        
+                        // Areas Section
+                        VStack(alignment: .leading, spacing: 16) {
+                            Text("AREAS")
+                                .font(.system(size: 15, weight: .medium))
+                                .foregroundColor(.white.opacity(0.6))
+                                .textCase(.uppercase)
+                                .padding(.horizontal)
+                            
+                            Text(exercise.areas.map(\.rawValue).joined(separator: ", "))
                                 .font(.system(size: 17))
                                 .foregroundColor(.white)
                                 .lineSpacing(4)
@@ -127,6 +128,6 @@ private struct TimelineView: View {
 }
 
 #Preview {
-    ExerciseDetailView(exercise: .mockDynamicSideBends)
+    ExerciseDetailView(exercise: ExerciseLibrary.exercises.first!)
         .preferredColorScheme(.dark)
 } 

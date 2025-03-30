@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		016A7A8B60DD717053C5072A /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D606C8D6CDA599FAFDF76120 /* NotificationService.swift */; };
 		01AEA0BB740450A2255E553E /* PlanLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCC9A6D9AC91F714ACB2D458 /* PlanLibrary.swift */; };
-		01E196FE7CBFB82B023AE55A /* MockData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3419675D6823AC9635622634 /* MockData.swift */; };
 		021192EB3086C9181B9C8117 /* Sentry in Frameworks */ = {isa = PBXBuildFile; productRef = 07C590DF8EEB4A0EAB809B98 /* Sentry */; };
 		02ED4C1F7C4E8B7432BAB368 /* requireLogin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5659C5D7AD221C5697002B98 /* requireLogin.swift */; };
 		0F113178ED631727CB3AF7BB /* TextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31773E0091EAC17A2A2E11F0 /* TextField.swift */; };
@@ -292,7 +291,6 @@
 		31773E0091EAC17A2A2E11F0 /* TextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextField.swift; sourceTree = "<group>"; };
 		32B592D5EEED8E5B114D2630 /* ProfileImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileImage.swift; sourceTree = "<group>"; };
 		3382516E12C8CB796FA8811A /* SettingsRowItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsRowItem.swift; sourceTree = "<group>"; };
-		3419675D6823AC9635622634 /* MockData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockData.swift; sourceTree = "<group>"; };
 		35A5E693BCA6E84AB9464CC9 /* NotificationsSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsSettingsView.swift; sourceTree = "<group>"; };
 		387F180DB5885A8E912AFDD5 /* TuistBundle+CrashlyticsKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistBundle+CrashlyticsKit.swift"; sourceTree = "<group>"; };
 		38EC50610E4B4466058B8E01 /* CheckmarkToggle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckmarkToggle.swift; sourceTree = "<group>"; };
@@ -521,7 +519,6 @@
 			isa = PBXGroup;
 			children = (
 				9B42B56BACE8973C4D747BEA /* Auth */,
-				C2902B6D73A8F238FB7F8391 /* Mock */,
 				6A2A33AADC3104D50BD04E7D /* User */,
 				68127D761F8CF5F33120898D /* SupabaseBackend.swift */,
 			);
@@ -929,14 +926,6 @@
 				2A30C7E4515091374D43BE5A /* SnapCarousel.swift */,
 			);
 			path = Components;
-			sourceTree = "<group>";
-		};
-		C2902B6D73A8F238FB7F8391 /* Mock */ = {
-			isa = PBXGroup;
-			children = (
-				3419675D6823AC9635622634 /* MockData.swift */,
-			);
-			path = Mock;
 			sourceTree = "<group>";
 		};
 		C65E3E96E188CB2FF6C7E463 /* Sources */ = {
@@ -1420,7 +1409,6 @@
 				A69C851C5A9A6381EAD2B0CD /* AuthGeneral.swift in Sources */,
 				8CEAB25115A63D8452C7790D /* AuthKitError.swift in Sources */,
 				C93F1D8A78A7DFE88844E617 /* SignInWithApple.swift in Sources */,
-				01E196FE7CBFB82B023AE55A /* MockData.swift in Sources */,
 				978270648561AA9A6516EF73 /* SupabaseBackend.swift in Sources */,
 				1590D6A919B6E1F3A2B3A8A4 /* SupabaseUserService.swift in Sources */,
 				F64203672ED5D301083CB8DB /* UserProfile.swift in Sources */,

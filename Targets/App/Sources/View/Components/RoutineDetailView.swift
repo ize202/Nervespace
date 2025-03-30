@@ -1,21 +1,19 @@
 import SwiftUI
-import SupabaseKit
+import SharedKit
 
 public struct RoutineDetailView: View {
     let routine: Routine
-    let exercises: [Exercise]
     let previewMode: Bool
-    @State private var exerciseDurations: [UUID: Int]
+    @State private var exerciseDurations: [String: Int]
     @State private var showingActiveSession = false
     @State private var selectedExercise: Exercise?
     @StateObject private var bookmarkManager = BookmarkManager.shared
     
-    public init(routine: Routine, exercises: [Exercise], previewMode: Bool = false) {
+    public init(routine: Routine, previewMode: Bool = false) {
         self.routine = routine
-        self.exercises = exercises
         self.previewMode = previewMode
         _exerciseDurations = State(initialValue: Dictionary(
-            uniqueKeysWithValues: exercises.map { ($0.id, $0.baseDuration) }
+            uniqueKeysWithValues: routine.exercises.map { ($0.exercise.id, $0.duration) }
         ))
     }
     
@@ -41,14 +39,12 @@ public struct RoutineDetailView: View {
                         .textCase(.uppercase)
                         .frame(maxWidth: .infinity, alignment: .leading)
                     
-                    if let description = routine.description {
-                        Text(description)
-                            .font(.system(size: 17))
-                            .foregroundColor(.white.opacity(0.7))
-                            .lineSpacing(4)
-                            .padding(.top, 8)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                    }
+                    Text(routine.description)
+                        .font(.system(size: 17))
+                        .foregroundColor(.white.opacity(0.7))
+                        .lineSpacing(4)
+                        .padding(.top, 8)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                 }
                 .padding(.horizontal)
                 .padding(.vertical, 24)
@@ -56,11 +52,11 @@ public struct RoutineDetailView: View {
                 // Exercise List
                 ScrollView {
                     VStack(spacing: 16) {
-                        ForEach(exercises) { exercise in
+                        ForEach(routine.exercises) { routineExercise in
                             ExerciseRow(
-                                exercise: exercise,
-                                duration: exerciseDurationBinding(for: exercise),
-                                onTap: { selectedExercise = exercise }
+                                exercise: routineExercise.exercise,
+                                duration: exerciseDurationBinding(for: routineExercise.exercise),
+                                onTap: { selectedExercise = routineExercise.exercise }
                             )
                         }
                     }
@@ -105,7 +101,6 @@ public struct RoutineDetailView: View {
         .fullScreenCover(isPresented: $showingActiveSession) {
             ActiveSessionView(
                 routine: routine,
-                exercises: exercises,
                 customDurations: exerciseDurations
             )
         }
@@ -113,7 +108,7 @@ public struct RoutineDetailView: View {
     
     private func exerciseDurationBinding(for exercise: Exercise) -> Binding<Int> {
         Binding(
-            get: { exerciseDurations[exercise.id] ?? exercise.baseDuration },
+            get: { exerciseDurations[exercise.id] ?? 0 },
             set: { exerciseDurations[exercise.id] = $0 }
         )
     }
@@ -128,21 +123,11 @@ private struct ExerciseRow: View {
         Button(action: onTap) {
             HStack(spacing: 12) {
                 // Thumbnail
-                if let thumbnailURL = exercise.thumbnailURL {
-                    AsyncImage(url: thumbnailURL) { image in
-                        image
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                    } placeholder: {
-                        Color.gray.opacity(0.2)
-                    }
+                Image(exercise.thumbnailName)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
                     .frame(width: 56, height: 56)
                     .clipShape(RoundedRectangle(cornerRadius: 8))
-                } else {
-                    RoundedRectangle(cornerRadius: 8)
-                        .fill(Color.gray.opacity(0.2))
-                        .frame(width: 56, height: 56)
-                }
                 
                 // Exercise Name
                 Text(exercise.name)
@@ -173,7 +158,7 @@ private struct DurationControls: View {
                 Image(systemName: "minus")
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundColor(.white)
-                    .frame(width: 44, height: 44) // Increased touch target
+                    .frame(width: 44, height: 44)
                     .background(Circle().fill(Color.white.opacity(0.2)).frame(width: 28, height: 28))
             }
             
@@ -187,20 +172,18 @@ private struct DurationControls: View {
                 Image(systemName: "plus")
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundColor(.white)
-                    .frame(width: 44, height: 44) // Increased touch target
+                    .frame(width: 44, height: 44)
                     .background(Circle().fill(Color.white.opacity(0.2)).frame(width: 28, height: 28))
             }
         }
-        .contentShape(Rectangle()) // Make the entire control tappable
+        .contentShape(Rectangle())
     }
 }
 
 #Preview {
     NavigationView {
         RoutineDetailView(
-            routine: .mockWakeAndShake,
-            exercises: Dictionary.mockRoutineExercises[Routine.mockWakeAndShake.id] ?? []
+            routine: RoutineLibrary.routines.first!
         )
     }
-    .preferredColorScheme(.dark)
 } 

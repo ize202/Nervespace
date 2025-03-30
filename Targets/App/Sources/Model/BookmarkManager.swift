@@ -1,5 +1,5 @@
 import Foundation
-import SupabaseKit
+import SharedKit
 
 class BookmarkManager: ObservableObject {
     static let shared = BookmarkManager()
@@ -33,14 +33,7 @@ class BookmarkManager: ObservableObject {
         defaults.set(stringIds, forKey: bookmarksKey)
     }
     
-    func getBookmarkedRoutines() -> [(Routine, [Exercise])] {
-        // For MVP, we'll just filter the mock data
-        // In production, this would fetch from the database
-        return Routine.allMocks
-            .filter { bookmarkedRoutineIds.contains($0.id) }
-            .compactMap { routine in
-                guard let exercises = Dictionary.mockRoutineExercises[routine.id] else { return nil }
-                return (routine, exercises)
-            }
+    func getBookmarkedRoutines() -> [Routine] {
+        return RoutineLibrary.routines.filter { bookmarkedRoutineIds.contains($0.id) }
     }
 } 

@@ -1,36 +1,15 @@
 import SwiftUI
-import SupabaseKit
+import SharedKit
 
 struct CompletedRoutine: Identifiable {
     let id: UUID
-    let routineName: String
+    let routine: Routine
     let date: Date
-    let duration: Int // in seconds
-    let exercises: [Exercise]
-    let thumbnailURL: URL?
 }
 
 struct HistoryView: View {
     @Environment(\.dismiss) private var dismiss
-    // Mock data for now - would come from database
-    @State private var completedRoutines: [CompletedRoutine] = [
-        CompletedRoutine(
-            id: UUID(),
-            routineName: "Morning Reset",
-            date: Date(),
-            duration: 900,
-            exercises: [],
-            thumbnailURL: nil
-        ),
-        CompletedRoutine(
-            id: UUID(),
-            routineName: "Evening Unwind",
-            date: Calendar.current.date(byAdding: .day, value: -1, to: Date())!,
-            duration: 600,
-            exercises: [],
-            thumbnailURL: nil
-        )
-    ]
+    @State private var completedRoutines: [CompletedRoutine] = []
     
     private let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
@@ -96,34 +75,22 @@ struct HistoryView: View {
                             
                             // Routines for this date
                             VStack(spacing: 12) {
-                                ForEach(routines) { routine in
-                                    Button(action: {
-                                        // TODO: Show detailed view of completed routine
-                                    }) {
+                                ForEach(routines) { completed in
+                                    NavigationLink(destination: RoutineDetailView(routine: completed.routine)) {
                                         HStack(spacing: 16) {
                                             // Thumbnail
-                                            if let thumbnailURL = routine.thumbnailURL {
-                                                AsyncImage(url: thumbnailURL) { image in
-                                                    image
-                                                        .resizable()
-                                                        .aspectRatio(contentMode: .fill)
-                                                } placeholder: {
-                                                    Color.white.opacity(0.1)
-                                                }
+                                            Image(completed.routine.thumbnailName)
+                                                .resizable()
+                                                .aspectRatio(contentMode: .fill)
                                                 .frame(width: 44, height: 44)
                                                 .clipShape(RoundedRectangle(cornerRadius: 8))
-                                            } else {
-                                                RoundedRectangle(cornerRadius: 8)
-                                                    .fill(Color.white.opacity(0.1))
-                                                    .frame(width: 44, height: 44)
-                                            }
                                             
                                             VStack(alignment: .leading, spacing: 4) {
-                                                Text(routine.routineName)
+                                                Text(completed.routine.name)
                                                     .font(.headline)
                                                     .foregroundColor(.white)
                                                 
-                                                Text("\(timeFormatter.string(from: routine.date)) • \(routine.duration / 60) min")
+                                                Text("\(timeFormatter.string(from: completed.date)) • \(completed.routine.totalDuration / 60) min")
                                                     .font(.subheadline)
                                                     .foregroundColor(.white.opacity(0.6))
                                             }
@@ -153,6 +120,25 @@ struct HistoryView: View {
         }
         .navigationBarTitleDisplayMode(.inline)
         .navigationTitle("History")
+        .onAppear {
+            // For preview purposes, we'll add some sample completed routines
+            // In production, this would be loaded from UserDefaults or a database
+            if completedRoutines.isEmpty {
+                let routines = Array(RoutineLibrary.routines.prefix(2))
+                completedRoutines = [
+                    CompletedRoutine(
+                        id: UUID(),
+                        routine: routines[0],
+                        date: Date()
+                    ),
+                    CompletedRoutine(
+                        id: UUID(),
+                        routine: routines[1],
+                        date: Calendar.current.date(byAdding: .day, value: -1, to: Date())!
+                    )
+                ]
+            }
+        }
     }
 }
 

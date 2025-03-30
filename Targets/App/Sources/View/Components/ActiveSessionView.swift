@@ -1,10 +1,9 @@
 import SwiftUI
-import SupabaseKit
+import SharedKit
 
 public struct ActiveSessionView: View {
     let routine: Routine
-    let exercises: [Exercise]
-    let customDurations: [UUID: Int]
+    let customDurations: [String: Int]
     @State private var currentExerciseIndex: Int = 0
     @State private var timeRemaining: Int
     @State private var isPaused: Bool = false
@@ -14,21 +13,24 @@ public struct ActiveSessionView: View {
     @State private var progressValue: Double = 0
     @State private var showExerciseDetail = false
     
-    public init(routine: Routine, exercises: [Exercise], customDurations: [UUID: Int]) {
+    public init(routine: Routine, customDurations: [String: Int]) {
         self.routine = routine
-        self.exercises = exercises
         self.customDurations = customDurations
         // Initialize with the first exercise duration
-        _timeRemaining = State(initialValue: exercises.first.map { customDurations[$0.id] ?? $0.baseDuration } ?? 30)
+        _timeRemaining = State(initialValue: routine.exercises.first.map { customDurations[$0.exercise.id] ?? $0.duration } ?? 30)
+    }
+    
+    private var currentRoutineExercise: RoutineExercise? {
+        guard routine.exercises.indices.contains(currentExerciseIndex) else { return nil }
+        return routine.exercises[currentExerciseIndex]
     }
     
     private var currentExercise: Exercise? {
-        guard exercises.indices.contains(currentExerciseIndex) else { return nil }
-        return exercises[currentExerciseIndex]
+        currentRoutineExercise?.exercise
     }
     
     private var progressText: String {
-        "\(currentExerciseIndex + 1) of \(exercises.count)"
+        "\(currentExerciseIndex + 1) of \(routine.exercises.count)"
     }
     
     public var body: some View {
@@ -70,18 +72,12 @@ public struct ActiveSessionView: View {
                 // Exercise Animation/Image
                 ZStack {
                     // Exercise Image
-                    if let thumbnailURL = currentExercise?.thumbnailURL {
-                        AsyncImage(url: thumbnailURL) { image in
-                            image
-                                .resizable()
-                                .aspectRatio(contentMode: .fill)
-                                .frame(width: 280, height: 280)
-                                .clipShape(RoundedRectangle(cornerRadius: 24))
-                        } placeholder: {
-                            RoundedRectangle(cornerRadius: 24)
-                                .fill(Color.gray.opacity(0.2))
-                                .frame(width: 280, height: 280)
-                        }
+                    if let exercise = currentExercise {
+                        Image(exercise.thumbnailName)
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: 280, height: 280)
+                            .clipShape(RoundedRectangle(cornerRadius: 24))
                     } else {
                         RoundedRectangle(cornerRadius: 24)
                             .fill(Color.gray.opacity(0.2))
@@ -179,7 +175,8 @@ public struct ActiveSessionView: View {
     }
     
     private func updateProgress() {
-        let duration = Double(currentExercise?.baseDuration ?? 30)
+        guard let routineExercise = currentRoutineExercise else { return }
+        let duration = Double(customDurations[routineExercise.exercise.id] ?? routineExercise.duration)
         let remaining = Double(timeRemaining)
         // Ensure we reach exactly 1.0 when time is up
         let progress = remaining <= 0 ? 1.0 : 1.0 - (remaining / duration)
@@ -200,7 +197,7 @@ public struct ActiveSessionView: View {
                 updateProgress()
             } else {
                 // Time's up for current exercise
-                if currentExerciseIndex < exercises.count - 1 {
+                if currentExerciseIndex < routine.exercises.count - 1 {
                     // Move to next exercise
                     nextExercise()
                 } else {
@@ -225,10 +222,12 @@ public struct ActiveSessionView: View {
     }
     
     private func nextExercise() {
-        guard currentExerciseIndex < exercises.count - 1 else { return }
+        guard currentExerciseIndex < routine.exercises.count - 1 else { return }
         progressValue = 0 // Reset progress immediately without animation wrapper
         currentExerciseIndex += 1
-        timeRemaining = customDurations[exercises[currentExerciseIndex].id] ?? exercises[currentExerciseIndex].baseDuration
+        if let routineExercise = currentRoutineExercise {
+            timeRemaining = customDurations[routineExercise.exercise.id] ?? routineExercise.duration
+        }
         // Small delay to ensure reset is complete before starting new animation
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
             updateProgress()
@@ -239,7 +238,9 @@ public struct ActiveSessionView: View {
         guard currentExerciseIndex > 0 else { return }
         progressValue = 0 // Reset progress immediately without animation wrapper
         currentExerciseIndex -= 1
-        timeRemaining = customDurations[exercises[currentExerciseIndex].id] ?? exercises[currentExerciseIndex].baseDuration
+        if let routineExercise = currentRoutineExercise {
+            timeRemaining = customDurations[routineExercise.exercise.id] ?? routineExercise.duration
+        }
         // Small delay to ensure reset is complete before starting new animation
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
             updateProgress()
@@ -249,8 +250,7 @@ public struct ActiveSessionView: View {
 
 #Preview {
     ActiveSessionView(
-        routine: .mockWakeAndShake,
-        exercises: Dictionary.mockRoutineExercises[Routine.mockWakeAndShake.id] ?? [],
+        routine: RoutineLibrary.routines.first!,
         customDurations: [:]
     )
 } 
