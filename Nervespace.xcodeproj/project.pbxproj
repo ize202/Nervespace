@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 55;
+	objectVersion = 56;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -30,6 +30,7 @@
 		31699A9567B1D5A13CA4645A /* OneSignalExtension in Frameworks */ = {isa = PBXBuildFile; productRef = 53E06AEFBCFEE5D596DDD235 /* OneSignalExtension */; };
 		32AE0B76A515FD7214260461 /* OneSignalFramework in Frameworks */ = {isa = PBXBuildFile; productRef = 188C0B847C7B0939BB7DBF05 /* OneSignalFramework */; };
 		34A6D5554C6E86F341EC61B2 /* RequestType.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5DFA5E09A8701AD67D4ECAB /* RequestType.swift */; };
+		37235766652209AE0BFBB4BC /* BookmarkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C2ECC22973D7C1A97317E4D /* BookmarkManager.swift */; };
 		378EFA1D4B6C986FDC481125 /* SharedKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 39E86B5FF5E957E5D088F40B /* SharedKit.framework */; };
 		39323B12200564DF86A723E3 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 2A95F18B032436B71DBB4D08 /* Supabase */; };
 		3C25A9005BCDA83403899218 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5C09F336EAC3018DF777EA4A /* Assets.xcassets */; };
@@ -61,7 +62,6 @@
 		765469CBCD1F16CFD013590C /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65AE6300BE637983E99BF16A /* Constants.swift */; };
 		792CD762D79FD27E7B9B29BC /* UserProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FE7EDF59E6D15650A3D653D /* UserProgress.swift */; };
 		79DB6C3455227F4E62D49C1E /* if.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C6F0DD2685F535945971DF /* if.swift */; };
-		7E20F5722A01AF9333C3AD61 /* BookmarkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0634B19BCCCDF284986616A1 /* BookmarkManager.swift */; };
 		818936A21734A89C82C2591B /* CheckmarkToggle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38EC50610E4B4466058B8E01 /* CheckmarkToggle.swift */; };
 		835DFE1BB77D212B4A938AC5 /* SupabaseKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F30ADB8BC53945EEF346BDA /* SupabaseKit.framework */; };
 		887A7A89BAFE84FA99F4B50A /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2470AAF9C69F809F21F03D04 /* ProfileView.swift */; };
@@ -270,7 +270,6 @@
 
 /* Begin PBXFileReference section */
 		0115360FEAD4F8357698A075 /* ShowPushNotificationPermissionSheetIfNeededModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowPushNotificationPermissionSheetIfNeededModifier.swift; sourceTree = "<group>"; };
-		0634B19BCCCDF284986616A1 /* BookmarkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkManager.swift; sourceTree = "<group>"; };
 		089A3AF5CF095FF7EE474590 /* Sentry-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "Sentry-Info.plist"; sourceTree = "<group>"; };
 		0A6F5D777272D1E306BA4BB9 /* Supabase-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "Supabase-Info.plist"; sourceTree = "<group>"; };
 		0AC67DFDFC9DBF0FBD43E333 /* Nervespace.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Nervespace.entitlements; sourceTree = "<group>"; };
@@ -301,6 +300,7 @@
 		448A821E0020473F069733A8 /* AuthGeneral.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthGeneral.swift; sourceTree = "<group>"; };
 		4634A94D674EB513386D2C52 /* SignInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInView.swift; sourceTree = "<group>"; };
 		4C0FB06C6665D672F2E3F45C /* BiometricAuth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BiometricAuth.swift; sourceTree = "<group>"; };
+		4C2ECC22973D7C1A97317E4D /* BookmarkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkManager.swift; sourceTree = "<group>"; };
 		4F95AB075CFCC69E3E00BE35 /* isPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = isPreview.swift; sourceTree = "<group>"; };
 		5507FF85704924F325225747 /* captureTaps.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = captureTaps.swift; sourceTree = "<group>"; };
 		553CD736FB8477C349AC0D06 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
@@ -324,7 +324,7 @@
 		79594A6344FB719426E5AF8D /* askUserFor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = askUserFor.swift; sourceTree = "<group>"; };
 		7B21ECAA94982679FD4F01DB /* Plan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Plan.swift; sourceTree = "<group>"; };
 		7B96390C931279366EC8AD1D /* AnalyticsKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = AnalyticsKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		7CE6AF7F72F5552A74F3A7B1 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		7CE6AF7F72F5552A74F3A7B1 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		813FF311671CDA4CFBB4342D /* NotificationsPermissionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsPermissionView.swift; sourceTree = "<group>"; };
 		83A9214733C3AC2CFF832873 /* TuistBundle+Nervespace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistBundle+Nervespace.swift"; sourceTree = "<group>"; };
 		845E04FFC5739ED0DE0AD18F /* SupabaseKit-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "SupabaseKit-Info.plist"; sourceTree = "<group>"; };
@@ -633,6 +633,7 @@
 		515F0526C42B5EF892EEEFF9 /* Routines */ = {
 			isa = PBXGroup;
 			children = (
+				4C2ECC22973D7C1A97317E4D /* BookmarkManager.swift */,
 				DCC1750D608D1A8DDD25B543 /* Routine.swift */,
 				1B3735F1E0764D2686F518C7 /* RoutineLibrary.swift */,
 			);
@@ -995,19 +996,10 @@
 		D075EDA48B9CC6F3929481B2 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
-				D3EFA5A846F9560CE264E7FC /* Model */,
 				01040C46A57A15CA77DD4FF3 /* View */,
 				9A6C05EE090C2810E6906508 /* App.swift */,
 			);
 			path = Sources;
-			sourceTree = "<group>";
-		};
-		D3EFA5A846F9560CE264E7FC /* Model */ = {
-			isa = PBXGroup;
-			children = (
-				0634B19BCCCDF284986616A1 /* BookmarkManager.swift */,
-			);
-			path = Model;
 			sourceTree = "<group>";
 		};
 		DD3935425162DEB997540504 /* Entitlements */ = {
@@ -1382,6 +1374,7 @@
 				89D6A1BC4CB4197E12D5382D /* ExerciseTypes.swift in Sources */,
 				B0759BAED1306AFCD9A2A428 /* Plan.swift in Sources */,
 				01AEA0BB740450A2255E553E /* PlanLibrary.swift in Sources */,
+				37235766652209AE0BFBB4BC /* BookmarkManager.swift in Sources */,
 				44E4911C31749ACBBA49ABC0 /* Routine.swift in Sources */,
 				F133C703CB6EAF0E92C551EB /* RoutineLibrary.swift in Sources */,
 				8E85E1D27F0BB36A49B582FB /* Color+Brand.swift in Sources */,
@@ -1450,7 +1443,6 @@
 			files = (
 				99347E5C50ECDC12DC4CF52C /* TuistBundle+Nervespace.swift in Sources */,
 				2CC928AEBAD65DD2F42F40CA /* App.swift in Sources */,
-				7E20F5722A01AF9333C3AD61 /* BookmarkManager.swift in Sources */,
 				F0E81C883C30503D2B8AC781 /* ActiveSessionView.swift in Sources */,
 				D0E0829C06F292050D66A833 /* CircularProgressView.swift in Sources */,
 				5E8DA7FF62F08794025361FB /* ExerciseDetailView.swift in Sources */,
@@ -1562,10 +1554,7 @@
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
-					"$(inherited)",
-					DEBUG,
-				);
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
 				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -1597,10 +1586,7 @@
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
-					"$(inherited)",
-					DEBUG,
-				);
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
 				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -1771,6 +1757,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Derived/Entitlements/Nervespace.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = NMXU2ZADVX;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = "Derived/InfoPlists/Nervespace-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -1799,6 +1786,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Derived/Entitlements/Nervespace.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = NMXU2ZADVX;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = "Derived/InfoPlists/Nervespace-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -1813,10 +1801,7 @@
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
-					"$(inherited)",
-					DEBUG,
-				);
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
 				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -1848,10 +1833,7 @@
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
-					"$(inherited)",
-					DEBUG,
-				);
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
 				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -1918,10 +1900,7 @@
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
-					"$(inherited)",
-					DEBUG,
-				);
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
 				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -2012,10 +1991,7 @@
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
-					"$(inherited)",
-					DEBUG,
-				);
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
 				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -2115,10 +2091,7 @@
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
-					"$(inherited)",
-					DEBUG,
-				);
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
 				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;

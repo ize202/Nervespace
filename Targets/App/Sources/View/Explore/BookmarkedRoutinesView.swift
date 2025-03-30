@@ -1,10 +1,15 @@
 import SwiftUI
-import SupabaseKit
+import SharedKit
+
+// Import models
+@_exported import struct SharedKit.Routine
+@_exported import struct SharedKit.Exercise
+@_exported import struct SharedKit.RoutineExercise
 
 struct BookmarkedRoutinesView: View {
     @StateObject private var bookmarkManager = BookmarkManager.shared
     
-    private var bookmarkedRoutines: [(Routine, [Exercise])] {
+    private var bookmarkedRoutines: [Routine] {
         bookmarkManager.getBookmarkedRoutines()
     }
     
@@ -30,32 +35,22 @@ struct BookmarkedRoutinesView: View {
             } else {
                 ScrollView {
                     VStack(spacing: 16) {
-                        ForEach(bookmarkedRoutines, id: \.0.id) { routine, exercises in
-                            NavigationLink(destination: RoutineDetailView(routine: routine, exercises: exercises)) {
+                        ForEach(bookmarkedRoutines) { routine in
+                            NavigationLink(destination: RoutineDetailView(routine: routine)) {
                                 HStack(spacing: 16) {
                                     // Thumbnail
-                                    if let thumbnailURL = routine.thumbnailURL {
-                                        AsyncImage(url: thumbnailURL) { image in
-                                            image
-                                                .resizable()
-                                                .aspectRatio(contentMode: .fill)
-                                        } placeholder: {
-                                            Color.white.opacity(0.1)
-                                        }
+                                    Image(routine.thumbnailName)
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fill)
                                         .frame(width: 56, height: 56)
                                         .clipShape(RoundedRectangle(cornerRadius: 8))
-                                    } else {
-                                        RoundedRectangle(cornerRadius: 8)
-                                            .fill(Color.white.opacity(0.1))
-                                            .frame(width: 56, height: 56)
-                                    }
                                     
                                     VStack(alignment: .leading, spacing: 4) {
                                         Text(routine.name)
                                             .font(.headline)
                                             .foregroundColor(.white)
                                         
-                                        Text("\(exercises.count) exercises • \(exercises.reduce(0) { $0 + $1.baseDuration } / 60) min")
+                                        Text("\(routine.exercises.count) exercises • \(routine.totalDuration / 60) min")
                                             .font(.subheadline)
                                             .foregroundColor(.white.opacity(0.6))
                                     }

@@ -7,79 +7,6 @@ alwaysApply: true
 ## This is our current db schema
 ### is might be out of date so you can use the MCP tool to confirm the schema
 ```sql
--- ENUMs
-CREATE TYPE exercise\_category AS ENUM (
-	'Static stretching', 'Dynamic stretching', 'Isometrics',
-	'Somatic', 'Calisthenics', 'Mobility', 'Yoga', 'Cardio'
-);
-
-CREATE TYPE exercise\_position AS ENUM (
-	'Standing', 'Seated', 'Floor'
-);
-
-CREATE TYPE exercise\_area AS ENUM (
-	'Abdomen', 'Ankles', 'Biceps', 'Calves', 'Chest', 'Core',
-	'Feet', 'Fingers', 'Forearms', 'Glutes', 'Groin', 'Hamstrings',
-	'Hands', 'Hips', 'IT Band', 'Knees', 'Lats', 'Lower Back',
-	'Neck', 'Obliques', 'Psoas', 'Quadriceps', 'Shins', 'Shoulders',
-	'Spine', 'Toes', 'Triceps', 'Upper Back', 'Wrists'
-);
-
--- 3. Create new tables with updated schema
-CREATE TABLE public.exercises (
-	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-	name TEXT NOT NULL,
-	description TEXT,
-	instructions TEXT,
-	modifications TEXT,
-	benefits TEXT,
-	categories exercise_category[] NOT NULL DEFAULT '{}',
-	positions exercise_position[] NOT NULL DEFAULT '{}',
-	areas exercise_area[] NOT NULL DEFAULT '{}',
-	animation_url TEXT,
-	video_url TEXT,
-	duration INTEGER NOT NULL CHECK (duration > 0),
-	created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-	updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE public.routines (
-	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-	name TEXT NOT NULL,
-	description TEXT,
-	is_premium BOOLEAN DEFAULT FALSE,
-	created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-	updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE public.routine\_exercises (
-	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-	routine_id UUID REFERENCES routines(id) ON DELETE CASCADE,
-	exercise_id UUID REFERENCES exercises(id) ON DELETE CASCADE,
-	sequence_order INTEGER NOT NULL,
-	duration INTEGER NOT NULL CHECK (duration > 0),
-	UNIQUE(routine_id, sequence_order)
-);
-
--- Create plans table
-CREATE TABLE public.plans (
-	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-	name TEXT NOT NULL,
-	description TEXT,
-	is_premium BOOLEAN DEFAULT FALSE,
-	created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-	updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
-); 
-
--- Create plan\_routines junction table
-CREATE TABLE public.plan\_routines (
-	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-	plan_id UUID REFERENCES plans(id) ON DELETE CASCADE,
-	routine_id UUID REFERENCES routines(id) ON DELETE CASCADE,
-	day INTEGER NOT NULL CHECK (day > 0),
-	sequence_order INTEGER NOT NULL DEFAULT 1,
-	UNIQUE(plan_id, day, sequence_order)
-);
 
 CREATE TABLE public.user\_profiles (
 	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -105,79 +32,14 @@ CREATE TABLE public.user\_progress (
 );
 
 -- 4. Add indexes for performance
-CREATE INDEX idx\_exercises\_categories ON exercises USING gin (categories);
-CREATE INDEX idx\_exercises\_positions ON exercises USING gin (positions);
-CREATE INDEX idx\_exercises\_areas ON exercises USING gin (areas);
-CREATE INDEX idx\_routine\_exercises\_routine\_id ON routine\_exercises(routine\_id);
 CREATE INDEX idx\_user\_progress\_user\_id ON user\_progress(user\_id);
-CREATE INDEX idx\_plan\_routines\_plan\_id ON plan\_routines(plan\_id);
 
 
 -- 5. Enable Row Level Security
-ALTER TABLE exercises ENABLE ROW LEVEL SECURITY;
-ALTER TABLE routines ENABLE ROW LEVEL SECURITY;
-ALTER TABLE routine\_exercises ENABLE ROW LEVEL SECURITY;
 ALTER TABLE user\_profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE user\_progress ENABLE ROW LEVEL SECURITY;
-ALTER TABLE plans ENABLE ROW LEVEL SECURITY;
-ALTER TABLE plan\_routines ENABLE ROW LEVEL SECURITY;
 
 -- 6. Add RLS Policies
--- Exercises: Everyone can read, only authenticated users can insert
-CREATE POLICY "Exercises are viewable by everyone"
-ON exercises FOR SELECT
-TO PUBLIC
-USING (true);
-
-CREATE POLICY "Exercises can be inserted by authenticated users only"
-ON exercises FOR INSERT
-TO authenticated
-WITH CHECK (true);
-
--- Routines: Everyone can read, only authenticated users can insert
-CREATE POLICY "Routines are viewable by everyone"
-ON routines FOR SELECT
-TO PUBLIC
-USING (true);
-
-CREATE POLICY "Routines can be inserted by authenticated users only"
-ON routines FOR INSERT
-TO authenticated
-WITH CHECK (true);
-
--- Routine Exercises: Everyone can read, only authenticated users can insert
-CREATE POLICY "Routine exercises are viewable by everyone"
-ON routine\_exercises FOR SELECT
-TO PUBLIC
-USING (true);
-
-CREATE POLICY "Routine exercises can be inserted by authenticated users only"
-ON routine\_exercises FOR INSERT
-TO authenticated
-WITH CHECK (true);
-
--- Add RLS Policies for plans
-CREATE POLICY "Plans are viewable by everyone"
-ON plans FOR SELECT
-TO PUBLIC
-USING (true);
-
-CREATE POLICY "Plans can be inserted by authenticated users only"
-ON plans FOR INSERT
-TO authenticated
-WITH CHECK (true);
-
--- Add RLS Policies for plan\_routines
-CREATE POLICY "Plan routines are viewable by everyone"
-ON plan\_routines FOR SELECT
-TO PUBLIC
-USING (true);
-
-CREATE POLICY "Plan routines can be inserted by authenticated users only"
-ON plan\_routines FOR INSERT
-TO authenticated
-WITH CHECK (true);
-
 -- User Profiles: Users can only view and modify their own profile
 CREATE POLICY "Users can view own profile"
 ON user\_profiles FOR SELECT

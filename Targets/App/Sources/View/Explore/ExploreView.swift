@@ -150,19 +150,19 @@ struct ExploreView: View {
                             
                             ScrollView(.horizontal, showsIndicators: false) {
                                 LazyHStack(spacing: 16) {
-                                    NavigationLink(destination: CategoryListView(category: "Meditation", systemImage: "heart.circle.fill")) {
+                                    NavigationLink(destination: CategoryListView(category: .somatic, systemImage: "heart.circle.fill")) {
                                         CategoryCard(title: "Meditation", systemImage: "heart.circle.fill")
                                     }
-                                    NavigationLink(destination: CategoryListView(category: "Breathwork", systemImage: "wind")) {
+                                    NavigationLink(destination: CategoryListView(category: .somatic, systemImage: "wind")) {
                                         CategoryCard(title: "Breathwork", systemImage: "wind")
                                     }
-                                    NavigationLink(destination: CategoryListView(category: "Movement", systemImage: "figure.walk")) {
+                                    NavigationLink(destination: CategoryListView(category: .mobility, systemImage: "figure.walk")) {
                                         CategoryCard(title: "Movement", systemImage: "figure.walk")
                                     }
-                                    NavigationLink(destination: CategoryListView(category: "Grounding", systemImage: "leaf.fill")) {
+                                    NavigationLink(destination: CategoryListView(category: .somatic, systemImage: "leaf.fill")) {
                                         CategoryCard(title: "Grounding", systemImage: "leaf.fill")
                                     }
-                                    NavigationLink(destination: CategoryListView(category: "Sleep", systemImage: "moon.stars.fill")) {
+                                    NavigationLink(destination: CategoryListView(category: .somatic, systemImage: "moon.stars.fill")) {
                                         CategoryCard(title: "Sleep", systemImage: "moon.stars.fill")
                                     }
                                 }
