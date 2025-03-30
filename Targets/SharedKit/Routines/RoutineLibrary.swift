@@ -21,7 +21,7 @@ public enum RoutineLibrary {
             description: "A comprehensive routine to activate the entire body.",
             exercises: [
                 RoutineExercise(exercise: ExerciseLibrary.exercises.first { $0.name == "Plank Hold" }!, duration: 30),
-                RoutineExercise(exercise: ExerciseLibrary.exercises.first { $0.name == "Dynamic Side Bends" }!, duration: 30),
+                RoutineExercise(exercise: ExerciseLibrary.exercises.first { $0.name == "Seated Side Bends" }!, duration: 30),
                 RoutineExercise(exercise: ExerciseLibrary.exercises.first { $0.name == "Downward Dog" }!, duration: 30),
                 RoutineExercise(exercise: ExerciseLibrary.exercises.first { $0.name == "Bridge Pose" }!, duration: 30),
                 RoutineExercise(exercise: ExerciseLibrary.exercises.first { $0.name == "Bear Hug" }!, duration: 30),
@@ -73,7 +73,7 @@ public enum RoutineLibrary {
             exercises: [
                 RoutineExercise(exercise: ExerciseLibrary.exercises.first { $0.name == "High Knees" }!, duration: 30),
                 RoutineExercise(exercise: ExerciseLibrary.exercises.first { $0.name == "Air Squats" }!, duration: 30),
-                RoutineExercise(exercise: ExerciseLibrary.exercises.first { $0.name == "Dynamic Side Bends" }!, duration: 30)
+                RoutineExercise(exercise: ExerciseLibrary.exercises.first { $0.name == "Seated Side Bends" }!, duration: 30)
             ]
         ),
         

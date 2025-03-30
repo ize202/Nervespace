@@ -54,7 +54,7 @@ public enum ExerciseLibrary {
         
         // Dynamic Stretching Exercises
         Exercise(
-            name: "Dynamic Side Bends",
+            name: "Seated Side Bends",
             description: "A dynamic stretch that targets the obliques and spine.",
             instructions: """
             1. Stand with feet shoulder-width apart.
