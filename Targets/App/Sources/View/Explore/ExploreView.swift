@@ -151,19 +151,28 @@ struct ExploreView: View {
                             ScrollView(.horizontal, showsIndicators: false) {
                                 LazyHStack(spacing: 16) {
                                     NavigationLink(destination: CategoryListView(category: .somatic, systemImage: "heart.circle.fill")) {
-                                        CategoryCard(title: "Meditation", systemImage: "heart.circle.fill")
+                                        CategoryCard(title: "Somatic", systemImage: "heart.circle.fill")
                                     }
-                                    NavigationLink(destination: CategoryListView(category: .somatic, systemImage: "wind")) {
-                                        CategoryCard(title: "Breathwork", systemImage: "wind")
+                                    NavigationLink(destination: CategoryListView(category: .yoga, systemImage: "figure.mind.and.body")) {
+                                        CategoryCard(title: "Yoga", systemImage: "figure.mind.and.body")
                                     }
                                     NavigationLink(destination: CategoryListView(category: .mobility, systemImage: "figure.walk")) {
-                                        CategoryCard(title: "Movement", systemImage: "figure.walk")
+                                        CategoryCard(title: "Mobility", systemImage: "figure.walk")
                                     }
-                                    NavigationLink(destination: CategoryListView(category: .somatic, systemImage: "leaf.fill")) {
-                                        CategoryCard(title: "Grounding", systemImage: "leaf.fill")
+                                    NavigationLink(destination: CategoryListView(category: .staticStretching, systemImage: "figure.flexibility")) {
+                                        CategoryCard(title: "Static Stretching", systemImage: "figure.flexibility")
                                     }
-                                    NavigationLink(destination: CategoryListView(category: .somatic, systemImage: "moon.stars.fill")) {
-                                        CategoryCard(title: "Sleep", systemImage: "moon.stars.fill")
+                                    NavigationLink(destination: CategoryListView(category: .dynamicStretching, systemImage: "figure.run")) {
+                                        CategoryCard(title: "Dynamic Stretching", systemImage: "figure.run")
+                                    }
+                                    NavigationLink(destination: CategoryListView(category: .isometrics, systemImage: "figure.strengthtraining.traditional")) {
+                                        CategoryCard(title: "Isometrics", systemImage: "figure.strengthtraining.traditional")
+                                    }
+                                    NavigationLink(destination: CategoryListView(category: .calisthenics, systemImage: "figure.highintensity.intervaltraining")) {
+                                        CategoryCard(title: "Calisthenics", systemImage: "figure.highintensity.intervaltraining")
+                                    }
+                                    NavigationLink(destination: CategoryListView(category: .cardio, systemImage: "heart.circle")) {
+                                        CategoryCard(title: "Cardio", systemImage: "heart.circle")
                                     }
                                 }
                                 .padding(.horizontal)

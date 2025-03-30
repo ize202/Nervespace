@@ -18,18 +18,27 @@ public struct Routine: Identifiable, Hashable {
     public let description: String
     public let isPremium: Bool
     public let exercises: [RoutineExercise]
+    public let category: RoutineCategory
+    public let difficulty: RoutineDifficulty
+    public let timeOfDay: TimeOfDay?
     
     public init(
         name: String,
         description: String,
         isPremium: Bool = false,
-        exercises: [RoutineExercise]
+        exercises: [RoutineExercise],
+        category: RoutineCategory = .core,
+        difficulty: RoutineDifficulty = .beginner,
+        timeOfDay: TimeOfDay? = nil
     ) {
         self.id = name.lowercased().replacingOccurrences(of: " ", with: "_")
         self.name = name
         self.description = description
         self.isPremium = isPremium
         self.exercises = exercises
+        self.category = category
+        self.difficulty = difficulty
+        self.timeOfDay = timeOfDay
     }
     
     public var thumbnailName: String {
@@ -39,4 +48,22 @@ public struct Routine: Identifiable, Hashable {
     public var totalDuration: Int {
         exercises.reduce(0) { $0 + $1.duration }
     }
+}
+
+public enum RoutineCategory: String, CaseIterable {
+    case core = "Core"
+    case quick = "Quick"
+    case custom = "Custom"
+}
+
+public enum RoutineDifficulty: String, CaseIterable {
+    case beginner = "Beginner"
+    case intermediate = "Intermediate"
+    case advanced = "Advanced"
+}
+
+public enum TimeOfDay: String, CaseIterable {
+    case morning = "Morning"
+    case midday = "Midday"
+    case evening = "Evening"
 } 

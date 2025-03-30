@@ -160,12 +160,12 @@ struct HomeView: View {
     @State private var showingProfile = false
     @StateObject private var bookmarkManager = BookmarkManager.shared
     
-    // Common Routines for Carousel (first 3 routines)
+    // Common Routines for Carousel (core routines)
     private var commonRoutines: [Routine] {
-        Array(RoutineLibrary.routines.prefix(3))
+        RoutineLibrary.coreRoutines
     }
     
-    // Quick Sessions (under 5 minutes)
+    // Quick Sessions (quick category routines)
     private var quickSessions: [Routine] {
         RoutineLibrary.quickRoutines
     }

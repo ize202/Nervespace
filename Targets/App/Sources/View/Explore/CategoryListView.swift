@@ -14,7 +14,7 @@ struct CategoryListView: View {
     }
     
     private var routines: [Routine] {
-        RoutineLibrary.routines(containing: category)
+        RoutineLibrary.routines(withExerciseCategory: category)
     }
     
     var body: some View {
