@@ -36,10 +36,8 @@ CREATE TABLE public.exercises (
 	categories exercise_category[] NOT NULL DEFAULT '{}',
 	positions exercise_position[] NOT NULL DEFAULT '{}',
 	areas exercise_area[] NOT NULL DEFAULT '{}',
-	thumbnail_url TEXT,
 	animation_url TEXT,
 	video_url TEXT,
-	preview_url TEXT,
 	duration INTEGER NOT NULL CHECK (duration > 0),
 	created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
 	updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
@@ -49,8 +47,6 @@ CREATE TABLE public.routines (
 	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 	name TEXT NOT NULL,
 	description TEXT,
-	big_thumbnail_url TEXT,
-	thumbnail_url TEXT,
 	is_premium BOOLEAN DEFAULT FALSE,
 	created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
 	updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
@@ -70,11 +66,10 @@ CREATE TABLE public.plans (
 	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 	name TEXT NOT NULL,
 	description TEXT,
-	thumbnail_url TEXT,
 	is_premium BOOLEAN DEFAULT FALSE,
 	created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
 	updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
-);
+); 
 
 -- Create plan\_routines junction table
 CREATE TABLE public.plan\_routines (

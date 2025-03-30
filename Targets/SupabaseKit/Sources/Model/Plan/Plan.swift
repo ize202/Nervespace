@@ -4,7 +4,6 @@ public struct Plan: Identifiable, Codable, Hashable {
     public let id: UUID
     public let name: String
     public let description: String?
-    public let thumbnailURL: URL?
     public let isPremium: Bool
     public let createdAt: Date
     public let updatedAt: Date
@@ -13,7 +12,6 @@ public struct Plan: Identifiable, Codable, Hashable {
         id: UUID = UUID(),
         name: String,
         description: String? = nil,
-        thumbnailURL: URL? = nil,
         isPremium: Bool = false,
         createdAt: Date = Date(),
         updatedAt: Date = Date()
@@ -21,7 +19,6 @@ public struct Plan: Identifiable, Codable, Hashable {
         self.id = id
         self.name = name
         self.description = description
-        self.thumbnailURL = thumbnailURL
         self.isPremium = isPremium
         self.createdAt = createdAt
         self.updatedAt = updatedAt
@@ -31,9 +28,8 @@ public struct Plan: Identifiable, Codable, Hashable {
         case id
         case name
         case description
-        case thumbnailURL = "thumbnail_url"
         case isPremium = "is_premium"
         case createdAt = "created_at"
         case updatedAt = "updated_at"
     }
-} 
+}
