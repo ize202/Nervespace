@@ -180,9 +180,8 @@ struct ExploreView: View {
                             
                             LazyVGrid(columns: gridItems, spacing: 16) {
                                 NavigationLink(destination: AreaListView(
-                                    title: "Stress Relief",
-                                    color: .brandPrimary,
-                                    imageUrl: nil
+                                    area: .core,
+                                    color: .brandPrimary
                                 )) {
                                     AreaCard(
                                         title: "Stress Relief",
@@ -191,9 +190,8 @@ struct ExploreView: View {
                                     )
                                 }
                                 NavigationLink(destination: AreaListView(
-                                    title: "Anxiety",
-                                    color: .brandSecondary,
-                                    imageUrl: nil
+                                    area: .psoas,
+                                    color: .brandSecondary
                                 )) {
                                     AreaCard(
                                         title: "Anxiety",
@@ -202,9 +200,8 @@ struct ExploreView: View {
                                     )
                                 }
                                 NavigationLink(destination: AreaListView(
-                                    title: "Focus & Clarity",
-                                    color: Color(hex: "6B8E23"),
-                                    imageUrl: nil
+                                    area: .neck,
+                                    color: Color(hex: "6B8E23")
                                 )) {
                                     AreaCard(
                                         title: "Focus & Clarity",
@@ -213,9 +210,8 @@ struct ExploreView: View {
                                     )
                                 }
                                 NavigationLink(destination: AreaListView(
-                                    title: "Energy Boost",
-                                    color: Color(hex: "CD853F"),
-                                    imageUrl: nil
+                                    area: .shoulders,
+                                    color: Color(hex: "CD853F")
                                 )) {
                                     AreaCard(
                                         title: "Energy Boost",
@@ -224,9 +220,8 @@ struct ExploreView: View {
                                     )
                                 }
                                 NavigationLink(destination: AreaListView(
-                                    title: "Better Sleep",
-                                    color: .brandPrimary,
-                                    imageUrl: nil
+                                    area: .spine,
+                                    color: .brandPrimary
                                 )) {
                                     AreaCard(
                                         title: "Better Sleep",
@@ -235,9 +230,8 @@ struct ExploreView: View {
                                     )
                                 }
                                 NavigationLink(destination: AreaListView(
-                                    title: "Quick Reset",
-                                    color: .brandSecondary,
-                                    imageUrl: nil
+                                    area: .upperBack,
+                                    color: .brandSecondary
                                 )) {
                                     AreaCard(
                                         title: "Quick Reset",

@@ -113,7 +113,7 @@ public enum RoutineLibrary {
             exercises: [
                 RoutineExercise(exercise: ExerciseLibrary.exercises.first { $0.name == "Jumping Jacks" }!, duration: 30),
                 RoutineExercise(exercise: ExerciseLibrary.exercises.first { $0.name == "Leg Swings" }!, duration: 30),
-                RoutineExercise(exercise: ExerciseLibrary.exercises.first { $0.name == "Dynamic Side Bends" }!, duration: 30)
+                RoutineExercise(exercise: ExerciseLibrary.exercises.first { $0.name == "Seated Side Bends" }!, duration: 30)
             ]
         )
     ]
