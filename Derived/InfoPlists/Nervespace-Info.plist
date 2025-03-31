@@ -26,8 +26,14 @@
 	<string>public.app-category.healthcare-fitness</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSContactsUsageDescription</key>
+	<string>We do not actually use contacts access. This permission is required by one of our dependencies but we do not access your contacts.</string>
 	<key>NSFaceIDUsageDescription</key>
 	<string>We will use FaceID to authenticate you</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>We do not actually use location access. This permission is required by one of our dependencies but we do not access your location.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>We do not actually use location access. This permission is required by one of our dependencies but we do not access your location.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

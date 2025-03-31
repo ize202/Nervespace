@@ -31,6 +31,11 @@ func tuistProject() -> Project {
 		"UILaunchStoryboardName": "LaunchScreen",
 		"UISupportedInterfaceOrientations": .array(["UIInterfaceOrientationPortrait"]),  //Only Support Portrait on iphone
         "ITSAppUsesNonExemptEncryption": .boolean(false),
+        
+        // Adding required privacy usage descriptions
+        "NSContactsUsageDescription": "We do not actually use contacts access. This permission is required by one of our dependencies but we do not access your contacts.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "We do not actually use location access. This permission is required by one of our dependencies but we do not access your location.",
+        "NSLocationWhenInUseUsageDescription": "We do not actually use location access. This permission is required by one of our dependencies but we do not access your location.",
     ]
 
 	let sharedKit = TargetDependency.target(name: "SharedKit")
