@@ -232,8 +232,7 @@ BEGIN
     )
     RETURNING id INTO v_completion_id;
 
-    -- Update user_progress streak
-    -- This ensures streak calculation happens in one place
+    -- Update user_progress streak and completion count
     IF p_user_id IS NOT NULL THEN
         -- For authenticated users
         UPDATE user_progress
@@ -243,6 +242,7 @@ BEGIN
                 WHEN last_activity::date = CURRENT_DATE THEN streak
                 ELSE 1
             END,
+            routine_completions = routine_completions + 1,
             last_activity = p_completed_at
         WHERE user_id = p_user_id;
     ELSE
@@ -254,6 +254,7 @@ BEGIN
                 WHEN last_activity::date = CURRENT_DATE THEN streak
                 ELSE 1
             END,
+            routine_completions = routine_completions + 1,
             last_activity = p_completed_at
         WHERE device_id = p_device_id;
     END IF;

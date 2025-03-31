@@ -204,7 +204,7 @@ public struct ActiveSessionView: View {
         isUpdating = true
         do {
             try await db.recordCompletion(routine: routine)
-            dismiss()
+            showingCompletion = true
         } catch {
             showError = true
             errorMessage = error.localizedDescription

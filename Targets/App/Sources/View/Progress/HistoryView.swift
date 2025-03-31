@@ -145,6 +145,7 @@ struct HistoryView: View {
     }
     
     private func loadCompletedRoutines() async {
+        await db.loadRecentCompletions()
         completedRoutines = db.recentCompletions.map { CompletedRoutine(completion: $0) }
     }
 }
