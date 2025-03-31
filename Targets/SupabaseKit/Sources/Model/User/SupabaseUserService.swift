@@ -355,17 +355,10 @@ public class SupabaseUserService: UserService {
             p_device_id: deviceId?.uuidString
         )
         
-        let result: [String] = try await client
+        let completionId: UUID = try await client
             .rpc("record_routine_completion", params: params)
             .execute()
             .value
-        
-        guard let completionIdString = result.first,
-              let completionId = UUID(uuidString: completionIdString) else {
-            throw NSError(domain: "UserService", code: 500, userInfo: [
-                NSLocalizedDescriptionKey: "Failed to record routine completion"
-            ])
-        }
         
         return completionId
     }
