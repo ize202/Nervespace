@@ -14,11 +14,8 @@ struct ProgressView: View {
     private let daysOfWeek = ["S", "M", "T", "W", "T", "F", "S"]
     
     private var currentMinutes: Int {
-        // Get today's minutes from total minutes if there was activity today
-        if calendar.isDateInToday(db.lastActivity ?? Date.distantPast) {
-            return db.totalMinutes % (24 * 60) // Get today's minutes only
-        }
-        return 0
+        guard let lastActivity = db.lastActivity else { return 0 }
+        return calendar.isDateInToday(lastActivity) ? (db.totalMinutes % (24 * 60)) : 0
     }
     
     var body: some View {
@@ -163,18 +160,26 @@ struct ProgressView: View {
     }
     
     private func loadStreakDays() async {
-        // Start with today if we have activity today
         var days: Set<Date> = []
-        if let lastActivity = db.lastActivity, calendar.isDateInToday(lastActivity) {
-            days.insert(lastActivity)
+        
+        // Add today if we have activity
+        if let lastActivity = db.lastActivity,
+           calendar.isDateInToday(lastActivity) {
+            // Normalize to start of day to ensure proper comparison
+            if let startOfDay = calendar.date(bySettingHour: 0, minute: 0, second: 0, of: lastActivity) {
+                days.insert(startOfDay)
+            }
         }
         
         // Add previous streak days
         if db.currentStreak > 1 {
             let today = Date()
-            for dayOffset in 1..<db.currentStreak {
-                if let date = calendar.date(byAdding: .day, value: -dayOffset, to: today) {
-                    days.insert(date)
+            // Get start of today for consistent date comparisons
+            if let startOfToday = calendar.date(bySettingHour: 0, minute: 0, second: 0, of: today) {
+                for dayOffset in 1..<db.currentStreak {
+                    if let date = calendar.date(byAdding: .day, value: -dayOffset, to: startOfToday) {
+                        days.insert(date)
+                    }
                 }
             }
         }

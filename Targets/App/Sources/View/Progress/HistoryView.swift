@@ -1,5 +1,6 @@
 import SwiftUI
 import SharedKit
+import SupabaseKit
 
 struct CompletedRoutine: Identifiable {
     let id: UUID
@@ -9,6 +10,7 @@ struct CompletedRoutine: Identifiable {
 
 struct HistoryView: View {
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject private var db: DB
     @State private var completedRoutines: [CompletedRoutine] = []
     
     private let dateFormatter: DateFormatter = {
@@ -62,27 +64,40 @@ struct HistoryView: View {
         ZStack {
             Color.baseBlack.ignoresSafeArea()
             
-            ScrollView {
-                VStack(spacing: 24) {
-                    ForEach(groupedRoutines, id: \.0) { date, routines in
-                        VStack(alignment: .leading, spacing: 16) {
-                            // Date Header
-                            Text(date)
-                                .font(.title2)
-                                .bold()
-                                .foregroundColor(.white)
-                                .padding(.horizontal)
-                            
-                            // Routines for this date
-                            VStack(spacing: 12) {
-                                ForEach(routines) { completed in
-                                    NavigationLink(destination: RoutineDetailView(routine: completed.routine)) {
+            if completedRoutines.isEmpty {
+                VStack(spacing: 16) {
+                    Text("No History Yet")
+                        .font(.title2)
+                        .bold()
+                        .foregroundColor(.white)
+                    
+                    Text("Complete your first routine to start tracking your progress!")
+                        .font(.body)
+                        .foregroundColor(.white.opacity(0.7))
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal)
+                }
+            } else {
+                ScrollView {
+                    VStack(spacing: 24) {
+                        ForEach(groupedRoutines, id: \.0) { date, routines in
+                            VStack(alignment: .leading, spacing: 16) {
+                                // Date Header
+                                Text(date)
+                                    .font(.title2)
+                                    .bold()
+                                    .foregroundColor(.white)
+                                    .padding(.horizontal)
+                                
+                                // Routines for this date
+                                VStack(spacing: 12) {
+                                    ForEach(routines) { completed in
                                         HStack(spacing: 16) {
                                             // Thumbnail
                                             Image(completed.routine.thumbnailName)
                                                 .resizable()
                                                 .aspectRatio(contentMode: .fill)
-                                                .frame(width: 44, height: 44)
+                                                .frame(width: 56, height: 56)
                                                 .clipShape(RoundedRectangle(cornerRadius: 8))
                                             
                                             VStack(alignment: .leading, spacing: 4) {
@@ -90,61 +105,76 @@ struct HistoryView: View {
                                                     .font(.headline)
                                                     .foregroundColor(.white)
                                                 
-                                                Text("\(timeFormatter.string(from: completed.date)) • \(completed.routine.totalDuration / 60) min")
+                                                Text("\(completed.routine.exercises.count) exercises • \(completed.routine.totalDuration / 60) min")
                                                     .font(.subheadline)
                                                     .foregroundColor(.white.opacity(0.6))
                                             }
                                             
                                             Spacer()
                                             
-                                            // Checkmark
-                                            Image(systemName: "checkmark")
-                                                .foregroundColor(.brandPrimary)
-                                                .frame(width: 44, height: 44)
+                                            Text(timeFormatter.string(from: completed.date))
+                                                .font(.subheadline)
+                                                .foregroundColor(.white.opacity(0.6))
                                         }
-                                        .padding(.horizontal, 16)
-                                        .padding(.vertical, 12)
+                                        .padding()
                                         .background {
                                             RoundedRectangle(cornerRadius: 12)
                                                 .fill(.ultraThinMaterial)
                                         }
                                     }
                                 }
+                                .padding(.horizontal)
                             }
-                            .padding(.horizontal)
                         }
                     }
+                    .padding(.vertical)
                 }
-                .padding(.vertical)
             }
         }
         .navigationBarTitleDisplayMode(.inline)
         .navigationTitle("History")
-        .onAppear {
-            // For preview purposes, we'll add some sample completed routines
-            // In production, this would be loaded from UserDefaults or a database
-            if completedRoutines.isEmpty {
-                let routines = Array(RoutineLibrary.routines.prefix(2))
-                completedRoutines = [
-                    CompletedRoutine(
+        .task {
+            await loadCompletedRoutines()
+        }
+    }
+    
+    private func loadCompletedRoutines() async {
+        // In a real app, this would load from your database
+        // For now, we'll create entries based on the streak
+        var routines: [CompletedRoutine] = []
+        let today = Date()
+        let calendar = Calendar.current
+        
+        if calendar.isDateInToday(db.lastActivity ?? Date.distantPast) {
+            // Add today's completion
+            routines.append(CompletedRoutine(
+                id: UUID(),
+                routine: RoutineLibrary.routines[0],
+                date: db.lastActivity ?? today
+            ))
+        }
+        
+        // Add previous days based on streak
+        if db.currentStreak > 1 {
+            for dayOffset in 1..<db.currentStreak {
+                if let date = calendar.date(byAdding: .day, value: -dayOffset, to: today) {
+                    routines.append(CompletedRoutine(
                         id: UUID(),
-                        routine: routines[0],
-                        date: Date()
-                    ),
-                    CompletedRoutine(
-                        id: UUID(),
-                        routine: routines[1],
-                        date: Calendar.current.date(byAdding: .day, value: -1, to: Date())!
-                    )
-                ]
+                        routine: RoutineLibrary.routines[dayOffset % RoutineLibrary.routines.count],
+                        date: date
+                    ))
+                }
             }
         }
+        
+        completedRoutines = routines
     }
 }
 
 #Preview {
     NavigationStack {
         HistoryView()
+            .environmentObject(DB())
     }
     .preferredColorScheme(.dark)
 } 
