@@ -40,7 +40,7 @@ public class DB: ObservableObject {
 	@Published public private(set) var lastActivity: Date?
 	
 	/// Routine completion history
-	@Published public private(set) var recentCompletions: [RoutineCompletion] = []
+	@Published public private(set) var recentCompletions: [Model.RoutineCompletion] = []
 	
 	/// Initialization state
 	@Published private(set) var isInitialized = false
@@ -104,7 +104,7 @@ public class DB: ObservableObject {
 	// MARK: - Progress Tracking
 	
 	public func loadProgress() async throws {
-		let progress: UserProgress
+		let progress: Model.UserProgress
 		if authState == .signedIn, let userId = currentUser?.id {
 			progress = try await userService.fetchProgress(userId: userId)
 		} else {
@@ -123,7 +123,7 @@ public class DB: ObservableObject {
 		await loadRecentCompletions()
 	}
 	
-	public func recordCompletion(routine: Routine) async throws -> UUID {
+	public func recordCompletion(routine: SharedKit.Routine) async throws -> UUID {
 		let userId = currentUser?.id
 		let deviceIdForCompletion = userId == nil ? deviceId : nil
 		let durationMinutes = routine.totalDuration / 60

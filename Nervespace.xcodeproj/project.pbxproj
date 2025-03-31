@@ -95,7 +95,6 @@
 		C4D493BCC761E86C60A7F306 /* Crashlytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74AE3F3CC16073BF90E9241A /* Crashlytics.swift */; };
 		C5CF30ED98652E66045D6081 /* HeroView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B0BE5BDC5A0673F9FCF7EA7 /* HeroView.swift */; };
 		C93F1D8A78A7DFE88844E617 /* SignInWithApple.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA42B0E1BD112FA7D35F2246 /* SignInWithApple.swift */; };
-		C9AB733F7F2A3814B471E284 /* RoutineCompletion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 313A0719E138101EB0C1B41A /* RoutineCompletion.swift */; };
 		CA0A5A60B953D2D32EDB42E1 /* SnapCarousel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A30C7E4515091374D43BE5A /* SnapCarousel.swift */; };
 		CBFF604839828BB5ECB82947 /* Stack.swift in Sources */ = {isa = PBXBuildFile; fileRef = E707125AB574BCCB8270439E /* Stack.swift */; };
 		CD2C782C2C8644C04E23572D /* isPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F95AB075CFCC69E3E00BE35 /* isPreview.swift */; };
@@ -288,7 +287,6 @@
 		2AA28166D86E5C2B8F07B9CE /* AreaListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AreaListView.swift; sourceTree = "<group>"; };
 		2B0BE5BDC5A0673F9FCF7EA7 /* HeroView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroView.swift; sourceTree = "<group>"; };
 		2B41B98092119FB95092A546 /* WhatsNewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhatsNewView.swift; sourceTree = "<group>"; };
-		313A0719E138101EB0C1B41A /* RoutineCompletion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineCompletion.swift; sourceTree = "<group>"; };
 		31773E0091EAC17A2A2E11F0 /* TextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextField.swift; sourceTree = "<group>"; };
 		32B592D5EEED8E5B114D2630 /* ProfileImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileImage.swift; sourceTree = "<group>"; };
 		3382516E12C8CB796FA8811A /* SettingsRowItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsRowItem.swift; sourceTree = "<group>"; };
@@ -710,7 +708,6 @@
 			isa = PBXGroup;
 			children = (
 				B2257224C0CE5130AC891C98 /* Models.swift */,
-				313A0719E138101EB0C1B41A /* RoutineCompletion.swift */,
 				FB518411EAE3C7FA9054FCC8 /* SupabaseUserService.swift */,
 				1763702111A0A093814B41BF /* UserService.swift */,
 			);
@@ -1408,7 +1405,6 @@
 				C93F1D8A78A7DFE88844E617 /* SignInWithApple.swift in Sources */,
 				978270648561AA9A6516EF73 /* SupabaseBackend.swift in Sources */,
 				735F57ECF2158D6B9578A52C /* Models.swift in Sources */,
-				C9AB733F7F2A3814B471E284 /* RoutineCompletion.swift in Sources */,
 				1590D6A919B6E1F3A2B3A8A4 /* SupabaseUserService.swift in Sources */,
 				A5DD577F098553E951EC427E /* UserService.swift in Sources */,
 				1EEC65B91A20DE2081E77E0D /* AccountSettingsView.swift in Sources */,
@@ -1769,6 +1765,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Derived/Entitlements/Nervespace.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = NMXU2ZADVX;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = "Derived/InfoPlists/Nervespace-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -1797,6 +1794,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Derived/Entitlements/Nervespace.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = NMXU2ZADVX;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = "Derived/InfoPlists/Nervespace-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;

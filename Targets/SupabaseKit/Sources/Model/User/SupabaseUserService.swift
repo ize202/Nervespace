@@ -78,7 +78,7 @@ public class SupabaseUserService: UserService {
     
     // MARK: - Profile Management
     
-    public func fetchProfile(userId: UUID) async throws -> UserProfile {
+    public func fetchProfile(userId: UUID) async throws -> Model.UserProfile {
         let query = client.database
             .from("user_profiles")
             .select()
@@ -86,12 +86,12 @@ public class SupabaseUserService: UserService {
             .single()
         
         let response = try await query.execute()
-        let data = try response.decode(UserProfile.self, using: .snakeCase)
+        let data = try response.decode(Model.UserProfile.self, using: .snakeCase)
         return data
     }
     
-    public func createProfile(appleId: String, email: String?, name: String?) async throws -> UserProfile {
-        let profile = UserProfile(
+    public func createProfile(appleId: String, email: String?, name: String?) async throws -> Model.UserProfile {
+        let profile = Model.UserProfile(
             appleId: appleId,
             email: email,
             name: name
@@ -103,11 +103,11 @@ public class SupabaseUserService: UserService {
             .single()
         
         let response = try await query.execute()
-        let data = try response.decode(UserProfile.self, using: .snakeCase)
+        let data = try response.decode(Model.UserProfile.self, using: .snakeCase)
         return data
     }
     
-    public func updateProfile(userId: UUID, name: String?, avatarURL: URL?) async throws -> UserProfile {
+    public func updateProfile(userId: UUID, name: String?, avatarURL: URL?) async throws -> Model.UserProfile {
         let update = ProfileUpdate(
             name: name,
             avatarURL: avatarURL?.absoluteString
@@ -120,7 +120,7 @@ public class SupabaseUserService: UserService {
             .single()
         
         let response = try await query.execute()
-        let data = try response.decode(UserProfile.self, using: .snakeCase)
+        let data = try response.decode(Model.UserProfile.self, using: .snakeCase)
         return data
     }
     
@@ -134,7 +134,7 @@ public class SupabaseUserService: UserService {
     
     // MARK: - Progress Tracking
     
-    public func fetchProgress(userId: UUID) async throws -> UserProgress {
+    public func fetchProgress(userId: UUID) async throws -> Model.UserProgress {
         let query = client.database
             .from("user_progress")
             .select()
@@ -142,11 +142,11 @@ public class SupabaseUserService: UserService {
             .single()
         
         let response = try await query.execute()
-        let data = try response.decode(UserProgress.self, using: .snakeCase)
+        let data = try response.decode(Model.UserProgress.self, using: .snakeCase)
         return data
     }
     
-    public func fetchProgressByDeviceId(_ deviceId: UUID) async throws -> UserProgress {
+    public func fetchProgressByDeviceId(_ deviceId: UUID) async throws -> Model.UserProgress {
         let query = client.database
             .from("user_progress")
             .select()
@@ -154,14 +154,14 @@ public class SupabaseUserService: UserService {
             .single()
         
         let response = try await query.execute()
-        let data = try response.decode(UserProgress.self, using: .snakeCase)
+        let data = try response.decode(Model.UserProgress.self, using: .snakeCase)
         return data
     }
     
-    public func initializeProgress(userId: UUID) async throws -> UserProgress {
-        let progress = UserProgress(userId: userId)
+    public func initializeProgress(userId: UUID) async throws -> Model.UserProgress {
+        let progress = Model.UserProgress(userId: userId)
         
-        let progresses: [UserProgress] = try await client
+        let progresses: [Model.UserProgress] = try await client
             .from("user_progress")
             .insert(progress)
             .execute()
@@ -176,7 +176,7 @@ public class SupabaseUserService: UserService {
         return created
     }
     
-    public func initializeAnonymousProgress(deviceId: UUID) async throws -> UserProgress {
+    public func initializeAnonymousProgress(deviceId: UUID) async throws -> Model.UserProgress {
         print("[DB] Initializing anonymous progress with deviceId: \(deviceId)")
         
         // Create minimal params for initialization
@@ -190,7 +190,7 @@ public class SupabaseUserService: UserService {
         
         do {
             print("[DB] Sending params to Supabase: \(String(describing: params))")
-            let progresses: [UserProgress] = try await client
+            let progresses: [Model.UserProgress] = try await client
                 .from("user_progress")
                 .insert(params)
                 .execute()
@@ -217,7 +217,7 @@ public class SupabaseUserService: UserService {
         routineCompletions: Int?,
         totalMinutes: Int?,
         lastActivity: Date?
-    ) async throws -> UserProgress {
+    ) async throws -> Model.UserProgress {
         let update = ProgressUpdate(
             userId: userId,
             deviceId: nil,
@@ -227,7 +227,7 @@ public class SupabaseUserService: UserService {
             lastActivity: lastActivity
         )
         
-        let progresses: [UserProgress] = try await client
+        let progresses: [Model.UserProgress] = try await client
             .from("user_progress")
             .update(update)
             .eq("user_id", value: userId)
@@ -249,7 +249,7 @@ public class SupabaseUserService: UserService {
         routineCompletions: Int?,
         totalMinutes: Int?,
         lastActivity: Date?
-    ) async throws -> UserProgress {
+    ) async throws -> Model.UserProgress {
         let update = ProgressUpdate(
             userId: nil,
             deviceId: deviceId,
@@ -259,7 +259,7 @@ public class SupabaseUserService: UserService {
             lastActivity: lastActivity
         )
         
-        let progresses: [UserProgress] = try await client
+        let progresses: [Model.UserProgress] = try await client
             .from("user_progress")
             .update(update)
             .eq("device_id", value: deviceId)
@@ -306,7 +306,7 @@ public class SupabaseUserService: UserService {
         userId: UUID,
         isPremium: Bool,
         premiumUntil: Date?
-    ) async throws -> UserProfile {
+    ) async throws -> Model.UserProfile {
         let update = PremiumStatusUpdate(
             isPremium: isPremium,
             premiumUntil: premiumUntil
@@ -319,13 +319,13 @@ public class SupabaseUserService: UserService {
             .single()
         
         let response = try await query.execute()
-        let data = try response.decode(UserProfile.self, using: .snakeCase)
+        let data = try response.decode(Model.UserProfile.self, using: .snakeCase)
         return data
     }
     
     // MARK: - Utility Methods
     
-    public func findProfileByAppleId(_ appleId: String) async throws -> UserProfile? {
+    public func findProfileByAppleId(_ appleId: String) async throws -> Model.UserProfile? {
         let query = client.database
             .from("user_profiles")
             .select()
@@ -334,7 +334,7 @@ public class SupabaseUserService: UserService {
         
         do {
             let response = try await query.execute()
-            let data = try response.decode(UserProfile.self, using: .snakeCase)
+            let data = try response.decode(Model.UserProfile.self, using: .snakeCase)
             return data
         } catch {
             return nil
@@ -368,7 +368,7 @@ public class SupabaseUserService: UserService {
         userId: UUID?,
         deviceId: UUID?,
         days: Int
-    ) async throws -> [RoutineCompletion] {
+    ) async throws -> [Model.RoutineCompletion] {
         let query = client.database
             .rpc("get_recent_completions", params: [
                 "p_user_id": userId as Any,
@@ -377,12 +377,12 @@ public class SupabaseUserService: UserService {
             ])
         
         let response = try await query.execute()
-        let completions = try response.decode([RoutineCompletion].self, using: .snakeCase)
+        let completions = try response.decode([Model.RoutineCompletion].self, using: .snakeCase)
         return completions
     }
     
     public func getCurrentStreak(userId: UUID) async throws -> Int {
-        let progresses: [UserProgress]
+        let progresses: [Model.UserProgress]
         
         // Try to fetch progress based on whether this is a user ID or device ID
         do {

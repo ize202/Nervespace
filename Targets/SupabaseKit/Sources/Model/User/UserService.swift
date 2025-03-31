@@ -2,14 +2,14 @@ import Foundation
 
 public protocol UserService {
     // Profile management
-    func fetchProfile(userId: UUID) async throws -> UserProfile
-    func createProfile(appleId: String, email: String?, name: String?) async throws -> UserProfile
-    func updateProfile(userId: UUID, name: String?, avatarURL: URL?) async throws -> UserProfile
+    func fetchProfile(userId: UUID) async throws -> Model.UserProfile
+    func createProfile(appleId: String, email: String?, name: String?) async throws -> Model.UserProfile
+    func updateProfile(userId: UUID, name: String?, avatarURL: URL?) async throws -> Model.UserProfile
     func deleteProfile(userId: UUID) async throws
     
     // Progress tracking
-    func fetchProgress(userId: UUID) async throws -> UserProgress
-    func fetchProgressByDeviceId(_ deviceId: UUID) async throws -> UserProgress
+    func fetchProgress(userId: UUID) async throws -> Model.UserProgress
+    func fetchProgressByDeviceId(_ deviceId: UUID) async throws -> Model.UserProgress
     
     // Routine completions
     func recordRoutineCompletion(
@@ -23,7 +23,7 @@ public protocol UserService {
         userId: UUID?,
         deviceId: UUID?,
         days: Int
-    ) async throws -> [RoutineCompletion]
+    ) async throws -> [Model.RoutineCompletion]
     
     // Account migration
     func migrateAnonymousProgress(
@@ -36,10 +36,10 @@ public protocol UserService {
         userId: UUID,
         isPremium: Bool,
         premiumUntil: Date?
-    ) async throws -> UserProfile
+    ) async throws -> Model.UserProfile
     
     // Utility methods
-    func findProfileByAppleId(_ appleId: String) async throws -> UserProfile?
+    func findProfileByAppleId(_ appleId: String) async throws -> Model.UserProfile?
 }
 
 public struct UserProgress {
