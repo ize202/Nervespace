@@ -95,6 +95,9 @@ public class DB: ObservableObject {
 			supabaseKey: apiKey
 		)
 		
+		// Load local progress immediately
+		loadLocalProgress()
+		
 		Task {
 			do {
 				await registerAuthStateListener(additionalHandler: onAuthStateChange)
@@ -107,6 +110,10 @@ public class DB: ObservableObject {
 						print("[DB] Found existing anonymous progress with streak: \(progress.streak)")
 						await MainActor.run {
 							updateProgress(from: progress)
+							// Load recent completions after updating progress
+							Task {
+								await loadRecentCompletions()
+							}
 						}
 					} catch let error as NSError {
 						if error.domain == "UserService" && error.code == 404 {
@@ -119,13 +126,9 @@ public class DB: ObservableObject {
 								}
 							} catch {
 								print("[DB] Error initializing anonymous progress: \(error.localizedDescription)")
-								// Load local progress as fallback
-								loadLocalProgress()
 							}
 						} else {
 							print("[DB] Error checking progress: \(error.localizedDescription)")
-							// Load local progress as fallback
-							loadLocalProgress()
 						}
 					}
 				}
@@ -135,11 +138,8 @@ public class DB: ObservableObject {
 				}
 			} catch {
 				print("[DB] Error during initialization: \(error.localizedDescription)")
-				// Even if initialization fails, we should still mark as initialized to prevent hanging
 				await MainActor.run {
 					self.isInitialized = true
-					// Load local progress as fallback
-					loadLocalProgress()
 				}
 			}
 		}
@@ -147,18 +147,26 @@ public class DB: ObservableObject {
 	
 	// MARK: - Progress Tracking
 	
-	private func loadLocalProgress() {
-		currentStreak = defaults.integer(forKey: "local_streak")
-		totalMinutes = defaults.integer(forKey: "local_minutes")
-		routineCompletions = defaults.integer(forKey: "local_completions")
-		lastActivity = defaults.object(forKey: "local_last_activity") as? Date
+	private func saveLocalProgress() {
+		let progress = [
+			"streak": currentStreak,
+			"totalMinutes": totalMinutes,
+			"routineCompletions": routineCompletions,
+			"lastActivity": lastActivity?.timeIntervalSince1970 ?? 0
+		] as [String : Any]
+		
+		defaults.set(progress, forKey: "local_progress")
 	}
 	
-	private func saveLocalProgress() {
-		defaults.set(currentStreak, forKey: "local_streak")
-		defaults.set(totalMinutes, forKey: "local_minutes")
-		defaults.set(routineCompletions, forKey: "local_completions")
-		defaults.set(lastActivity, forKey: "local_last_activity")
+	private func loadLocalProgress() {
+		guard let progress = defaults.dictionary(forKey: "local_progress") else { return }
+		
+		currentStreak = progress["streak"] as? Int ?? 0
+		totalMinutes = progress["totalMinutes"] as? Int ?? 0
+		routineCompletions = progress["routineCompletions"] as? Int ?? 0
+		if let timestamp = progress["lastActivity"] as? TimeInterval, timestamp > 0 {
+			lastActivity = Date(timeIntervalSince1970: timestamp)
+		}
 	}
 	
 	public func loadProgress() async throws {
@@ -189,7 +197,7 @@ public class DB: ObservableObject {
 		saveLocalProgress()
 	}
 	
-	public func recordCompletion(routine: Routine) async throws {
+	public func recordCompletion(routine: Routine) async throws -> UUID {
 		if !isInitialized {
 			print("[DB] Waiting for initialization to complete...")
 			// Wait for initialization with a timeout
@@ -222,14 +230,55 @@ public class DB: ObservableObject {
 		print("[DB] Successfully recorded completion with ID: \(completionId)")
 		
 		// Update local state
-		currentStreak = try await userService.getCurrentStreak(userId: userId ?? deviceId)
-		lastActivity = today
-		totalMinutes += routine.totalDuration / 60
-		routineCompletions += 1
-		saveLocalProgress()
+		await MainActor.run {
+			lastActivity = today
+			totalMinutes += routine.totalDuration / 60
+			routineCompletions += 1
+			
+			// Update streak
+			if let lastActivity = self.lastActivity {
+				let calendar = Calendar.current
+				if calendar.isDateInToday(lastActivity) {
+					// Already completed today, keep streak
+				} else if calendar.isDate(lastActivity, inSameDayAs: calendar.date(byAdding: .day, value: -1, to: today) ?? today) {
+					// Completed yesterday, increment streak
+					currentStreak += 1
+				} else {
+					// Break in streak, reset to 1
+					currentStreak = 1
+				}
+			} else {
+				// First completion
+				currentStreak = 1
+			}
+			
+			// Save local progress
+			saveLocalProgress()
+		}
+		
+		// Update remote state
+		if userId != nil {
+			_ = try await userService.updateProgress(
+				userId: userId!,
+				streak: currentStreak,
+				routineCompletions: routineCompletions,
+				totalMinutes: totalMinutes,
+				lastActivity: lastActivity
+			)
+		} else {
+			_ = try await userService.updateAnonymousProgress(
+				deviceId: deviceId,
+				streak: currentStreak,
+				routineCompletions: routineCompletions,
+				totalMinutes: totalMinutes,
+				lastActivity: lastActivity
+			)
+		}
 		
 		// Fetch recent completions
 		await loadRecentCompletions()
+		
+		return completionId
 	}
 	
 	public func loadRecentCompletions() async {

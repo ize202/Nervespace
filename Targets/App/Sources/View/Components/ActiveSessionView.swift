@@ -16,6 +16,7 @@ public struct ActiveSessionView: View {
     @State private var showingCompletion = false
     @State private var showError = false
     @State private var errorMessage = ""
+    @State private var completionId: UUID?
     @EnvironmentObject private var db: DB
     @State private var isUpdating = false
     
@@ -172,8 +173,10 @@ public struct ActiveSessionView: View {
                 ExerciseDetailView(exercise: exercise)
             }
         }
-        .fullScreenCover(isPresented: $showingCompletion) {
-            RoutineCompletionView(routine: routine)
+        .sheet(isPresented: $showingCompletion) {
+            if let completionId = completionId {
+                RoutineCompletionView(routine: routine, completionId: completionId)
+            }
         }
         .alert("Error", isPresented: $showError) {
             Button("OK", role: .cancel) {}
@@ -203,7 +206,7 @@ public struct ActiveSessionView: View {
     private func completeRoutine() async {
         isUpdating = true
         do {
-            try await db.recordCompletion(routine: routine)
+            completionId = try await db.recordCompletion(routine: routine)
             showingCompletion = true
         } catch {
             showError = true
