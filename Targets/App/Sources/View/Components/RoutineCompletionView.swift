@@ -56,7 +56,7 @@ struct RoutineCompletionView: View {
                     
                     // Week view
                     HStack(spacing: 20) {
-                        ForEach(weekDays, id: \.self) { day in
+                        ForEach(Array(weekDays.enumerated()), id: \.offset) { index, day in
                             VStack(spacing: 8) {
                                 Text(day)
                                     .font(.footnote)

@@ -69,7 +69,7 @@ struct ProgressView: View {
                                     
                                     // Days of week header
                                     HStack {
-                                        ForEach(daysOfWeek, id: \.self) { day in
+                                        ForEach(Array(daysOfWeek.enumerated()), id: \.offset) { index, day in
                                             Text(day)
                                                 .font(.caption)
                                                 .fontWeight(.medium)
@@ -80,7 +80,7 @@ struct ProgressView: View {
                                     
                                     // Calendar grid
                                     LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7), spacing: 8) {
-                                        ForEach(days, id: \.self) { date in
+                                        ForEach(Array(days.enumerated()), id: \.offset) { index, date in
                                             if let date = date {
                                                 DayCell(date: date, isSelected: isDateInStreak(date))
                                             } else {
