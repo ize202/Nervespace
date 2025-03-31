@@ -105,18 +105,27 @@ public class DB: ObservableObject {
 					do {
 						let progress = try await userService.fetchProgressByDeviceId(deviceId)
 						print("[DB] Found existing anonymous progress with streak: \(progress.streak)")
-						try await loadProgress()
-					} catch {
-						if (error as NSError).domain == "UserService" && (error as NSError).code == 404 {
+						await MainActor.run {
+							updateProgress(from: progress)
+						}
+					} catch let error as NSError {
+						if error.domain == "UserService" && error.code == 404 {
 							print("[DB] No existing progress found, initializing anonymous user progress...")
-							let progress = try await userService.initializeAnonymousProgress(deviceId: deviceId)
-							print("[DB] Successfully initialized anonymous progress with ID: \(progress.id)")
-							await MainActor.run {
-								updateProgress(from: progress)
+							do {
+								let progress = try await userService.initializeAnonymousProgress(deviceId: deviceId)
+								print("[DB] Successfully initialized anonymous progress with ID: \(progress.id)")
+								await MainActor.run {
+									updateProgress(from: progress)
+								}
+							} catch {
+								print("[DB] Error initializing anonymous progress: \(error.localizedDescription)")
+								// Load local progress as fallback
+								loadLocalProgress()
 							}
 						} else {
 							print("[DB] Error checking progress: \(error.localizedDescription)")
-							throw error
+							// Load local progress as fallback
+							loadLocalProgress()
 						}
 					}
 				}
@@ -129,6 +138,8 @@ public class DB: ObservableObject {
 				// Even if initialization fails, we should still mark as initialized to prevent hanging
 				await MainActor.run {
 					self.isInitialized = true
+					// Load local progress as fallback
+					loadLocalProgress()
 				}
 			}
 		}

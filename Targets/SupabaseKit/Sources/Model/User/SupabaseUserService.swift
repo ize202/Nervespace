@@ -55,9 +55,20 @@ private struct GetRecentCompletionsParams: Encodable {
 
 private struct InitialProgressParams: Encodable {
     let device_id: UUID
+    let user_id: UUID?
     let streak: Int
     let routine_completions: Int
     let total_minutes: Int
+    let last_activity: Date?
+    
+    enum CodingKeys: String, CodingKey {
+        case device_id
+        case user_id
+        case streak
+        case routine_completions
+        case total_minutes
+        case last_activity
+    }
 }
 
 public class SupabaseUserService: UserService {
@@ -196,26 +207,30 @@ public class SupabaseUserService: UserService {
     }
     
     public func initializeAnonymousProgress(deviceId: UUID) async throws -> UserProgress {
-        let params = InitialProgressParams(
-            device_id: deviceId,
-            streak: 0,
-            routine_completions: 0,
-            total_minutes: 0
-        )
+        print("[DB] Initializing anonymous progress with deviceId: \(deviceId)")
+        let progress = UserProgress(deviceId: deviceId)
         
-        let progresses: [UserProgress] = try await client
-            .from("user_progress")
-            .insert(params)
-            .execute()
-            .value
-        
-        guard let created = progresses.first else {
-            throw NSError(domain: "UserService", code: 500, userInfo: [
-                NSLocalizedDescriptionKey: "Failed to initialize anonymous progress"
-            ])
+        do {
+            print("[DB] Sending progress to Supabase: \(String(describing: progress))")
+            let progresses: [UserProgress] = try await client
+                .from("user_progress")
+                .insert(progress)
+                .execute()
+                .value
+            
+            guard let created = progresses.first else {
+                print("[DB] No progress returned from Supabase")
+                throw NSError(domain: "UserService", code: 500, userInfo: [
+                    NSLocalizedDescriptionKey: "Failed to initialize anonymous progress"
+                ])
+            }
+            
+            print("[DB] Successfully created anonymous progress: \(String(describing: created))")
+            return created
+        } catch {
+            print("[DB] Error creating anonymous progress: \(error.localizedDescription)")
+            throw error
         }
-        
-        return created
     }
     
     public func updateProgress(
