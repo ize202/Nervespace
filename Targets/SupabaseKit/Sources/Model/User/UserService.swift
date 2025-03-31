@@ -37,6 +37,7 @@ public protocol UserService {
     // Routine completions
     func recordRoutineCompletion(
         routineId: String,
+        durationMinutes: Int,
         userId: UUID?,
         deviceId: UUID?
     ) async throws -> UUID
@@ -48,4 +49,60 @@ public protocol UserService {
     ) async throws -> [RoutineCompletion]
     
     func getCurrentStreak(userId: UUID) async throws -> Int
+}
+
+public struct UserProgress {
+    public let id: UUID
+    public let userId: UUID?
+    public let deviceId: UUID?
+    public let streak: Int
+    public let dailyMinutes: Int
+    public let totalMinutes: Int
+    public let lastActivity: Date?
+    public let createdAt: Date
+    
+    public init(
+        id: UUID,
+        userId: UUID?,
+        deviceId: UUID?,
+        streak: Int,
+        dailyMinutes: Int,
+        totalMinutes: Int,
+        lastActivity: Date?,
+        createdAt: Date
+    ) {
+        self.id = id
+        self.userId = userId
+        self.deviceId = deviceId
+        self.streak = streak
+        self.dailyMinutes = dailyMinutes
+        self.totalMinutes = totalMinutes
+        self.lastActivity = lastActivity
+        self.createdAt = createdAt
+    }
+}
+
+public struct RoutineCompletion {
+    public let id: UUID
+    public let userId: UUID?
+    public let deviceId: UUID?
+    public let routineId: String
+    public let completedAt: Date
+    public let durationMinutes: Int
+    
+    public init(
+        id: UUID,
+        userId: UUID?,
+        deviceId: UUID?,
+        routineId: String,
+        completedAt: Date,
+        durationMinutes: Int
+    ) {
+        self.id = id
+        self.userId = userId
+        self.deviceId = deviceId
+        self.routineId = routineId
+        self.completedAt = completedAt
+        self.durationMinutes = durationMinutes
+    }
 } 

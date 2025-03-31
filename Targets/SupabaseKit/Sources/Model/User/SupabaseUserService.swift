@@ -153,37 +153,27 @@ public class SupabaseUserService: UserService {
     // MARK: - Progress Tracking
     
     public func fetchProgress(userId: UUID) async throws -> UserProgress {
-        let progresses: [UserProgress] = try await client
+        let query = client.database
             .from("user_progress")
             .select()
             .eq("user_id", value: userId)
-            .execute()
-            .value
+            .single()
         
-        guard let progress = progresses.first else {
-            throw NSError(domain: "UserService", code: 404, userInfo: [
-                NSLocalizedDescriptionKey: "User progress not found"
-            ])
-        }
-        
-        return progress
+        let response = try await query.execute()
+        let data = try response.decode(UserProgress.self, using: .snakeCase)
+        return data
     }
     
     public func fetchProgressByDeviceId(_ deviceId: UUID) async throws -> UserProgress {
-        let progresses: [UserProgress] = try await client
+        let query = client.database
             .from("user_progress")
             .select()
             .eq("device_id", value: deviceId)
-            .execute()
-            .value
+            .single()
         
-        guard let progress = progresses.first else {
-            throw NSError(domain: "UserService", code: 404, userInfo: [
-                NSLocalizedDescriptionKey: "User progress not found"
-            ])
-        }
-        
-        return progress
+        let response = try await query.execute()
+        let data = try response.decode(UserProgress.self, using: .snakeCase)
+        return data
     }
     
     public func initializeProgress(userId: UUID) async throws -> UserProgress {
@@ -303,41 +293,29 @@ public class SupabaseUserService: UserService {
         return updated
     }
     
-    public func migrateAnonymousProgress(from deviceId: UUID, to userId: UUID) async throws -> UserProgress {
-        // First, fetch the anonymous progress
-        let anonymousProgress = try await fetchProgressByDeviceId(deviceId)
-        
-        // Create a new progress entry for the authenticated user
-        let update = ProgressUpdate(
-            userId: userId,
-            deviceId: nil,
-            streak: anonymousProgress.streak,
-            routineCompletions: anonymousProgress.routineCompletions,
-            totalMinutes: anonymousProgress.totalMinutes,
-            lastActivity: anonymousProgress.lastActivity
-        )
-        
-        // Insert the new progress
-        let progresses: [UserProgress] = try await client
+    public func migrateAnonymousProgress(
+        from deviceId: UUID,
+        to userId: UUID
+    ) async throws {
+        // First, update the user_progress entry
+        try await client.database
             .from("user_progress")
-            .insert(update)
-            .execute()
-            .value
-        
-        guard let created = progresses.first else {
-            throw NSError(domain: "UserService", code: 500, userInfo: [
-                NSLocalizedDescriptionKey: "Failed to migrate anonymous progress"
+            .update([
+                "user_id": userId,
+                "device_id": nil
             ])
-        }
-        
-        // Delete the anonymous progress
-        try await client
-            .from("user_progress")
-            .delete()
             .eq("device_id", value: deviceId)
             .execute()
         
-        return created
+        // Then, update all routine_completions
+        try await client.database
+            .from("routine_completions")
+            .update([
+                "user_id": userId,
+                "device_id": nil
+            ])
+            .eq("device_id", value: deviceId)
+            .execute()
     }
     
     // MARK: - Premium Status
@@ -379,20 +357,25 @@ public class SupabaseUserService: UserService {
     
     public func recordRoutineCompletion(
         routineId: String,
+        durationMinutes: Int,
         userId: UUID?,
         deviceId: UUID?
     ) async throws -> UUID {
-        let params = RoutineCompletionParams(
-            p_routine_id: routineId,
-            p_user_id: userId?.uuidString,
-            p_device_id: deviceId?.uuidString
-        )
+        // Call the record_routine_completion function which handles both tables
+        let query = client.database
+            .rpc("record_routine_completion", params: [
+                "p_routine_id": routineId,
+                "p_duration_minutes": durationMinutes,
+                "p_user_id": userId as Any,
+                "p_device_id": deviceId as Any
+            ])
         
-        let completionId: UUID = try await client
-            .rpc("record_routine_completion", params: params)
-            .execute()
-            .value
-        
+        let response = try await query.execute()
+        guard let completionId = try? response.decode(UUID.self) else {
+            throw NSError(domain: "UserService", code: 500, userInfo: [
+                NSLocalizedDescriptionKey: "Failed to decode completion ID"
+            ])
+        }
         return completionId
     }
     
@@ -401,25 +384,16 @@ public class SupabaseUserService: UserService {
         deviceId: UUID?,
         days: Int
     ) async throws -> [RoutineCompletion] {
-        let startDate = Calendar.current.date(
-            byAdding: .day,
-            value: -days,
-            to: Date()
-        ) ?? Date()
+        // Call the get_recent_completions function
+        let query = client.database
+            .rpc("get_recent_completions", params: [
+                "p_user_id": userId as Any,
+                "p_device_id": deviceId as Any,
+                "p_days": days
+            ])
         
-        let dateFormatter = ISO8601DateFormatter()
-        let params = GetRecentCompletionsParams(
-            p_start_date: dateFormatter.string(from: startDate),
-            p_end_date: dateFormatter.string(from: Date()),
-            p_user_id: userId?.uuidString,
-            p_device_id: deviceId?.uuidString
-        )
-        
-        let completions: [RoutineCompletion] = try await client
-            .rpc("get_user_completions", params: params)
-            .execute()
-            .value
-        
+        let response = try await query.execute()
+        let completions = try response.decode([RoutineCompletion].self, using: .snakeCase)
         return completions
     }
     

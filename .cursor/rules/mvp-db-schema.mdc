@@ -21,18 +21,30 @@ CREATE TABLE public.user_profiles (
     updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 
--- User Progress Table (Updated to support anonymous users)
+-- User Progress Table (Simplified)
 CREATE TABLE public.user_progress (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID REFERENCES user_profiles(id) ON DELETE CASCADE,
-    device_id UUID UNIQUE, -- For anonymous users
+    device_id UUID UNIQUE,
     streak INTEGER DEFAULT 0,
-    routine_completions INTEGER DEFAULT 0,
-    total_minutes INTEGER DEFAULT 0,
+    daily_minutes INTEGER DEFAULT 0,     -- For daily goal tracking
+    total_minutes INTEGER DEFAULT 0,     -- For lifetime stats
     last_activity DATE,
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-    -- Ensure either user_id or device_id is present, but not both
+    CONSTRAINT check_id_present CHECK (
+        (user_id IS NOT NULL AND device_id IS NULL) OR 
+        (device_id IS NOT NULL AND user_id IS NULL)
+    )
+);
+
+-- Routine Completions Table (Simplified)
+CREATE TABLE public.routine_completions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES user_profiles(id) ON DELETE CASCADE,
+    device_id UUID,
+    routine_id TEXT NOT NULL,
+    completed_at TIMESTAMPTZ NOT NULL,
+    duration_minutes INTEGER NOT NULL,
     CONSTRAINT check_id_present CHECK (
         (user_id IS NOT NULL AND device_id IS NULL) OR 
         (device_id IS NOT NULL AND user_id IS NULL)
@@ -42,10 +54,16 @@ CREATE TABLE public.user_progress (
 -- Indexes for performance
 CREATE INDEX idx_user_progress_user_id ON user_progress(user_id);
 CREATE INDEX idx_user_progress_device_id ON user_progress(device_id);
+CREATE INDEX idx_user_progress_last_activity ON user_progress(last_activity);
+
+CREATE INDEX idx_routine_completions_user_id ON routine_completions(user_id);
+CREATE INDEX idx_routine_completions_device_id ON routine_completions(device_id);
+CREATE INDEX idx_routine_completions_completed_at ON routine_completions(completed_at);
 
 -- Enable Row Level Security
 ALTER TABLE user_profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE user_progress ENABLE ROW LEVEL SECURITY;
+ALTER TABLE routine_completions ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies for User Profiles
 CREATE POLICY "Users can view own profile"
@@ -64,17 +82,10 @@ TO authenticated
 USING (auth.uid() = id)
 WITH CHECK (auth.uid() = id);
 
--- RLS Policies for User Progress (Updated to support anonymous users)
+-- RLS Policies for User Progress
 CREATE POLICY "Users can view own progress"
 ON user_progress FOR SELECT
 USING (
-    (auth.uid()::uuid = user_id) OR 
-    (device_id IS NOT NULL)
-);
-
-CREATE POLICY "Users can insert own progress"
-ON user_progress FOR INSERT
-WITH CHECK (
     (auth.uid()::uuid = user_id) OR 
     (device_id IS NOT NULL)
 );
@@ -89,27 +100,185 @@ WITH CHECK (
     (auth.uid()::uuid = user_id) OR 
     (device_id IS NOT NULL)
 );
+
+-- RLS Policies for Routine Completions
+CREATE POLICY "Users can view own completions"
+ON routine_completions FOR SELECT
+USING (
+    (auth.uid()::uuid = user_id) OR 
+    (device_id IS NOT NULL)
+);
+
+CREATE POLICY "Users can insert own completions"
+ON routine_completions FOR INSERT
+WITH CHECK (
+    (auth.uid()::uuid = user_id) OR 
+    (device_id IS NOT NULL)
+);
+
+-- Database Functions
+
+-- Function to record a routine completion and update progress
+CREATE OR REPLACE FUNCTION record_routine_completion(
+    p_routine_id TEXT,
+    p_duration_minutes INTEGER,
+    p_completed_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    p_user_id UUID DEFAULT NULL,
+    p_device_id UUID DEFAULT NULL
+)
+RETURNS UUID
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+    v_completion_id UUID;
+    v_last_activity DATE;
+    v_current_date DATE := CURRENT_DATE;
+BEGIN
+    -- Insert the completion
+    INSERT INTO routine_completions (
+        user_id,
+        device_id,
+        routine_id,
+        completed_at,
+        duration_minutes
+    )
+    VALUES (
+        p_user_id,
+        p_device_id,
+        p_routine_id,
+        p_completed_at,
+        p_duration_minutes
+    )
+    RETURNING id INTO v_completion_id;
+
+    -- Get the last activity date for the user/device
+    SELECT last_activity INTO v_last_activity
+    FROM user_progress
+    WHERE (p_user_id IS NOT NULL AND user_id = p_user_id)
+       OR (p_device_id IS NOT NULL AND device_id = p_device_id);
+
+    -- Update or insert user_progress
+    INSERT INTO user_progress (
+        user_id,
+        device_id,
+        streak,
+        daily_minutes,
+        total_minutes,
+        last_activity
+    )
+    VALUES (
+        p_user_id,
+        p_device_id,
+        1, -- Initial streak
+        p_duration_minutes, -- Initial daily minutes
+        p_duration_minutes, -- Initial total minutes
+        v_current_date
+    )
+    ON CONFLICT ON CONSTRAINT check_id_present DO UPDATE
+    SET 
+        streak = CASE 
+            WHEN user_progress.last_activity = v_current_date - 1 THEN user_progress.streak + 1
+            WHEN user_progress.last_activity = v_current_date THEN user_progress.streak
+            ELSE 1
+        END,
+        daily_minutes = CASE 
+            WHEN user_progress.last_activity = v_current_date THEN user_progress.daily_minutes + p_duration_minutes
+            ELSE p_duration_minutes
+        END,
+        total_minutes = user_progress.total_minutes + p_duration_minutes,
+        last_activity = v_current_date;
+
+    RETURN v_completion_id;
+END;
+$$;
+
+-- Function to get user progress
+CREATE OR REPLACE FUNCTION get_user_progress(
+    p_user_id UUID DEFAULT NULL,
+    p_device_id UUID DEFAULT NULL
+)
+RETURNS TABLE (
+    streak INTEGER,
+    daily_minutes INTEGER,
+    total_minutes INTEGER,
+    last_activity DATE
+)
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT 
+        up.streak,
+        CASE 
+            WHEN up.last_activity = CURRENT_DATE THEN up.daily_minutes
+            ELSE 0
+        END as daily_minutes,
+        up.total_minutes,
+        up.last_activity
+    FROM user_progress up
+    WHERE (p_user_id IS NOT NULL AND up.user_id = p_user_id)
+       OR (p_device_id IS NOT NULL AND up.device_id = p_device_id);
+END;
+$$;
+
+-- Function to get recent completions
+CREATE OR REPLACE FUNCTION get_recent_completions(
+    p_user_id UUID DEFAULT NULL,
+    p_device_id UUID DEFAULT NULL,
+    p_days INTEGER DEFAULT 30
+)
+RETURNS TABLE (
+    id UUID,
+    routine_id TEXT,
+    completed_at TIMESTAMPTZ,
+    duration_minutes INTEGER
+)
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT 
+        rc.id,
+        rc.routine_id,
+        rc.completed_at,
+        rc.duration_minutes
+    FROM routine_completions rc
+    WHERE ((p_user_id IS NOT NULL AND rc.user_id = p_user_id)
+        OR (p_device_id IS NOT NULL AND rc.device_id = p_device_id))
+        AND rc.completed_at >= CURRENT_DATE - p_days
+    ORDER BY rc.completed_at DESC;
+END;
+$$;
 ```
 
-## Key Changes for Anonymous Users Support
+## Key Changes in Schema
 
-1. Added `device_id` column to `user_progress` table
-   - UUID type for unique device identification
-   - UNIQUE constraint to prevent duplicates
-   - NULL for authenticated users
+1. User Progress Table:
+   - Added `daily_minutes` for tracking daily goals
+   - Removed redundant `routine_completions` count
+   - Removed `updated_at` timestamp (using `last_activity` instead)
+   - Maintained `total_minutes` for lifetime stats
 
-2. Added constraint `check_id_present`
-   - Ensures either `user_id` OR `device_id` is present
-   - Prevents having both or neither
+2. Routine Completions Table:
+   - Added `duration_minutes` for accurate time tracking
+   - Removed redundant `created_at` timestamp
+   - Simplified structure for better performance
 
-3. Updated RLS policies
-   - Now supports both authenticated and anonymous access
-   - Authenticated users access via `user_id`
-   - Anonymous users access via `device_id`
+3. Database Functions:
+   - `record_routine_completion`: Handles both tables in one transaction
+   - `get_user_progress`: Returns daily and total minutes
+   - `get_recent_completions`: Includes duration in results
 
-4. Added performance optimizations
-   - Index on `device_id` for faster lookups
-   - Maintained existing index on `user_id`
+4. Performance Optimizations:
+   - Added index on `last_activity` for streak calculations
+   - Maintained existing indexes for user/device lookups
+   - Added index on `completed_at` for history queries
 
 ## Usage Notes
 
@@ -123,143 +292,12 @@ WITH CHECK (
    - Requires user profile
    - Progress syncs across devices
 
-3. Migration Process:
-   - When anonymous user creates account:
-     1. Create user profile
-     2. Copy progress data to new row with `user_id`
-     3. Optionally delete anonymous progress 
+3. Daily vs Total Minutes:
+   - `daily_minutes` resets each day
+   - `total_minutes` accumulates over time
+   - Both updated automatically by `record_routine_completion`
 
-```sql
--- Routine Completions Table
-CREATE TABLE public.routine_completions (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID REFERENCES user_profiles(id) ON DELETE CASCADE,
-    device_id UUID, -- For anonymous users
-    routine_id TEXT NOT NULL, -- References the local routine ID from RoutineLibrary
-    completed_at TIMESTAMPTZ NOT NULL,
-    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-    -- Ensure either user_id or device_id is present, but not both
-    CONSTRAINT check_id_present CHECK (
-        (user_id IS NOT NULL AND device_id IS NULL) OR 
-        (device_id IS NOT NULL AND user_id IS NULL)
-    )
-);
-
--- Indexes for performance
-CREATE INDEX idx_routine_completions_user_id ON routine_completions(user_id);
-CREATE INDEX idx_routine_completions_device_id ON routine_completions(device_id);
-CREATE INDEX idx_routine_completions_completed_at ON routine_completions(completed_at);
-
--- Enable Row Level Security
-ALTER TABLE routine_completions ENABLE ROW LEVEL SECURITY;
-
--- RLS Policies for Routine Completions
-CREATE POLICY "Users can view own completions"
-ON routine_completions FOR SELECT
-TO authenticated, anon
-USING (
-    (auth.uid()::uuid = user_id) OR 
-    (device_id IS NOT NULL)
-);
-
-CREATE POLICY "Users can insert own completions"
-ON routine_completions FOR INSERT
-TO authenticated, anon
-WITH CHECK (
-    (auth.uid()::uuid = user_id) OR 
-    (device_id IS NOT NULL)
-);
-
--- Function to get completions for a user
-CREATE OR REPLACE FUNCTION get_user_completions(
-    p_start_date TIMESTAMPTZ DEFAULT '-infinity',
-    p_end_date TIMESTAMPTZ DEFAULT 'infinity',
-    p_user_id UUID DEFAULT NULL,
-    p_device_id UUID DEFAULT NULL
-)
-RETURNS TABLE (
-    id UUID,
-    routine_id TEXT,
-    completed_at TIMESTAMPTZ
-)
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = public
-AS $$
-BEGIN
-    RETURN QUERY
-    SELECT 
-        rc.id,
-        rc.routine_id,
-        rc.completed_at
-    FROM routine_completions rc
-    WHERE 
-        (p_user_id IS NOT NULL AND rc.user_id = p_user_id) OR
-        (p_device_id IS NOT NULL AND rc.device_id = p_device_id)
-        AND rc.completed_at >= p_start_date
-        AND rc.completed_at <= p_end_date
-    ORDER BY rc.completed_at DESC;
-END;
-$$;
-
--- Function to record a completion
-CREATE OR REPLACE FUNCTION record_routine_completion(
-    p_routine_id TEXT,
-    p_completed_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-    p_user_id UUID DEFAULT NULL,
-    p_device_id UUID DEFAULT NULL
-)
-RETURNS UUID
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = public
-AS $$
-DECLARE
-    v_completion_id UUID;
-BEGIN
-    -- Insert the completion
-    INSERT INTO routine_completions (
-        user_id,
-        device_id,
-        routine_id,
-        completed_at
-    )
-    VALUES (
-        p_user_id,
-        p_device_id,
-        p_routine_id,
-        p_completed_at
-    )
-    RETURNING id INTO v_completion_id;
-
-    -- Update user_progress streak and completion count
-    IF p_user_id IS NOT NULL THEN
-        -- For authenticated users
-        UPDATE user_progress
-        SET 
-            streak = CASE 
-                WHEN last_activity::date = CURRENT_DATE - 1 THEN streak + 1
-                WHEN last_activity::date = CURRENT_DATE THEN streak
-                ELSE 1
-            END,
-            routine_completions = routine_completions + 1,
-            last_activity = p_completed_at
-        WHERE user_id = p_user_id;
-    ELSE
-        -- For anonymous users
-        UPDATE user_progress
-        SET 
-            streak = CASE 
-                WHEN last_activity::date = CURRENT_DATE - 1 THEN streak + 1
-                WHEN last_activity::date = CURRENT_DATE THEN streak
-                ELSE 1
-            END,
-            routine_completions = routine_completions + 1,
-            last_activity = p_completed_at
-        WHERE device_id = p_device_id;
-    END IF;
-
-    RETURN v_completion_id;
-END;
-$$;
-```
+4. Streak Calculation:
+   - Increments when activity is on consecutive days
+   - Resets when a day is missed
+   - Maintains current streak for multiple activities in same day

@@ -35,8 +35,8 @@ public class DB: ObservableObject {
 	
 	/// Progress tracking properties
 	@Published public private(set) var currentStreak: Int = 0
+	@Published public private(set) var dailyMinutes: Int = 0
 	@Published public private(set) var totalMinutes: Int = 0
-	@Published public private(set) var routineCompletions: Int = 0
 	@Published public private(set) var lastActivity: Date?
 	
 	/// Routine completion history
@@ -95,188 +95,49 @@ public class DB: ObservableObject {
 			supabaseKey: apiKey
 		)
 		
-		// Load local progress immediately
-		loadLocalProgress()
-		
 		Task {
-			do {
-				await registerAuthStateListener(additionalHandler: onAuthStateChange)
-				
-				// Initialize anonymous progress if needed
-				if self.authState == .signedOut {
-					print("[DB] Checking for existing anonymous progress...")
-					do {
-						let progress = try await userService.fetchProgressByDeviceId(deviceId)
-						print("[DB] Found existing anonymous progress with streak: \(progress.streak)")
-						await MainActor.run {
-							updateProgress(from: progress)
-							// Load recent completions after updating progress
-							Task {
-								await loadRecentCompletions()
-							}
-						}
-					} catch let error as NSError {
-						if error.domain == "UserService" && error.code == 404 {
-							print("[DB] No existing progress found, initializing anonymous user progress...")
-							do {
-								let progress = try await userService.initializeAnonymousProgress(deviceId: deviceId)
-								print("[DB] Successfully initialized anonymous progress with ID: \(progress.id)")
-								await MainActor.run {
-									updateProgress(from: progress)
-								}
-							} catch {
-								print("[DB] Error initializing anonymous progress: \(error.localizedDescription)")
-							}
-						} else {
-							print("[DB] Error checking progress: \(error.localizedDescription)")
-						}
-					}
-				}
-				
-				await MainActor.run {
-					self.isInitialized = true
-				}
-			} catch {
-				print("[DB] Error during initialization: \(error.localizedDescription)")
-				await MainActor.run {
-					self.isInitialized = true
-				}
-			}
+			await registerAuthStateListener(additionalHandler: onAuthStateChange)
+			try? await loadProgress()
 		}
 	}
 	
 	// MARK: - Progress Tracking
 	
-	private func saveLocalProgress() {
-		let progress = [
-			"streak": currentStreak,
-			"totalMinutes": totalMinutes,
-			"routineCompletions": routineCompletions,
-			"lastActivity": lastActivity?.timeIntervalSince1970 ?? 0
-		] as [String : Any]
-		
-		defaults.set(progress, forKey: "local_progress")
-	}
-	
-	private func loadLocalProgress() {
-		guard let progress = defaults.dictionary(forKey: "local_progress") else { return }
-		
-		currentStreak = progress["streak"] as? Int ?? 0
-		totalMinutes = progress["totalMinutes"] as? Int ?? 0
-		routineCompletions = progress["routineCompletions"] as? Int ?? 0
-		if let timestamp = progress["lastActivity"] as? TimeInterval, timestamp > 0 {
-			lastActivity = Date(timeIntervalSince1970: timestamp)
-		}
-	}
-	
 	public func loadProgress() async throws {
+		let progress: UserProgress
 		if authState == .signedIn, let userId = currentUser?.id {
-			let progress = try await userService.fetchProgress(userId: userId)
-			updateProgress(from: progress)
-			// Also load completions
-			await loadRecentCompletions()
+			progress = try await userService.fetchProgress(userId: userId)
 		} else {
-			do {
-				let progress = try await userService.fetchProgressByDeviceId(deviceId)
-				updateProgress(from: progress)
-				// Also load completions
-				await loadRecentCompletions()
-			} catch {
-				print("No remote progress found for anonymous user, using local")
-				loadLocalProgress()
-			}
+			progress = try await userService.fetchProgressByDeviceId(deviceId)
 		}
-	}
-	
-	@MainActor
-	private func updateProgress(from progress: UserProgress) {
-		currentStreak = progress.streak
-		totalMinutes = progress.totalMinutes
-		routineCompletions = progress.routineCompletions
-		lastActivity = progress.lastActivity
-		saveLocalProgress()
+		
+		// Update state with server data
+		await MainActor.run {
+			currentStreak = progress.streak
+			dailyMinutes = progress.dailyMinutes
+			totalMinutes = progress.totalMinutes
+			lastActivity = progress.lastActivity
+		}
+		
+		// Load completions
+		await loadRecentCompletions()
 	}
 	
 	public func recordCompletion(routine: Routine) async throws -> UUID {
-		if !isInitialized {
-			print("[DB] Waiting for initialization to complete...")
-			// Wait for initialization with a timeout
-			for _ in 0..<10 { // 1 second timeout
-				if isInitialized { break }
-				try await Task.sleep(nanoseconds: 100_000_000) // 0.1 second
-			}
-			
-			guard isInitialized else {
-				print("[DB] Initialization timed out")
-				throw NSError(domain: "DB", code: 500, userInfo: [
-					NSLocalizedDescriptionKey: "Database initialization timed out"
-				])
-			}
-		}
-		
-		let today = Date()
 		let userId = currentUser?.id
 		let deviceIdForCompletion = userId == nil ? deviceId : nil
+		let durationMinutes = routine.totalDuration / 60
 		
-		print("[DB] Recording completion for \(userId?.uuidString ?? "anonymous")/\(deviceIdForCompletion?.uuidString ?? "no device")")
-		
-		// Record the completion in the completions table
-		let completionId: UUID = try await userService.recordRoutineCompletion(
+		// Record completion directly to Supabase - it will handle all updates
+		let completionId = try await userService.recordRoutineCompletion(
 			routineId: routine.id,
+			durationMinutes: durationMinutes,
 			userId: userId,
 			deviceId: deviceIdForCompletion
 		)
 		
-		print("[DB] Successfully recorded completion with ID: \(completionId)")
-		
-		// Update local state
-		await MainActor.run {
-			lastActivity = today
-			totalMinutes += routine.totalDuration / 60
-			routineCompletions += 1
-			
-			// Update streak
-			if let lastActivity = self.lastActivity {
-				let calendar = Calendar.current
-				if calendar.isDateInToday(lastActivity) {
-					// Already completed today, keep streak
-				} else if calendar.isDate(lastActivity, inSameDayAs: calendar.date(byAdding: .day, value: -1, to: today) ?? today) {
-					// Completed yesterday, increment streak
-					currentStreak += 1
-				} else {
-					// Break in streak, reset to 1
-					currentStreak = 1
-				}
-			} else {
-				// First completion
-				currentStreak = 1
-			}
-			
-			// Save local progress
-			saveLocalProgress()
-		}
-		
-		// Update remote state
-		if userId != nil {
-			_ = try await userService.updateProgress(
-				userId: userId!,
-				streak: currentStreak,
-				routineCompletions: routineCompletions,
-				totalMinutes: totalMinutes,
-				lastActivity: lastActivity
-			)
-		} else {
-			_ = try await userService.updateAnonymousProgress(
-				deviceId: deviceId,
-				streak: currentStreak,
-				routineCompletions: routineCompletions,
-				totalMinutes: totalMinutes,
-				lastActivity: lastActivity
-			)
-		}
-		
-		// Fetch recent completions
-		await loadRecentCompletions()
+		// Refresh our state from server
+		try await loadProgress()
 		
 		return completionId
 	}
@@ -287,7 +148,7 @@ public class DB: ObservableObject {
 			let completions = try await userService.getRecentCompletions(
 				userId: userId,
 				deviceId: userId == nil ? deviceId : nil,
-				days: 30 // Fetch last 30 days of completions
+				days: 30
 			)
 			await MainActor.run {
 				self.recentCompletions = completions
@@ -297,19 +158,11 @@ public class DB: ObservableObject {
 		}
 	}
 	
-	// Call this when user creates an account to migrate anonymous data
+	// MARK: - Account Migration
+	
 	public func migrateProgress(to userId: UUID) async throws {
 		guard authState == .signedIn else { return }
-		
-		// Create new progress entry for authenticated user
-		let progress = try await userService.updateProgress(
-			userId: userId,
-			streak: currentStreak,
-			routineCompletions: routineCompletions,
-			totalMinutes: totalMinutes,
-			lastActivity: lastActivity
-		)
-		// Update local state with server response
-		updateProgress(from: progress)
+		try await userService.migrateAnonymousProgress(from: deviceId, to: userId)
+		try await loadProgress()
 	}
 }
