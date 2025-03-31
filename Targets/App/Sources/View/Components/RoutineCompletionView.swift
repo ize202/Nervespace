@@ -18,6 +18,10 @@ struct RoutineCompletionView: View {
         db.currentStreak <= 1 ? "START STREAK" : "ADD TO STREAK"
     }
     
+    private var isStreakMilestone: Bool {
+        db.currentStreak <= 1 || db.currentStreak.isMultiple(of: 7)
+    }
+    
     var body: some View {
         ZStack {
             // Background
@@ -151,7 +155,7 @@ struct RoutineCompletionView: View {
             
             // Confetti Layer
             if showConfetti {
-                ConfettiView()
+                ConfettiView(intensity: isStreakMilestone ? .high : .low)
                     .allowsHitTesting(false)
                     .ignoresSafeArea()
             }
@@ -162,9 +166,7 @@ struct RoutineCompletionView: View {
             Text(errorMessage)
         }
         .onAppear {
-            if db.currentStreak <= 1 {
-                showConfetti = true
-            }
+            showConfetti = true
         }
     }
     
@@ -192,21 +194,48 @@ struct RoutineCompletionView: View {
 
 // Custom Confetti View
 struct ConfettiView: View {
+    enum Intensity {
+        case low
+        case high
+        
+        var pieceCount: Int {
+            switch self {
+            case .low: return 20
+            case .high: return 50
+            }
+        }
+        
+        var duration: ClosedRange<Double> {
+            switch self {
+            case .low: return 1.5...2.5
+            case .high: return 2...4
+            }
+        }
+        
+        var delayRange: ClosedRange<Double> {
+            switch self {
+            case .low: return 0...1
+            case .high: return 0...2
+            }
+        }
+    }
+    
+    let intensity: Intensity
     @State private var isAnimating = false
     
     var body: some View {
         GeometryReader { geometry in
             ZStack {
-                ForEach(0..<50) { _ in
+                ForEach(0..<intensity.pieceCount) { _ in
                     ConfettiPiece()
                         .position(
                             x: .random(in: 0...geometry.size.width),
                             y: isAnimating ? geometry.size.height + 100 : -100
                         )
                         .animation(
-                            Animation.linear(duration: .random(in: 2...4))
+                            Animation.linear(duration: .random(in: intensity.duration))
                             .repeatForever(autoreverses: false)
-                            .delay(.random(in: 0...2)),
+                            .delay(.random(in: intensity.delayRange)),
                             value: isAnimating
                         )
                 }
@@ -219,7 +248,7 @@ struct ConfettiView: View {
 }
 
 struct ConfettiPiece: View {
-    let colors: [Color] = [.red, .blue, .green, .yellow, .pink, .purple, .orange]
+    let colors: [Color] = [.brandPrimary, .blue, .green, .yellow, .pink, .purple, .orange]
     let rotationRange = -360.0...360.0
     let size: CGFloat = 10
     
