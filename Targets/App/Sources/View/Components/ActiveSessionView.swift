@@ -1,5 +1,6 @@
 import SwiftUI
 import SharedKit
+import SupabaseKit
 
 public struct ActiveSessionView: View {
     let routine: Routine
@@ -13,12 +14,18 @@ public struct ActiveSessionView: View {
     @State private var progressValue: Double = 0
     @State private var showExerciseDetail = false
     @State private var showingCompletion = false
+    @State private var showError = false
+    @State private var errorMessage = ""
+    @EnvironmentObject private var db: DB
+    @StateObject private var progressManager: ProgressManager
+    @State private var isUpdating = false
     
     public init(routine: Routine, customDurations: [String: Int]) {
         self.routine = routine
         self.customDurations = customDurations
         // Initialize with the first exercise duration
         _timeRemaining = State(initialValue: routine.exercises.first.map { customDurations[$0.exercise.id] ?? $0.duration } ?? 30)
+        _progressManager = StateObject(wrappedValue: ProgressManager())
     }
     
     private var currentRoutineExercise: RoutineExercise? {
@@ -170,6 +177,11 @@ public struct ActiveSessionView: View {
         .fullScreenCover(isPresented: $showingCompletion) {
             RoutineCompletionView(routine: routine)
         }
+        .alert("Error", isPresented: $showError) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(errorMessage)
+        }
     }
     
     private func timeString(from seconds: Int) -> String {
@@ -190,6 +202,24 @@ public struct ActiveSessionView: View {
         }
     }
     
+    private func completeRoutine() async {
+        guard let userId = db.currentUser?.id else {
+            showError = true
+            errorMessage = "User not logged in"
+            return
+        }
+        
+        isUpdating = true
+        do {
+            try await progressManager.recordCompletion(userId: userId, routine: routine)
+            dismiss()
+        } catch {
+            showError = true
+            errorMessage = error.localizedDescription
+        }
+        isUpdating = false
+    }
+
     private func startTimer() {
         guard timer == nil else { return }
         updateProgress() // Initial progress update
@@ -208,7 +238,9 @@ public struct ActiveSessionView: View {
                     // Workout complete
                     timer?.invalidate()
                     timer = nil
-                    showingCompletion = true
+                    Task {
+                        await completeRoutine()
+                    }
                 }
             }
         }
@@ -256,4 +288,5 @@ public struct ActiveSessionView: View {
         routine: RoutineLibrary.routines.first!,
         customDurations: [:]
     )
+    .environmentObject(DB())
 } 

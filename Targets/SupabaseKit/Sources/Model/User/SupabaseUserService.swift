@@ -13,12 +13,16 @@ private struct ProfileUpdate: Encodable {
 }
 
 private struct ProgressUpdate: Encodable {
+    let userId: UUID?
+    let deviceId: UUID?
     let streak: Int?
     let routineCompletions: Int?
     let totalMinutes: Int?
     let lastActivity: Date?
     
     enum CodingKeys: String, CodingKey {
+        case userId = "user_id"
+        case deviceId = "device_id"
         case streak
         case routineCompletions = "routine_completions"
         case totalMinutes = "total_minutes"
@@ -136,6 +140,23 @@ public class SupabaseUserService: UserService {
         return progress
     }
     
+    public func fetchProgressByDeviceId(_ deviceId: UUID) async throws -> UserProgress {
+        let progresses: [UserProgress] = try await client.database
+            .from("user_progress")
+            .select()
+            .eq("device_id", value: deviceId)
+            .execute()
+            .value
+        
+        guard let progress = progresses.first else {
+            throw NSError(domain: "UserService", code: 404, userInfo: [
+                NSLocalizedDescriptionKey: "User progress not found"
+            ])
+        }
+        
+        return progress
+    }
+    
     public func initializeProgress(userId: UUID) async throws -> UserProgress {
         let progress = UserProgress(userId: userId)
         
@@ -154,6 +175,24 @@ public class SupabaseUserService: UserService {
         return created
     }
     
+    public func initializeAnonymousProgress(deviceId: UUID) async throws -> UserProgress {
+        let progress = UserProgress(deviceId: deviceId)
+        
+        let progresses: [UserProgress] = try await client.database
+            .from("user_progress")
+            .insert(progress)
+            .execute()
+            .value
+        
+        guard let created = progresses.first else {
+            throw NSError(domain: "UserService", code: 500, userInfo: [
+                NSLocalizedDescriptionKey: "Failed to initialize anonymous progress"
+            ])
+        }
+        
+        return created
+    }
+    
     public func updateProgress(
         userId: UUID,
         streak: Int?,
@@ -162,6 +201,8 @@ public class SupabaseUserService: UserService {
         lastActivity: Date?
     ) async throws -> UserProgress {
         let update = ProgressUpdate(
+            userId: userId,
+            deviceId: nil,
             streak: streak,
             routineCompletions: routineCompletions,
             totalMinutes: totalMinutes,
@@ -182,6 +223,75 @@ public class SupabaseUserService: UserService {
         }
         
         return updated
+    }
+    
+    public func updateAnonymousProgress(
+        deviceId: UUID,
+        streak: Int?,
+        routineCompletions: Int?,
+        totalMinutes: Int?,
+        lastActivity: Date?
+    ) async throws -> UserProgress {
+        let update = ProgressUpdate(
+            userId: nil,
+            deviceId: deviceId,
+            streak: streak,
+            routineCompletions: routineCompletions,
+            totalMinutes: totalMinutes,
+            lastActivity: lastActivity
+        )
+        
+        let progresses: [UserProgress] = try await client.database
+            .from("user_progress")
+            .update(update)
+            .eq("device_id", value: deviceId)
+            .execute()
+            .value
+        
+        guard let updated = progresses.first else {
+            throw NSError(domain: "UserService", code: 500, userInfo: [
+                NSLocalizedDescriptionKey: "Failed to update anonymous progress"
+            ])
+        }
+        
+        return updated
+    }
+    
+    public func migrateAnonymousProgress(from deviceId: UUID, to userId: UUID) async throws -> UserProgress {
+        // First, fetch the anonymous progress
+        let anonymousProgress = try await fetchProgressByDeviceId(deviceId)
+        
+        // Create a new progress entry for the authenticated user
+        let update = ProgressUpdate(
+            userId: userId,
+            deviceId: nil,
+            streak: anonymousProgress.streak,
+            routineCompletions: anonymousProgress.routineCompletions,
+            totalMinutes: anonymousProgress.totalMinutes,
+            lastActivity: anonymousProgress.lastActivity
+        )
+        
+        // Insert the new progress
+        let progresses: [UserProgress] = try await client.database
+            .from("user_progress")
+            .insert(update)
+            .execute()
+            .value
+        
+        guard let created = progresses.first else {
+            throw NSError(domain: "UserService", code: 500, userInfo: [
+                NSLocalizedDescriptionKey: "Failed to migrate anonymous progress"
+            ])
+        }
+        
+        // Delete the anonymous progress
+        try await client.database
+            .from("user_progress")
+            .delete()
+            .eq("device_id", value: deviceId)
+            .execute()
+        
+        return created
     }
     
     // MARK: - Premium Status

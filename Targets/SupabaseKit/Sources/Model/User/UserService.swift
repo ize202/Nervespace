@@ -9,7 +9,9 @@ public protocol UserService {
     
     // Progress tracking
     func fetchProgress(userId: UUID) async throws -> UserProgress
+    func fetchProgressByDeviceId(_ deviceId: UUID) async throws -> UserProgress
     func initializeProgress(userId: UUID) async throws -> UserProgress
+    func initializeAnonymousProgress(deviceId: UUID) async throws -> UserProgress
     func updateProgress(
         userId: UUID,
         streak: Int?,
@@ -17,6 +19,14 @@ public protocol UserService {
         totalMinutes: Int?,
         lastActivity: Date?
     ) async throws -> UserProgress
+    func updateAnonymousProgress(
+        deviceId: UUID,
+        streak: Int?,
+        routineCompletions: Int?,
+        totalMinutes: Int?,
+        lastActivity: Date?
+    ) async throws -> UserProgress
+    func migrateAnonymousProgress(from deviceId: UUID, to userId: UUID) async throws -> UserProgress
     
     // Premium status
     func updatePremiumStatus(userId: UUID, isPremium: Bool, premiumUntil: Date?) async throws -> UserProfile

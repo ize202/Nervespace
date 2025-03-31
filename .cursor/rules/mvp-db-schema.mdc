@@ -5,72 +5,126 @@ alwaysApply: true
 ---
 # DB Schema
 ## This is our current db schema
-### is might be out of date so you can use the MCP tool to confirm the schema
+### This schema supports both authenticated and anonymous users
+
 ```sql
-
-CREATE TABLE public.user\_profiles (
-	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-	apple_id TEXT UNIQUE,
-	email TEXT,
-	name TEXT,
-	avatar_url TEXT,
-	is_premium BOOLEAN DEFAULT FALSE,
-	premium_until TIMESTAMPTZ,
-	created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-	updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+-- User Profiles Table
+CREATE TABLE public.user_profiles (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    apple_id TEXT UNIQUE,
+    email TEXT,
+    name TEXT,
+    avatar_url TEXT,
+    is_premium BOOLEAN DEFAULT FALSE,
+    premium_until TIMESTAMPTZ,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE public.user\_progress (
-	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-	user_id UUID REFERENCES user_profiles(id) ON DELETE CASCADE,
-	streak INTEGER DEFAULT 0,
-	routine_completions INTEGER DEFAULT 0,
-	total_minutes INTEGER DEFAULT 0,
-	last_activity DATE,
-	created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-	updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+-- User Progress Table (Updated to support anonymous users)
+CREATE TABLE public.user_progress (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES user_profiles(id) ON DELETE CASCADE,
+    device_id UUID UNIQUE, -- For anonymous users
+    streak INTEGER DEFAULT 0,
+    routine_completions INTEGER DEFAULT 0,
+    total_minutes INTEGER DEFAULT 0,
+    last_activity DATE,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    -- Ensure either user_id or device_id is present, but not both
+    CONSTRAINT check_id_present CHECK (
+        (user_id IS NOT NULL AND device_id IS NULL) OR 
+        (device_id IS NOT NULL AND user_id IS NULL)
+    )
 );
 
--- 4. Add indexes for performance
-CREATE INDEX idx\_user\_progress\_user\_id ON user\_progress(user\_id);
+-- Indexes for performance
+CREATE INDEX idx_user_progress_user_id ON user_progress(user_id);
+CREATE INDEX idx_user_progress_device_id ON user_progress(device_id);
 
+-- Enable Row Level Security
+ALTER TABLE user_profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE user_progress ENABLE ROW LEVEL SECURITY;
 
--- 5. Enable Row Level Security
-ALTER TABLE user\_profiles ENABLE ROW LEVEL SECURITY;
-ALTER TABLE user\_progress ENABLE ROW LEVEL SECURITY;
-
--- 6. Add RLS Policies
--- User Profiles: Users can only view and modify their own profile
+-- RLS Policies for User Profiles
 CREATE POLICY "Users can view own profile"
-ON user\_profiles FOR SELECT
+ON user_profiles FOR SELECT
 TO authenticated
 USING (auth.uid() = id);
 
 CREATE POLICY "Users can insert own profile"
-ON user\_profiles FOR INSERT
+ON user_profiles FOR INSERT
 TO authenticated
 WITH CHECK (auth.uid() = id);
 
 CREATE POLICY "Users can update own profile"
-ON user\_profiles FOR UPDATE
+ON user_profiles FOR UPDATE
 TO authenticated
 USING (auth.uid() = id)
 WITH CHECK (auth.uid() = id);
 
--- User Progress: Users can only view and modify their own progress
+-- RLS Policies for User Progress (Updated to support anonymous users)
 CREATE POLICY "Users can view own progress"
-ON user\_progress FOR SELECT
-TO authenticated
-USING (auth.uid() = user\_id);
+ON user_progress FOR SELECT
+USING (
+    (auth.uid()::uuid = user_id) OR 
+    (device_id IS NOT NULL)
+);
 
 CREATE POLICY "Users can insert own progress"
-ON user\_progress FOR INSERT
-TO authenticated
-WITH CHECK (auth.uid() = user\_id);
+ON user_progress FOR INSERT
+WITH CHECK (
+    (auth.uid()::uuid = user_id) OR 
+    (device_id IS NOT NULL)
+);
 
 CREATE POLICY "Users can update own progress"
-ON user\_progress FOR UPDATE
-TO authenticated
-USING (auth.uid() = user\_id)
-WITH CHECK (auth.uid() = user\_id);
+ON user_progress FOR UPDATE
+USING (
+    (auth.uid()::uuid = user_id) OR 
+    (device_id IS NOT NULL)
+)
+WITH CHECK (
+    (auth.uid()::uuid = user_id) OR 
+    (device_id IS NOT NULL)
+);
 ```
+
+## Key Changes for Anonymous Users Support
+
+1. Added `device_id` column to `user_progress` table
+   - UUID type for unique device identification
+   - UNIQUE constraint to prevent duplicates
+   - NULL for authenticated users
+
+2. Added constraint `check_id_present`
+   - Ensures either `user_id` OR `device_id` is present
+   - Prevents having both or neither
+
+3. Updated RLS policies
+   - Now supports both authenticated and anonymous access
+   - Authenticated users access via `user_id`
+   - Anonymous users access via `device_id`
+
+4. Added performance optimizations
+   - Index on `device_id` for faster lookups
+   - Maintained existing index on `user_id`
+
+## Usage Notes
+
+1. Anonymous Users:
+   - Identified by `device_id`
+   - No user profile required
+   - Progress tracked per device
+
+2. Authenticated Users:
+   - Identified by `user_id`
+   - Requires user profile
+   - Progress syncs across devices
+
+3. Migration Process:
+   - When anonymous user creates account:
+     1. Create user profile
+     2. Copy progress data to new row with `user_id`
+     3. Optionally delete anonymous progress 
