@@ -1,17 +1,25 @@
 import SwiftUI
 import SharedKit
+import SupabaseKit
 
 struct ProgressView: View {
-    // Remove selectedDate since we're always showing current month
+    @EnvironmentObject private var db: DB
     private let currentDate = Date()
-    @State private var streakDays: Set<Date> = [Date()]  // Temporary for demo
+    @State private var streakDays: Set<Date> = []
     
-    // TODO: Move these to user settings
-    private let dailyGoal = 5 // Default goal in minutes
-    private let currentMinutes = 2 // This would come from actual tracking
+    // Daily goal in minutes (we can move this to user settings later)
+    private let dailyGoal = 5
     
     private let calendar = Calendar.current
     private let daysOfWeek = ["S", "M", "T", "W", "T", "F", "S"]
+    
+    private var currentMinutes: Int {
+        // Get today's minutes from total minutes if there was activity today
+        if calendar.isDateInToday(db.lastActivity ?? Date.distantPast) {
+            return db.totalMinutes % (24 * 60) // Get today's minutes only
+        }
+        return 0
+    }
     
     var body: some View {
         NavigationStack {
@@ -36,7 +44,7 @@ struct ProgressView: View {
                             // Calendar Card
                             VStack(alignment: .leading, spacing: 16) {
                                 HStack {
-                                    Label("4-Day Streak", systemImage: "flame.fill")
+                                    Label("\(db.currentStreak)-Day Streak", systemImage: "flame.fill")
                                         .font(.headline)
                                         .foregroundColor(.brandPrimary)
                                     
@@ -94,7 +102,7 @@ struct ProgressView: View {
                             
                             // Minutes Tracking Chart
                             VStack(alignment: .leading, spacing: 16) {
-                                Text("Minutes Goal")
+                                Text("Daily Minutes Goal")
                                     .font(.headline)
                                     .foregroundColor(.white)
                                 
@@ -123,6 +131,9 @@ struct ProgressView: View {
                 }
             }
             .navigationBarHidden(true)
+            .task {
+                await loadStreakDays()
+            }
         }
         .preferredColorScheme(.dark)
     }
@@ -149,6 +160,26 @@ struct ProgressView: View {
     
     private func isDateInStreak(_ date: Date) -> Bool {
         return streakDays.contains { calendar.isDate($0, inSameDayAs: date) }
+    }
+    
+    private func loadStreakDays() async {
+        // Start with today if we have activity today
+        var days: Set<Date> = []
+        if let lastActivity = db.lastActivity, calendar.isDateInToday(lastActivity) {
+            days.insert(lastActivity)
+        }
+        
+        // Add previous streak days
+        if db.currentStreak > 1 {
+            let today = Date()
+            for dayOffset in 1..<db.currentStreak {
+                if let date = calendar.date(byAdding: .day, value: -dayOffset, to: today) {
+                    days.insert(date)
+                }
+            }
+        }
+        
+        streakDays = days
     }
 }
 
@@ -181,5 +212,6 @@ struct DayCell: View {
 
 #Preview {
     ProgressView()
+        .environmentObject(DB())
         .preferredColorScheme(.dark)
 }
