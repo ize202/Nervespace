@@ -13,42 +13,39 @@ struct RoutineCompletionView: View {
     private let weekDays = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"]
     private let calendar = Calendar.current
     
+    private var buttonText: String {
+        db.currentStreak <= 1 ? "START STREAK" : "ADD TO STREAK"
+    }
+    
     var body: some View {
         ZStack {
             // Background
             Color.baseBlack.ignoresSafeArea()
             
-            VStack(spacing: 32) {
-                // Checkmark Icon
-                Circle()
-                    .fill(.ultraThinMaterial)
-                    .frame(width: 80, height: 80)
-                    .overlay {
-                        Image(systemName: "checkmark")
-                            .font(.system(size: 40, weight: .medium))
-                            .foregroundColor(.white)
-                    }
-                
-                // Congratulations Text
-                VStack(spacing: 8) {
-                    Text("Congrats!")
-                        .font(.system(size: 34, weight: .bold))
+            VStack(alignment: .leading, spacing: 32) {
+                // Header Text
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Congrats")
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
                         .foregroundColor(.white)
                     
                     Text("You completed your daily routine.")
-                        .font(.system(size: 17))
+                        .font(.body)
                         .foregroundColor(.white.opacity(0.7))
                 }
+                .padding(.horizontal)
                 
                 // Streak Card
                 VStack(spacing: 16) {
                     // Streak count
                     Text("\(db.currentStreak) day")
-                        .font(.system(size: 34, weight: .bold))
+                        .font(.system(size: 44, weight: .bold))
                         .foregroundColor(.white)
                     
                     Text("ACTIVE STREAK")
-                        .font(.system(size: 15, weight: .medium))
+                        .font(.subheadline)
+                        .fontWeight(.medium)
                         .foregroundColor(.white.opacity(0.6))
                         .textCase(.uppercase)
                     
@@ -57,7 +54,8 @@ struct RoutineCompletionView: View {
                         ForEach(weekDays, id: \.self) { day in
                             VStack(spacing: 8) {
                                 Text(day)
-                                    .font(.system(size: 15, weight: .medium))
+                                    .font(.footnote)
+                                    .fontWeight(.medium)
                                     .foregroundColor(.white.opacity(0.6))
                                 
                                 Circle()
@@ -74,8 +72,48 @@ struct RoutineCompletionView: View {
                         }
                     }
                 }
+                .frame(maxWidth: .infinity)
                 .padding(.vertical, 24)
                 .padding(.horizontal)
+                .background(.ultraThinMaterial)
+                .cornerRadius(16)
+                .padding(.horizontal)
+                
+                // Completed Routine Card with Checkmark
+                HStack(spacing: 16) {
+                    // Routine Info
+                    HStack(spacing: 16) {
+                        // Thumbnail
+                        Image(routine.thumbnailName)
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: 56, height: 56)
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                        
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(routine.name)
+                                .font(.headline)
+                                .foregroundColor(.white)
+                            
+                            Text("\(routine.exercises.count) exercises • \(routine.totalDuration / 60) min")
+                                .font(.subheadline)
+                                .foregroundColor(.white.opacity(0.6))
+                        }
+                    }
+                    
+                    Spacer()
+                    
+                    // Checkmark Icon
+                    Circle()
+                        .fill(.ultraThinMaterial)
+                        .frame(width: 44, height: 44)
+                        .overlay {
+                            Image(systemName: "checkmark")
+                                .font(.system(size: 20, weight: .medium))
+                                .foregroundColor(.white)
+                        }
+                }
+                .padding()
                 .background(.ultraThinMaterial)
                 .cornerRadius(16)
                 .padding(.horizontal)
@@ -89,7 +127,7 @@ struct RoutineCompletionView: View {
                     }
                 }) {
                     HStack {
-                        Text("ADD TO STREAK")
+                        Text(buttonText)
                             .font(.headline)
                             .foregroundColor(.white)
                         
@@ -136,30 +174,6 @@ struct RoutineCompletionView: View {
             errorMessage = error.localizedDescription
         }
         isUpdating = false
-    }
-}
-
-struct StatCard: View {
-    let title: String
-    let value: String
-    
-    var body: some View {
-        HStack {
-            Text(title)
-                .font(.system(size: 17))
-                .foregroundColor(.white)
-            
-            Spacer()
-            
-            Text(value)
-                .font(.system(size: 17, weight: .medium))
-                .foregroundColor(.white)
-        }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 20)
-        .background(.ultraThinMaterial)
-        .cornerRadius(12)
-        .padding(.horizontal)
     }
 }
 
