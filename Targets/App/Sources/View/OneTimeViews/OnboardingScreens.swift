@@ -1,5 +1,6 @@
 import SwiftUI
 import SharedKit
+import NotifKit
 
 // MARK: - Common Components
 
@@ -262,17 +263,16 @@ struct ReminderScreen: View {
     var body: some View {
         OnboardingScreenContainer(
             title: OnboardingScreen.reminder.title,
-            subtitle: OnboardingScreen.reminder.subtitle
+            subtitle: OnboardingScreen.reminder.subtitle,
+            nextButtonTitle: "Set Reminder"
         ) {
+            PushNotifications.showNotificationsPermissionsSheet()
             viewModel.moveToNextScreen()
         } content: {
             VStack(spacing: 24) {
                 DatePicker("Select Time", selection: $viewModel.selections.reminderTime, displayedComponents: .hourAndMinute)
                     .datePickerStyle(.wheel)
                     .labelsHidden()
-                
-                Toggle("Enable Notifications", isOn: $viewModel.selections.notificationsEnabled)
-                    .tint(.brandPrimary)
             }
             .padding(.vertical, 20)
         }
@@ -312,6 +312,7 @@ struct MoodCheckScreen: View {
 
 struct ResetPlanScreen: View {
     @ObservedObject var viewModel: OnboardingViewModel
+    @State private var hasRequestedReview = false
     
     var body: some View {
         OnboardingScreenContainer(
@@ -319,7 +320,14 @@ struct ResetPlanScreen: View {
             subtitle: OnboardingScreen.resetPlan.subtitle,
             nextButtonTitle: "Start Day 1 Now"
         ) {
-            viewModel.moveToNextScreen()
+            if !hasRequestedReview {
+                askUserFor(.appRating) {
+                    // On successful rating or dismissal, set the flag and continue
+                    hasRequestedReview = true
+                }
+            } else {
+                viewModel.moveToNextScreen()
+            }
         } content: {
             VStack(spacing: 16) {
                 PlanDayView(day: 1, title: "Grounding Breath", isLocked: false)

@@ -80,7 +80,6 @@ struct OnboardingSelections {
 	var timeCommitment: String = ""
 	var reminderTime: Date = Date()
 	var initialMood: Double = 0.5
-	var notificationsEnabled: Bool = false
 }
 
 // MARK: - Main Onboarding View
