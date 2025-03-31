@@ -153,11 +153,4 @@ public class DB: ObservableObject {
 		}
 	}
 	
-	// MARK: - Account Migration
-	
-	public func migrateProgress(to userId: UUID) async throws {
-		guard authState == .signedIn else { return }
-		try await userService.migrateAnonymousProgress(from: deviceId, to: userId)
-		try await loadProgress()
-	}
 }
