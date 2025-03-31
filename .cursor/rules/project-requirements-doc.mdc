@@ -13,23 +13,6 @@ Nervespace is a mobile application designed to help users manage stress, restore
 ### Scope
 The initial versions of Nervespace (up to v1.0) will prioritize delivering high-quality somatic sessions and daily reset routines, establishing a solid user base and core functionality. Future iterations (v1.2 to v1.5) will introduce advanced features like biofeedback integration, personalization, building on a stable foundation.
 
-### New User Architecture 
-the new architecture works:
-First Launch:
-App generates and stores a device UUID
-All progress is stored locally first
-Attempts to sync with Supabase using device UUID as identifier
-Works offline-first with local storage as backup
-Regular Usage (Anonymous):
-All progress updates are saved locally first
-Then attempts to sync with Supabase in background
-If sync fails, continues with local data
-User doesn't notice any disruption
-Account Creation (Optional):
-When user creates account, we migrate their anonymous progress
-All future syncs use their authenticated user ID
-Can optionally delete the anonymous data
-Enables cross-device sync
 
 ## Market Analysis
 

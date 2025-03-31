@@ -16,7 +16,7 @@ private struct ProgressUpdate: Encodable {
     let userId: UUID?
     let deviceId: UUID?
     let streak: Int?
-    let routineCompletions: Int?
+    let dailyMinutes: Int?
     let totalMinutes: Int?
     let lastActivity: Date?
     
@@ -24,7 +24,7 @@ private struct ProgressUpdate: Encodable {
         case userId = "user_id"
         case deviceId = "device_id"
         case streak
-        case routineCompletions = "routine_completions"
+        case dailyMinutes = "daily_minutes"
         case totalMinutes = "total_minutes"
         case lastActivity = "last_activity"
     }
@@ -47,26 +47,37 @@ private struct RoutineCompletionParams: Encodable {
 }
 
 private struct GetRecentCompletionsParams: Encodable {
-    let p_start_date: String
-    let p_end_date: String
     let p_user_id: String?
     let p_device_id: String?
+    let p_days: Int
 }
 
 private struct InitialProgressParams: Encodable {
     let device_id: UUID
     let streak: Int
-    let routine_completions: Int
+    let daily_minutes: Int
     let total_minutes: Int
     let last_activity: Date?
     
     enum CodingKeys: String, CodingKey {
         case device_id
         case streak
-        case routine_completions = "routine_completions"
-        case total_minutes = "total_minutes"
-        case last_activity = "last_activity"
+        case daily_minutes
+        case total_minutes
+        case last_activity
     }
+}
+
+private struct RecordRoutineCompletionParams: Encodable {
+    let p_routine_id: String
+    let p_duration_minutes: Int
+    let p_user_id: String?
+    let p_device_id: String?
+}
+
+private struct MigrateProgressParams: Encodable {
+    let p_device_id: String
+    let p_user_id: String
 }
 
 public class SupabaseUserService: UserService {
@@ -171,7 +182,7 @@ public class SupabaseUserService: UserService {
         let params = InitialProgressParams(
             device_id: deviceId,
             streak: 0,
-            routine_completions: 0,
+            daily_minutes: 0,
             total_minutes: 0,
             last_activity: nil
         )
@@ -196,7 +207,7 @@ public class SupabaseUserService: UserService {
     public func updateProgress(
         userId: UUID,
         streak: Int?,
-        routineCompletions: Int?,
+        dailyMinutes: Int?,
         totalMinutes: Int?,
         lastActivity: Date?
     ) async throws -> Model.UserProgress {
@@ -204,7 +215,7 @@ public class SupabaseUserService: UserService {
             userId: userId,
             deviceId: nil,
             streak: streak,
-            routineCompletions: routineCompletions,
+            dailyMinutes: dailyMinutes,
             totalMinutes: totalMinutes,
             lastActivity: lastActivity
         )
@@ -222,7 +233,7 @@ public class SupabaseUserService: UserService {
     public func updateAnonymousProgress(
         deviceId: UUID,
         streak: Int?,
-        routineCompletions: Int?,
+        dailyMinutes: Int?,
         totalMinutes: Int?,
         lastActivity: Date?
     ) async throws -> Model.UserProgress {
@@ -230,7 +241,7 @@ public class SupabaseUserService: UserService {
             userId: nil,
             deviceId: deviceId,
             streak: streak,
-            routineCompletions: routineCompletions,
+            dailyMinutes: dailyMinutes,
             totalMinutes: totalMinutes,
             lastActivity: lastActivity
         )
@@ -249,28 +260,13 @@ public class SupabaseUserService: UserService {
         from deviceId: UUID,
         to userId: UUID
     ) async throws {
-        struct UpdateParams: Encodable {
-            let user_id: String
-            let device_id: String?
-        }
-        
-        let updateParams = UpdateParams(
-            user_id: userId.uuidString,
-            device_id: nil
+        let params = MigrateProgressParams(
+            p_device_id: deviceId.uuidString,
+            p_user_id: userId.uuidString
         )
         
-        // First, update the user_progress entry
         try await client
-            .from("user_progress")
-            .update(updateParams)
-            .eq("device_id", value: deviceId.uuidString)
-            .execute()
-        
-        // Then, update all routine_completions
-        try await client
-            .from("routine_completions")
-            .update(updateParams)
-            .eq("device_id", value: deviceId.uuidString)
+            .rpc("migrate_anonymous_progress", params: params)
             .execute()
     }
     
@@ -319,24 +315,19 @@ public class SupabaseUserService: UserService {
         userId: UUID?,
         deviceId: UUID?
     ) async throws -> UUID {
-        struct RPCParams: Encodable {
-            let p_routine_id: String
-            let p_duration_minutes: Int
-            let p_user_id: String?
-            let p_device_id: String?
-        }
-        
-        let params = RPCParams(
+        let params = RecordRoutineCompletionParams(
             p_routine_id: routineId,
             p_duration_minutes: durationMinutes,
             p_user_id: userId?.uuidString,
             p_device_id: deviceId?.uuidString
         )
         
-        return try await client
+        let response: UUID = try await client
             .rpc("record_routine_completion", params: params)
             .execute()
             .value
+        
+        return response
     }
     
     public func getRecentCompletions(
@@ -344,22 +335,18 @@ public class SupabaseUserService: UserService {
         deviceId: UUID?,
         days: Int
     ) async throws -> [Model.RoutineCompletion] {
-        struct RPCParams: Encodable {
-            let p_user_id: String?
-            let p_device_id: String?
-            let p_days: Int
-        }
-        
-        let params = RPCParams(
+        let params = GetRecentCompletionsParams(
             p_user_id: userId?.uuidString,
             p_device_id: deviceId?.uuidString,
             p_days: days
         )
         
-        return try await client
+        let response: [Model.RoutineCompletion] = try await client
             .rpc("get_recent_completions", params: params)
             .execute()
             .value
+        
+        return response
     }
     
     public func getCurrentStreak(userId: UUID) async throws -> Int {
