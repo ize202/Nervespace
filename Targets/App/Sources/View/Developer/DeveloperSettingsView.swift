@@ -176,7 +176,7 @@ struct DeveloperSettingsView: View {
 					}
 				}
 				.sheet(isPresented: $showOnboarding) {
-					ShowOnboardingViewOnFirstLaunchEverModifier.OnboardingView {
+					OnboardingView {
 						showOnboarding = false
 					}
 				}

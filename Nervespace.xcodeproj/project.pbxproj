@@ -55,6 +55,7 @@
 		66D223B163C18D10D156C5F6 /* SharedKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 39E86B5FF5E957E5D088F40B /* SharedKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		6712A1D6389D74911B57F6E6 /* SettingsRowItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3382516E12C8CB796FA8811A /* SettingsRowItem.swift */; };
 		67A63CBD9499D6DDC2B62785 /* squircle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ABB9FEAD6E86F6A57C86CA8 /* squircle.swift */; };
+		67F54819AD970619D0F51E9C /* OnboardingScreens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5279F25E04166E8C66540B70 /* OnboardingScreens.swift */; };
 		6A4338D3DFEB36D4DBE8CAF2 /* SupabaseKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5F30ADB8BC53945EEF346BDA /* SupabaseKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		6D755810CAB2E032B92EDBB5 /* openAppInSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = E792EB44A5FA4D059ECCAD19 /* openAppInSettings.swift */; };
 		715169DF84AFCBA856E6EB71 /* getPlistEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = E015553A7F98EF624CB69E09 /* getPlistEntry.swift */; };
@@ -303,6 +304,7 @@
 		4C0FB06C6665D672F2E3F45C /* BiometricAuth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BiometricAuth.swift; sourceTree = "<group>"; };
 		4C2ECC22973D7C1A97317E4D /* BookmarkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkManager.swift; sourceTree = "<group>"; };
 		4F95AB075CFCC69E3E00BE35 /* isPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = isPreview.swift; sourceTree = "<group>"; };
+		5279F25E04166E8C66540B70 /* OnboardingScreens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingScreens.swift; sourceTree = "<group>"; };
 		5507FF85704924F325225747 /* captureTaps.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = captureTaps.swift; sourceTree = "<group>"; };
 		553CD736FB8477C349AC0D06 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		5659C5D7AD221C5697002B98 /* requireLogin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = requireLogin.swift; sourceTree = "<group>"; };
@@ -747,6 +749,7 @@
 		7DE694CD3A9F608127E634BA /* OneTimeViews */ = {
 			isa = PBXGroup;
 			children = (
+				5279F25E04166E8C66540B70 /* OnboardingScreens.swift */,
 				9832E64FAC80EB454827E3C3 /* OnboardingView.swift */,
 				2B41B98092119FB95092A546 /* WhatsNewView.swift */,
 			);
@@ -1457,6 +1460,7 @@
 				F7C4629C557B760D327D6751 /* ExploreView.swift in Sources */,
 				2517BB44FACE02E21DDE3B02 /* HomeView.swift in Sources */,
 				F44676509FDFBA07126F8641 /* PlanDetailView.swift in Sources */,
+				67F54819AD970619D0F51E9C /* OnboardingScreens.swift in Sources */,
 				5F3DC110D5E209A65485438A /* OnboardingView.swift in Sources */,
 				F4F252C9D438A26CC4F592A3 /* WhatsNewView.swift in Sources */,
 				9C9D2BFE9AB3340B61C46261 /* AccountSettingsView.swift in Sources */,

@@ -12,36 +12,152 @@ import SharedKit
 import SwiftUI
 import AnalyticsKit
 
-/// Set this to the views you want to show during Onboarding (first App launch ever)
-/// Use these 3-4 views max to showcase the main selling point of your Application
-/// Add the count in forEach loop below when adding or removing views here (swift doesnt like if its dynamic onboardingPages.count)
-private let onboardingPages: [AnyView] = [
-	AnyView(
-		HeroView(
-			sfSymbolName: "scribble.variable",
-			title: "Onboarding Page 1",
-			subtitle: "Lorem ipsum dolor sit amet,\nconsectetur adipiscing elit, sed do.",
-			bounceOnAppear: true
-		)),
-	AnyView(
-		HeroView(
-			sfSymbolName: "timeline.selection", title: "Onboarding Page 2",
-			subtitle: "Lorem ipsum dolor sit amet,\nconsectetur adipiscing elit, sed do.")),
-	AnyView(
-		HeroView(
-			sfSymbolName: "person.3.fill", title: "Onboarding Page 3",
-			subtitle: "Lorem ipsum dolor sit amet,\nconsectetur adipiscing elit, sed do.")),
-]
+// MARK: - Models and Enums
 
-/// Is attached to the root ContentView in App.swift, and shown when the app version saved in UserDefaults
-/// is NONE (means the user opens the app for the first time ever, as we save the current app version when the app is opened)
+enum OnboardingScreen: Int, CaseIterable {
+	case welcome
+	case motivation
+	case tensionAreas
+	case timeCommitment
+	case reminder
+	case moodCheck
+	case resetPlan
+	case breathingExercise
+	case progress
+	
+	var title: String {
+		switch self {
+		case .welcome:
+			return "Welcome to Your Nervous System Reset"
+		case .motivation:
+			return "What brings you to NerveSpace today?"
+		case .tensionAreas:
+			return "Where do you feel the most tension in your body?"
+		case .timeCommitment:
+			return "How much time can you give yourself each day?"
+		case .reminder:
+			return "When should we remind you to reset?"
+		case .moodCheck:
+			return "How are you feeling right now?"
+		case .resetPlan:
+			return "Here's your personalized 3-day reset path"
+		case .breathingExercise:
+			return "Let's take your first reset breath"
+		case .progress:
+			return "You've started something powerful"
+		}
+	}
+	
+	var subtitle: String {
+		switch self {
+		case .welcome:
+			return "You're here because you want to feel better — less stressed, more grounded, more you."
+		case .motivation:
+			return "Choose what you're seeking — this helps us shape your journey."
+		case .tensionAreas:
+			return "Your body holds what your mind suppresses. Let's listen."
+		case .timeCommitment:
+			return "We'll build a plan that fits your energy, not the other way around."
+		case .reminder:
+			return "A gentle nudge can make all the difference."
+		case .moodCheck:
+			return "We'll come back to this after your first reset."
+		case .resetPlan:
+			return "Built from your answers to fit your energy and needs."
+		case .breathingExercise:
+			return "No movement needed — just follow the rhythm."
+		case .progress:
+			return "You're 1 day in. Your reset plan continues tomorrow."
+		}
+	}
+}
+
+// MARK: - User Selections Models
+
+struct OnboardingSelections {
+	var motivation: String = ""
+	var tensionAreas: Set<String> = []
+	var timeCommitment: String = ""
+	var reminderTime: Date = Date()
+	var initialMood: Double = 0.5
+	var notificationsEnabled: Bool = false
+}
+
+// MARK: - Main Onboarding View
+
+struct OnboardingView: View {
+	@StateObject private var viewModel = OnboardingViewModel()
+	let onCompletion: () -> Void
+	
+	var body: some View {
+		ZStack {
+			Color.brandPrimary.opacity(0.1).ignoresSafeArea()
+			
+			TabView(selection: $viewModel.currentScreen) {
+				WelcomeScreen(viewModel: viewModel)
+					.tag(OnboardingScreen.welcome)
+				
+				MotivationScreen(viewModel: viewModel)
+					.tag(OnboardingScreen.motivation)
+				
+				TensionAreasScreen(viewModel: viewModel)
+					.tag(OnboardingScreen.tensionAreas)
+				
+				TimeCommitmentScreen(viewModel: viewModel)
+					.tag(OnboardingScreen.timeCommitment)
+				
+				ReminderScreen(viewModel: viewModel)
+					.tag(OnboardingScreen.reminder)
+				
+				MoodCheckScreen(viewModel: viewModel)
+					.tag(OnboardingScreen.moodCheck)
+				
+				ResetPlanScreen(viewModel: viewModel)
+					.tag(OnboardingScreen.resetPlan)
+				
+				BreathingExerciseScreen(viewModel: viewModel)
+					.tag(OnboardingScreen.breathingExercise)
+				
+				ProgressScreen(viewModel: viewModel)
+					.tag(OnboardingScreen.progress)
+			}
+			.tabViewStyle(.page(indexDisplayMode: .never))
+			.animation(.easeInOut, value: viewModel.currentScreen)
+		}
+	}
+}
+
+// MARK: - View Model
+
+class OnboardingViewModel: ObservableObject {
+	@Published var currentScreen: OnboardingScreen = .welcome
+	@Published var selections = OnboardingSelections()
+	
+	func moveToNextScreen() {
+		guard let currentIndex = OnboardingScreen.allCases.firstIndex(of: currentScreen),
+			  currentIndex < OnboardingScreen.allCases.count - 1 else {
+			return
+		}
+		currentScreen = OnboardingScreen.allCases[currentIndex + 1]
+	}
+	
+	func moveToPreviousScreen() {
+		guard let currentIndex = OnboardingScreen.allCases.firstIndex(of: currentScreen),
+			  currentIndex > 0 else {
+			return
+		}
+		currentScreen = OnboardingScreen.allCases[currentIndex - 1]
+	}
+}
+
+// MARK: - Modifier
+
 struct ShowOnboardingViewOnFirstLaunchEverModifier: ViewModifier {
-
 	@AppStorage(Constants.UserDefaults.General.lastAppVersionAppWasOpenedAt)
 	private var lastAppVersionAppWasOpenedAt: String = "NONE"
-
+	
 	@State private var showOnboarding: Bool = false
-
+	
 	func body(content: Content) -> some View {
 		Group {
 			if showOnboarding {
@@ -57,10 +173,7 @@ struct ShowOnboardingViewOnFirstLaunchEverModifier: ViewModifier {
 					.transition(.opacity)
 			}
 		}
-		// Do not move this into init(), as it may be called multiple times, which will result in the OnboardingView never being shown!
 		.onAppear {
-			// Convenience to see the OnboardingView in the preview every time
-			// Otherwise, only show onboarding on the first app launch ever
 			if isPreview {
 				self.showOnboarding = true
 			} else {
@@ -68,48 +181,6 @@ struct ShowOnboardingViewOnFirstLaunchEverModifier: ViewModifier {
 				if lastAppVersionAppWasOpenedAt == "NONE" {
 					Analytics.capture(.info, id: "onboarding_started", source: .general)
 				}
-			}
-		}
-	}
-
-	/// Carousel with multiple views from the `onboardingPages` array.
-	/// Users can move forward and backward via swipe gestures or by pressing the "Continue" button.
-	/// On the last page the button says "Finish Onboarding" and will close the onboarding view.
-	struct OnboardingView: View {
-		@State var pageIndex: Int = 0
-
-		/// Is called when the user is on last page -> finish Onboarding
-		let onCompletion: () -> Void
-
-		var body: some View {
-			VStack {
-				TabView(selection: $pageIndex) {
-					ForEach(0..<3) { index in  // <- Add the count here when adding or removing views in onboardingPages above
-						onboardingPages[index]
-							.tag(index)
-					}
-				}
-				.tabViewStyle(.page(indexDisplayMode: .never))  // don't show the page dots
-				.onChange(of: pageIndex) { _, newIndex in
-					Analytics.capture(.info, id: "onboarding_page_viewed", longDescription: "Page \(newIndex + 1)", source: .general)
-				}
-
-				Button(pageIndex == onboardingPages.count - 1 ? "Finish Onboarding" : "Next") {
-					withAnimation {
-						if pageIndex == onboardingPages.count - 1 {
-							onCompletion()
-						} else {
-							pageIndex += 1
-						}
-					}
-				}
-				.buttonStyle(.cta())
-				.padding(.horizontal)
-				.padding(.bottom)
-			}
-			.accentBackground(strong: true)
-			.onAppear {
-				Analytics.capture(.info, id: "onboarding_page_viewed", longDescription: "Page 1", source: .general)
 			}
 		}
 	}
