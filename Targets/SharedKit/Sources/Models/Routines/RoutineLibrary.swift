@@ -98,7 +98,7 @@ public enum RoutineLibrary {
             name: "Rapid Relax",
             description: "Fast-track to relaxation and stress relief.",
             exercises: [
-                RoutineExercise(exercise: ExerciseLibrary.exercises.first { $0.name == "Deep Breathing" }!, duration: 60),
+                RoutineExercise(exercise: ExerciseLibrary.exercises.first { $0.name == "Deep Breathing" }!, duration: 30),
                 RoutineExercise(exercise: ExerciseLibrary.exercises.first { $0.name == "Seated Forward Fold" }!, duration: 30),
                 RoutineExercise(exercise: ExerciseLibrary.exercises.first { $0.name == "Neck Rolls" }!, duration: 30)
             ],

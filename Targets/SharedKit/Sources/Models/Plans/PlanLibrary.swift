@@ -36,7 +36,7 @@ public enum PlanLibrary {
                 name: "Somatic Reset",
                 description: "Focus on calming the nervous system and promoting relaxation.",
                 routines: {
-                    let routineNames = ["Somatic Ease", "Rapid Relax", "Evening Calm", "Posture Reset"]
+                    let routineNames = ["Rapid Relax", "Somatic Ease", "Evening Calm", "Posture Reset"]
                     var planRoutines: [PlanRoutine] = []
                     
                     for (index, name) in routineNames.enumerated() {
