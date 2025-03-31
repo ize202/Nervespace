@@ -33,4 +33,19 @@ public protocol UserService {
     
     // Utility methods
     func findProfileByAppleId(_ appleId: String) async throws -> UserProfile?
+    
+    // Routine completions
+    func recordRoutineCompletion(
+        routineId: String,
+        userId: UUID?,
+        deviceId: UUID?
+    ) async throws -> UUID
+    
+    func getRecentCompletions(
+        userId: UUID?,
+        deviceId: UUID?,
+        days: Int
+    ) async throws -> [RoutineCompletion]
+    
+    func getCurrentStreak(userId: UUID) async throws -> Int
 } 

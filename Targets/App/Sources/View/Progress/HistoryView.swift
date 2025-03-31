@@ -6,6 +6,12 @@ struct CompletedRoutine: Identifiable {
     let id: UUID
     let routine: Routine
     let date: Date
+    
+    init(completion: RoutineCompletion) {
+        self.id = completion.id
+        self.routine = RoutineLibrary.routines.first { $0.id == completion.routineId } ?? RoutineLibrary.routines[0]
+        self.date = completion.completedAt
+    }
 }
 
 struct HistoryView: View {
@@ -139,35 +145,7 @@ struct HistoryView: View {
     }
     
     private func loadCompletedRoutines() async {
-        // In a real app, this would load from your database
-        // For now, we'll create entries based on the streak
-        var routines: [CompletedRoutine] = []
-        let today = Date()
-        let calendar = Calendar.current
-        
-        if calendar.isDateInToday(db.lastActivity ?? Date.distantPast) {
-            // Add today's completion
-            routines.append(CompletedRoutine(
-                id: UUID(),
-                routine: RoutineLibrary.routines[0],
-                date: db.lastActivity ?? today
-            ))
-        }
-        
-        // Add previous days based on streak
-        if db.currentStreak > 1 {
-            for dayOffset in 1..<db.currentStreak {
-                if let date = calendar.date(byAdding: .day, value: -dayOffset, to: today) {
-                    routines.append(CompletedRoutine(
-                        id: UUID(),
-                        routine: RoutineLibrary.routines[dayOffset % RoutineLibrary.routines.count],
-                        date: date
-                    ))
-                }
-            }
-        }
-        
-        completedRoutines = routines
+        completedRoutines = db.recentCompletions.map { CompletedRoutine(completion: $0) }
     }
 }
 

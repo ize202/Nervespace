@@ -128,3 +128,137 @@ WITH CHECK (
      1. Create user profile
      2. Copy progress data to new row with `user_id`
      3. Optionally delete anonymous progress 
+
+```sql
+-- Routine Completions Table
+CREATE TABLE public.routine_completions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES user_profiles(id) ON DELETE CASCADE,
+    device_id UUID, -- For anonymous users
+    routine_id TEXT NOT NULL, -- References the local routine ID from RoutineLibrary
+    completed_at TIMESTAMPTZ NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    -- Ensure either user_id or device_id is present, but not both
+    CONSTRAINT check_id_present CHECK (
+        (user_id IS NOT NULL AND device_id IS NULL) OR 
+        (device_id IS NOT NULL AND user_id IS NULL)
+    )
+);
+
+-- Indexes for performance
+CREATE INDEX idx_routine_completions_user_id ON routine_completions(user_id);
+CREATE INDEX idx_routine_completions_device_id ON routine_completions(device_id);
+CREATE INDEX idx_routine_completions_completed_at ON routine_completions(completed_at);
+
+-- Enable Row Level Security
+ALTER TABLE routine_completions ENABLE ROW LEVEL SECURITY;
+
+-- RLS Policies for Routine Completions
+CREATE POLICY "Users can view own completions"
+ON routine_completions FOR SELECT
+TO authenticated, anon
+USING (
+    (auth.uid()::uuid = user_id) OR 
+    (device_id IS NOT NULL)
+);
+
+CREATE POLICY "Users can insert own completions"
+ON routine_completions FOR INSERT
+TO authenticated, anon
+WITH CHECK (
+    (auth.uid()::uuid = user_id) OR 
+    (device_id IS NOT NULL)
+);
+
+-- Function to get completions for a user
+CREATE OR REPLACE FUNCTION get_user_completions(
+    p_start_date TIMESTAMPTZ DEFAULT '-infinity',
+    p_end_date TIMESTAMPTZ DEFAULT 'infinity',
+    p_user_id UUID DEFAULT NULL,
+    p_device_id UUID DEFAULT NULL
+)
+RETURNS TABLE (
+    id UUID,
+    routine_id TEXT,
+    completed_at TIMESTAMPTZ
+)
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT 
+        rc.id,
+        rc.routine_id,
+        rc.completed_at
+    FROM routine_completions rc
+    WHERE 
+        (p_user_id IS NOT NULL AND rc.user_id = p_user_id) OR
+        (p_device_id IS NOT NULL AND rc.device_id = p_device_id)
+        AND rc.completed_at >= p_start_date
+        AND rc.completed_at <= p_end_date
+    ORDER BY rc.completed_at DESC;
+END;
+$$;
+
+-- Function to record a completion
+CREATE OR REPLACE FUNCTION record_routine_completion(
+    p_routine_id TEXT,
+    p_completed_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    p_user_id UUID DEFAULT NULL,
+    p_device_id UUID DEFAULT NULL
+)
+RETURNS UUID
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+    v_completion_id UUID;
+BEGIN
+    -- Insert the completion
+    INSERT INTO routine_completions (
+        user_id,
+        device_id,
+        routine_id,
+        completed_at
+    )
+    VALUES (
+        p_user_id,
+        p_device_id,
+        p_routine_id,
+        p_completed_at
+    )
+    RETURNING id INTO v_completion_id;
+
+    -- Update user_progress streak
+    -- This ensures streak calculation happens in one place
+    IF p_user_id IS NOT NULL THEN
+        -- For authenticated users
+        UPDATE user_progress
+        SET 
+            streak = CASE 
+                WHEN last_activity::date = CURRENT_DATE - 1 THEN streak + 1
+                WHEN last_activity::date = CURRENT_DATE THEN streak
+                ELSE 1
+            END,
+            last_activity = p_completed_at
+        WHERE user_id = p_user_id;
+    ELSE
+        -- For anonymous users
+        UPDATE user_progress
+        SET 
+            streak = CASE 
+                WHEN last_activity::date = CURRENT_DATE - 1 THEN streak + 1
+                WHEN last_activity::date = CURRENT_DATE THEN streak
+                ELSE 1
+            END,
+            last_activity = p_completed_at
+        WHERE device_id = p_device_id;
+    END IF;
+
+    RETURN v_completion_id;
+END;
+$$;
+```

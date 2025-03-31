@@ -39,6 +39,9 @@ public class DB: ObservableObject {
 	@Published public private(set) var routineCompletions: Int = 0
 	@Published public private(set) var lastActivity: Date?
 	
+	/// Routine completion history
+	@Published public private(set) var recentCompletions: [RoutineCompletion] = []
+	
 	/// For Supabase to keep track of the Auth State (see AuthGeneral.swift)
 	internal var authStateHandler: AuthStateChangeListenerRegistration?
 	
@@ -114,10 +117,14 @@ public class DB: ObservableObject {
 		if authState == .signedIn, let userId = currentUser?.id {
 			let progress = try await userService.fetchProgress(userId: userId)
 			updateProgress(from: progress)
+			// Also load completions
+			await loadRecentCompletions()
 		} else {
 			do {
 				let progress = try await userService.fetchProgress(userId: deviceId)
 				updateProgress(from: progress)
+				// Also load completions
+				await loadRecentCompletions()
 			} catch {
 				print("No remote progress found for anonymous user, using local")
 				loadLocalProgress()
@@ -138,41 +145,38 @@ public class DB: ObservableObject {
 		let today = Date()
 		let calendar = Calendar.current
 		
-		// Calculate new streak
-		var newStreak = currentStreak
-		if let lastActivity = lastActivity {
-			if calendar.isDateInYesterday(lastActivity) {
-				newStreak += 1
-			} else if !calendar.isDateInToday(lastActivity) {
-				newStreak = 1
-			}
-		} else {
-			newStreak = 1
-		}
+		// First record the completion in the completions table
+		let userId = currentUser?.id
+		let completionId: UUID = try await userService.recordRoutineCompletion(
+			routineId: routine.id,
+			userId: userId,
+			deviceId: userId == nil ? deviceId : nil
+		)
 		
-		// Update local state first
-		currentStreak = newStreak
+		// Then update local state
+		currentStreak = try await userService.getCurrentStreak(userId: userId ?? deviceId)
+		lastActivity = today
 		totalMinutes += routine.totalDuration / 60
 		routineCompletions += 1
-		lastActivity = today
 		saveLocalProgress()
 		
-		// Then try to sync with backend
-		let userId = currentUser?.id ?? deviceId
-		
+		// Fetch recent completions
+		await loadRecentCompletions()
+	}
+	
+	public func loadRecentCompletions() async {
 		do {
-			let progress = try await userService.updateProgress(
+			let userId = currentUser?.id
+			let completions = try await userService.getRecentCompletions(
 				userId: userId,
-				streak: newStreak,
-				routineCompletions: routineCompletions,
-				totalMinutes: totalMinutes,
-				lastActivity: today
+				deviceId: userId == nil ? deviceId : nil,
+				days: 30 // Fetch last 30 days of completions
 			)
-			// Update local state with server response
-			updateProgress(from: progress)
+			await MainActor.run {
+				self.recentCompletions = completions
+			}
 		} catch {
-			print("Failed to sync progress with server: \(error.localizedDescription)")
-			// Continue with local progress
+			print("[DB] Failed to load recent completions: \(error.localizedDescription)")
 		}
 	}
 	

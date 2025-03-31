@@ -330,4 +330,68 @@ public class SupabaseUserService: UserService {
         
         return profiles.first
     }
+    
+    public func recordRoutineCompletion(
+        routineId: String,
+        userId: UUID?,
+        deviceId: UUID?
+    ) async throws -> UUID {
+        let result: [UUID] = try await client
+            .rpc("record_routine_completion", params: [
+                "p_routine_id": routineId,
+                "p_user_id": userId as Any,
+                "p_device_id": deviceId as Any
+            ])
+            .execute()
+            .value
+        
+        guard let completionId = result.first else {
+            throw NSError(domain: "UserService", code: 500, userInfo: [
+                NSLocalizedDescriptionKey: "Failed to record routine completion"
+            ])
+        }
+        
+        return completionId
+    }
+    
+    public func getRecentCompletions(
+        userId: UUID?,
+        deviceId: UUID?,
+        days: Int
+    ) async throws -> [RoutineCompletion] {
+        let startDate = Calendar.current.date(
+            byAdding: .day,
+            value: -days,
+            to: Date()
+        ) ?? Date()
+        
+        let completions: [RoutineCompletion] = try await client
+            .rpc("get_user_completions", params: [
+                "p_start_date": startDate,
+                "p_end_date": Date(),
+                "p_user_id": userId as Any,
+                "p_device_id": deviceId as Any
+            ])
+            .execute()
+            .value
+        
+        return completions
+    }
+    
+    public func getCurrentStreak(userId: UUID) async throws -> Int {
+        let progresses: [UserProgress] = try await client
+            .from("user_progress")
+            .select()
+            .eq(UserProgress.CodingKeys.userId.rawValue, value: userId)
+            .execute()
+            .value
+        
+        guard let progress = progresses.first else {
+            throw NSError(domain: "UserService", code: 404, userInfo: [
+                NSLocalizedDescriptionKey: "User progress not found"
+            ])
+        }
+        
+        return progress.streak
+    }
 } 
