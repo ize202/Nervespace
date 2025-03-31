@@ -33,6 +33,12 @@ public class DB: ObservableObject {
 	/// SupabaseAuth State (use this to check auth state, updates with currentUser)
 	@Published public var authState: AuthState = .signedOut
 	
+	/// Progress tracking properties
+	@Published public private(set) var currentStreak: Int = 0
+	@Published public private(set) var totalMinutes: Int = 0
+	@Published public private(set) var routineCompletions: Int = 0
+	@Published public private(set) var lastActivity: Date?
+	
 	/// For Supabase to keep track of the Auth State (see AuthGeneral.swift)
 	internal var authStateHandler: AuthStateChangeListenerRegistration?
 	
@@ -41,6 +47,20 @@ public class DB: ObservableObject {
 	
 	/// For Sign in With Apple (see SignInWithApple.siwft)
 	internal var currentNonce: String?
+	
+	private let defaults = UserDefaults.standard
+	private let deviceIdKey = "device_uuid"
+	
+	/// Device UUID for anonymous users
+	private var deviceId: UUID {
+		if let storedId = defaults.string(forKey: deviceIdKey),
+		   let uuid = UUID(uuidString: storedId) {
+			return uuid
+		}
+		let newId = UUID()
+		defaults.set(newId.uuidString, forKey: deviceIdKey)
+		return newId
+	}
 	
 	///- Parameter onAuthStateChange: Additional closure to pass to the AuthState Listener.
 	/// We use this to set all the different providers to use the same, supabase-issued user ID to identify the user.
@@ -72,5 +92,101 @@ public class DB: ObservableObject {
 		Task {
 			await registerAuthStateListener(additionalHandler: onAuthStateChange)
 		}
+	}
+	
+	// MARK: - Progress Tracking
+	
+	private func loadLocalProgress() {
+		currentStreak = defaults.integer(forKey: "local_streak")
+		totalMinutes = defaults.integer(forKey: "local_minutes")
+		routineCompletions = defaults.integer(forKey: "local_completions")
+		lastActivity = defaults.object(forKey: "local_last_activity") as? Date
+	}
+	
+	private func saveLocalProgress() {
+		defaults.set(currentStreak, forKey: "local_streak")
+		defaults.set(totalMinutes, forKey: "local_minutes")
+		defaults.set(routineCompletions, forKey: "local_completions")
+		defaults.set(lastActivity, forKey: "local_last_activity")
+	}
+	
+	public func loadProgress() async throws {
+		if authState == .signedIn, let userId = currentUser?.id {
+			let progress = try await userService.fetchProgress(userId: userId)
+			await updateProgress(from: progress)
+		} else {
+			do {
+				let progress = try await userService.fetchProgress(userId: deviceId)
+				await updateProgress(from: progress)
+			} catch {
+				print("No remote progress found for anonymous user, using local")
+				loadLocalProgress()
+			}
+		}
+	}
+	
+	@MainActor
+	private func updateProgress(from progress: UserProgress) {
+		currentStreak = progress.streak
+		totalMinutes = progress.totalMinutes
+		routineCompletions = progress.routineCompletions
+		lastActivity = progress.lastActivity
+		saveLocalProgress()
+	}
+	
+	public func recordCompletion(routine: Routine) async throws {
+		let today = Date()
+		let calendar = Calendar.current
+		
+		// Calculate new streak
+		var newStreak = currentStreak
+		if let lastActivity = lastActivity {
+			if calendar.isDateInYesterday(lastActivity) {
+				newStreak += 1
+			} else if !calendar.isDateInToday(lastActivity) {
+				newStreak = 1
+			}
+		} else {
+			newStreak = 1
+		}
+		
+		// Update local state first
+		currentStreak = newStreak
+		totalMinutes += routine.totalDuration / 60
+		routineCompletions += 1
+		lastActivity = today
+		saveLocalProgress()
+		
+		// Then try to sync with backend
+		let userId = currentUser?.id ?? deviceId
+		
+		do {
+			let progress = try await userService.updateProgress(
+				userId: userId,
+				streak: newStreak,
+				routineCompletions: routineCompletions,
+				totalMinutes: totalMinutes,
+				lastActivity: today
+			)
+			// Update local state with server response
+			await updateProgress(from: progress)
+		} catch {
+			print("Failed to sync progress with server: \(error.localizedDescription)")
+			// Continue with local progress
+		}
+	}
+	
+	// Call this when user creates an account to migrate anonymous data
+	public func migrateProgress(to userId: UUID) async throws {
+		guard authState == .signedIn else { return }
+		
+		// Create new progress entry for authenticated user
+		try await userService.updateProgress(
+			userId: userId,
+			streak: currentStreak,
+			routineCompletions: routineCompletions,
+			totalMinutes: totalMinutes,
+			lastActivity: lastActivity
+		)
 	}
 }

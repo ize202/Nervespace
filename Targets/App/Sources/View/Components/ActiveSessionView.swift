@@ -17,7 +17,6 @@ public struct ActiveSessionView: View {
     @State private var showError = false
     @State private var errorMessage = ""
     @EnvironmentObject private var db: DB
-    @StateObject private var progressManager: ProgressManager
     @State private var isUpdating = false
     
     public init(routine: Routine, customDurations: [String: Int]) {
@@ -25,7 +24,6 @@ public struct ActiveSessionView: View {
         self.customDurations = customDurations
         // Initialize with the first exercise duration
         _timeRemaining = State(initialValue: routine.exercises.first.map { customDurations[$0.exercise.id] ?? $0.duration } ?? 30)
-        _progressManager = StateObject(wrappedValue: ProgressManager())
     }
     
     private var currentRoutineExercise: RoutineExercise? {
@@ -203,15 +201,9 @@ public struct ActiveSessionView: View {
     }
     
     private func completeRoutine() async {
-        guard let userId = db.currentUser?.id else {
-            showError = true
-            errorMessage = "User not logged in"
-            return
-        }
-        
         isUpdating = true
         do {
-            try await progressManager.recordCompletion(userId: userId, routine: routine)
+            try await db.recordCompletion(routine: routine)
             dismiss()
         } catch {
             showError = true

@@ -12,7 +12,7 @@ import Supabase
 extension DB {
 
 	// Supabase calls this function when user state changes
-	func registerAuthStateListener(additionalHandler: @escaping (AuthChangeEvent, Session?) -> Void) async {
+	public func registerAuthStateListener(additionalHandler: @escaping (AuthChangeEvent, Session?) -> Void) async {
 		if authStateHandler == nil {
 			authStateHandler = await _db.auth.onAuthStateChange { event, session in
 				print(

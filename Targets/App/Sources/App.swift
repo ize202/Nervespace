@@ -25,27 +25,11 @@ struct MainApp: App {
 	@UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
 
 	/// Object to access DBKit and AuthKit (SupabaseKit).
-	@StateObject var db: DB
+	@StateObject private var db = DB()
 
 	// To track when app goes into foreground/background
 	// We use this to clear push notifications when the app is opened.
 	@Environment(\.scenePhase) var scenePhase
-
-	init() {
-		_db = StateObject(
-			wrappedValue: DB(onAuthStateChange: { event, session in
-				if let user = session?.user {
-					// Logged in => Privacy Consent Given during signup (NotifKit)
-					PushNotifications.oneSignalConsentGiven()
-
-					// Identify OneSignal with Supabase user (NotifKit & AuthKit)
-					PushNotifications.associateUserWithID(user.id.uuidString)
-
-				} else {
-					PushNotifications.removeUserIDAssociation()
-				}
-			}))
-	}
 
 	var body: some Scene {
 		WindowGroup {
@@ -77,6 +61,19 @@ struct MainApp: App {
 				}
 
 				.environmentObject(db)
+				.task {
+					await db.registerAuthStateListener { event, session in
+						if let user = session?.user {
+							// Logged in => Privacy Consent Given during signup (NotifKit)
+							PushNotifications.oneSignalConsentGiven()
+
+							// Identify OneSignal with Supabase user (NotifKit & AuthKit)
+							PushNotifications.associateUserWithID(user.id.uuidString)
+						} else {
+							PushNotifications.removeUserIDAssociation()
+						}
+					}
+				}
 		}
 	}
 }

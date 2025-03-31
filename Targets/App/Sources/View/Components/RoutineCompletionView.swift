@@ -6,18 +6,12 @@ struct RoutineCompletionView: View {
     let routine: Routine
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var db: DB
-    @StateObject private var progressManager: ProgressManager
     @State private var isUpdating = false
     @State private var showError = false
     @State private var errorMessage = ""
     
     private let weekDays = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"]
     private let calendar = Calendar.current
-    
-    init(routine: Routine) {
-        self.routine = routine
-        _progressManager = StateObject(wrappedValue: ProgressManager())
-    }
     
     var body: some View {
         ZStack {
@@ -49,7 +43,7 @@ struct RoutineCompletionView: View {
                 // Streak Card
                 VStack(spacing: 16) {
                     // Streak count
-                    Text("\(progressManager.currentStreak) day")
+                    Text("\(db.currentStreak) day")
                         .font(.system(size: 34, weight: .bold))
                         .foregroundColor(.white)
                     
@@ -133,15 +127,9 @@ struct RoutineCompletionView: View {
     }
     
     private func addToStreak() async {
-        guard let userId = db.currentUser?.id else {
-            showError = true
-            errorMessage = "User not logged in"
-            return
-        }
-        
         isUpdating = true
         do {
-            try await progressManager.recordCompletion(userId: userId, routine: routine)
+            try await db.recordCompletion(routine: routine)
             dismiss()
         } catch {
             showError = true

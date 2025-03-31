@@ -23,7 +23,6 @@
 		1EEC65B91A20DE2081E77E0D /* AccountSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF13AD0325C6FF35BCBA173 /* AccountSettingsView.swift */; };
 		21B2F1D2A2D090C5A8D905DB /* Sentry-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 089A3AF5CF095FF7EE474590 /* Sentry-Info.plist */; };
 		2517BB44FACE02E21DDE3B02 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 553CD736FB8477C349AC0D06 /* HomeView.swift */; };
-		2687C345FF1B195243827606 /* ProgressManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6586F7EAF72BEDB2BF60E1AC /* ProgressManager.swift */; };
 		2B857DD0EC9B9248B272BEE2 /* SharedKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 39E86B5FF5E957E5D088F40B /* SharedKit.framework */; };
 		2C09B4EF821A2C217A82A6BA /* SignInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4634A94D674EB513386D2C52 /* SignInView.swift */; };
 		2CC928AEBAD65DD2F42F40CA /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A6C05EE090C2810E6906508 /* App.swift */; };
@@ -316,7 +315,6 @@
 		5C09F336EAC3018DF777EA4A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		5F30ADB8BC53945EEF346BDA /* SupabaseKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SupabaseKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		633A256FA034894812F8FDB9 /* ExerciseTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseTypes.swift; sourceTree = "<group>"; };
-		6586F7EAF72BEDB2BF60E1AC /* ProgressManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressManager.swift; sourceTree = "<group>"; };
 		65AE6300BE637983E99BF16A /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		65E69E217434ADAC2A1B9129 /* sensitiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = sensitiveView.swift; sourceTree = "<group>"; };
 		66F7833E2C3320D7BD7D173F /* SharedKit-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "SharedKit-Info.plist"; sourceTree = "<group>"; };
@@ -486,14 +484,6 @@
 				897300D0BA41A6DC8ECB9B61 /* Views */,
 			);
 			path = Sources;
-			sourceTree = "<group>";
-		};
-		1002840CDA507C014B2E9B39 /* Services */ = {
-			isa = PBXGroup;
-			children = (
-				6586F7EAF72BEDB2BF60E1AC /* ProgressManager.swift */,
-			);
-			path = Services;
 			sourceTree = "<group>";
 		};
 		13775A8302F7BEC838B6B6AB /* Sources */ = {
@@ -1009,7 +999,6 @@
 		D075EDA48B9CC6F3929481B2 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
-				1002840CDA507C014B2E9B39 /* Services */,
 				01040C46A57A15CA77DD4FF3 /* View */,
 				9A6C05EE090C2810E6906508 /* App.swift */,
 			);
@@ -1457,7 +1446,6 @@
 			files = (
 				99347E5C50ECDC12DC4CF52C /* TuistBundle+Nervespace.swift in Sources */,
 				2CC928AEBAD65DD2F42F40CA /* App.swift in Sources */,
-				2687C345FF1B195243827606 /* ProgressManager.swift in Sources */,
 				F0E81C883C30503D2B8AC781 /* ActiveSessionView.swift in Sources */,
 				D0E0829C06F292050D66A833 /* CircularProgressView.swift in Sources */,
 				5E8DA7FF62F08794025361FB /* ExerciseDetailView.swift in Sources */,
