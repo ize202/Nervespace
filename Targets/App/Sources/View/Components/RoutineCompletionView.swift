@@ -9,6 +9,7 @@ struct RoutineCompletionView: View {
     @State private var isUpdating = false
     @State private var showError = false
     @State private var errorMessage = ""
+    @State private var showConfetti = false
     
     private let weekDays = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"]
     private let calendar = Calendar.current
@@ -25,7 +26,7 @@ struct RoutineCompletionView: View {
             VStack(alignment: .leading, spacing: 32) {
                 // Header Text
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Congrats")
+                    Text("Congrats!")
                         .font(.largeTitle)
                         .fontWeight(.bold)
                         .foregroundColor(.white)
@@ -147,11 +148,23 @@ struct RoutineCompletionView: View {
                 .padding(.bottom, 32)
             }
             .padding(.top, 64)
+            
+            // Confetti Layer
+            if showConfetti {
+                ConfettiView()
+                    .allowsHitTesting(false)
+                    .ignoresSafeArea()
+            }
         }
         .alert("Error", isPresented: $showError) {
             Button("OK", role: .cancel) {}
         } message: {
             Text(errorMessage)
+        }
+        .onAppear {
+            if db.currentStreak <= 1 {
+                showConfetti = true
+            }
         }
     }
     
@@ -174,6 +187,54 @@ struct RoutineCompletionView: View {
             errorMessage = error.localizedDescription
         }
         isUpdating = false
+    }
+}
+
+// Custom Confetti View
+struct ConfettiView: View {
+    @State private var isAnimating = false
+    
+    var body: some View {
+        GeometryReader { geometry in
+            ZStack {
+                ForEach(0..<50) { _ in
+                    ConfettiPiece()
+                        .position(
+                            x: .random(in: 0...geometry.size.width),
+                            y: isAnimating ? geometry.size.height + 100 : -100
+                        )
+                        .animation(
+                            Animation.linear(duration: .random(in: 2...4))
+                            .repeatForever(autoreverses: false)
+                            .delay(.random(in: 0...2)),
+                            value: isAnimating
+                        )
+                }
+            }
+        }
+        .onAppear {
+            isAnimating = true
+        }
+    }
+}
+
+struct ConfettiPiece: View {
+    let colors: [Color] = [.red, .blue, .green, .yellow, .pink, .purple, .orange]
+    let rotationRange = -360.0...360.0
+    let size: CGFloat = 10
+    
+    var body: some View {
+        Circle()
+            .fill(colors.randomElement()!)
+            .frame(width: size, height: size)
+            .rotation3DEffect(
+                .degrees(.random(in: rotationRange)),
+                axis: (
+                    x: .random(in: 0...1),
+                    y: .random(in: 0...1),
+                    z: .random(in: 0...1)
+                )
+            )
     }
 }
 
