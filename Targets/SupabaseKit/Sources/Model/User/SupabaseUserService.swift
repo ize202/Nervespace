@@ -40,6 +40,19 @@ private struct PremiumStatusUpdate: Encodable {
     }
 }
 
+private struct RoutineCompletionParams: Encodable {
+    let p_routine_id: String
+    let p_user_id: String?
+    let p_device_id: String?
+}
+
+private struct GetRecentCompletionsParams: Encodable {
+    let p_start_date: String
+    let p_end_date: String
+    let p_user_id: String?
+    let p_device_id: String?
+}
+
 public class SupabaseUserService: UserService {
     private let client: SupabaseClient
     
@@ -336,16 +349,19 @@ public class SupabaseUserService: UserService {
         userId: UUID?,
         deviceId: UUID?
     ) async throws -> UUID {
-        let result: [UUID] = try await client
-            .rpc("record_routine_completion", params: [
-                "p_routine_id": routineId,
-                "p_user_id": userId as Any,
-                "p_device_id": deviceId as Any
-            ])
+        let params = RoutineCompletionParams(
+            p_routine_id: routineId,
+            p_user_id: userId?.uuidString,
+            p_device_id: deviceId?.uuidString
+        )
+        
+        let result: [String] = try await client
+            .rpc("record_routine_completion", params: params)
             .execute()
             .value
         
-        guard let completionId = result.first else {
+        guard let completionIdString = result.first,
+              let completionId = UUID(uuidString: completionIdString) else {
             throw NSError(domain: "UserService", code: 500, userInfo: [
                 NSLocalizedDescriptionKey: "Failed to record routine completion"
             ])
@@ -365,13 +381,16 @@ public class SupabaseUserService: UserService {
             to: Date()
         ) ?? Date()
         
+        let dateFormatter = ISO8601DateFormatter()
+        let params = GetRecentCompletionsParams(
+            p_start_date: dateFormatter.string(from: startDate),
+            p_end_date: dateFormatter.string(from: Date()),
+            p_user_id: userId?.uuidString,
+            p_device_id: deviceId?.uuidString
+        )
+        
         let completions: [RoutineCompletion] = try await client
-            .rpc("get_user_completions", params: [
-                "p_start_date": startDate,
-                "p_end_date": Date(),
-                "p_user_id": userId as Any,
-                "p_device_id": deviceId as Any
-            ])
+            .rpc("get_user_completions", params: params)
             .execute()
             .value
         
