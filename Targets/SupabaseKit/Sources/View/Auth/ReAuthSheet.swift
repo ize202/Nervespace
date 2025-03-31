@@ -42,7 +42,7 @@ public struct ReAuthSheetView: View {
 				}
 			}
 
-			if let user = db.currentUser {
+			if db.currentUser != nil {
 				AppleAuthButton(showNotificationOnSuccessfulSignIn: false) {
 					onComplete(.success)
 				}

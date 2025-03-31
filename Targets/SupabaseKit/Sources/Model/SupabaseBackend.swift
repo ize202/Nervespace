@@ -113,11 +113,11 @@ public class DB: ObservableObject {
 	public func loadProgress() async throws {
 		if authState == .signedIn, let userId = currentUser?.id {
 			let progress = try await userService.fetchProgress(userId: userId)
-			await updateProgress(from: progress)
+			updateProgress(from: progress)
 		} else {
 			do {
 				let progress = try await userService.fetchProgress(userId: deviceId)
-				await updateProgress(from: progress)
+				updateProgress(from: progress)
 			} catch {
 				print("No remote progress found for anonymous user, using local")
 				loadLocalProgress()
@@ -169,7 +169,7 @@ public class DB: ObservableObject {
 				lastActivity: today
 			)
 			// Update local state with server response
-			await updateProgress(from: progress)
+			updateProgress(from: progress)
 		} catch {
 			print("Failed to sync progress with server: \(error.localizedDescription)")
 			// Continue with local progress
@@ -181,12 +181,14 @@ public class DB: ObservableObject {
 		guard authState == .signedIn else { return }
 		
 		// Create new progress entry for authenticated user
-		try await userService.updateProgress(
+		let progress = try await userService.updateProgress(
 			userId: userId,
 			streak: currentStreak,
 			routineCompletions: routineCompletions,
 			totalMinutes: totalMinutes,
 			lastActivity: lastActivity
 		)
+		// Update local state with server response
+		updateProgress(from: progress)
 	}
 }
