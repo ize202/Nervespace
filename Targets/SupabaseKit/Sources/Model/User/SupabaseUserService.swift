@@ -53,6 +53,13 @@ private struct GetRecentCompletionsParams: Encodable {
     let p_device_id: String?
 }
 
+private struct InitialProgressParams: Encodable {
+    let device_id: UUID
+    let streak: Int
+    let routine_completions: Int
+    let total_minutes: Int
+}
+
 public class SupabaseUserService: UserService {
     private let client: SupabaseClient
     
@@ -189,11 +196,16 @@ public class SupabaseUserService: UserService {
     }
     
     public func initializeAnonymousProgress(deviceId: UUID) async throws -> UserProgress {
-        let progress = UserProgress(deviceId: deviceId)
+        let params = InitialProgressParams(
+            device_id: deviceId,
+            streak: 0,
+            routine_completions: 0,
+            total_minutes: 0
+        )
         
         let progresses: [UserProgress] = try await client
             .from("user_progress")
-            .insert(progress)
+            .insert(params)
             .execute()
             .value
         
@@ -391,12 +403,25 @@ public class SupabaseUserService: UserService {
     }
     
     public func getCurrentStreak(userId: UUID) async throws -> Int {
-        let progresses: [UserProgress] = try await client
-            .from("user_progress")
-            .select()
-            .eq(UserProgress.CodingKeys.userId.rawValue, value: userId)
-            .execute()
-            .value
+        let progresses: [UserProgress]
+        
+        // Try to fetch progress based on whether this is a user ID or device ID
+        do {
+            progresses = try await client
+                .from("user_progress")
+                .select()
+                .or("user_id.eq.\(userId),device_id.eq.\(userId)")
+                .execute()
+                .value
+        } catch {
+            // If that fails, try fetching by device ID specifically
+            progresses = try await client
+                .from("user_progress")
+                .select()
+                .eq("device_id", value: userId)
+                .execute()
+                .value
+        }
         
         guard let progress = progresses.first else {
             throw NSError(domain: "UserService", code: 404, userInfo: [

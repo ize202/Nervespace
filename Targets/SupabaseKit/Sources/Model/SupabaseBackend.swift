@@ -42,6 +42,9 @@ public class DB: ObservableObject {
 	/// Routine completion history
 	@Published public private(set) var recentCompletions: [RoutineCompletion] = []
 	
+	/// Initialization state
+	@Published private(set) var isInitialized = false
+	
 	/// For Supabase to keep track of the Auth State (see AuthGeneral.swift)
 	internal var authStateHandler: AuthStateChangeListenerRegistration?
 	
@@ -93,7 +96,41 @@ public class DB: ObservableObject {
 		)
 		
 		Task {
-			await registerAuthStateListener(additionalHandler: onAuthStateChange)
+			do {
+				await registerAuthStateListener(additionalHandler: onAuthStateChange)
+				
+				// Initialize anonymous progress if needed
+				if self.authState == .signedOut {
+					print("[DB] Checking for existing anonymous progress...")
+					do {
+						let progress = try await userService.fetchProgressByDeviceId(deviceId)
+						print("[DB] Found existing anonymous progress with streak: \(progress.streak)")
+						try await loadProgress()
+					} catch {
+						if (error as NSError).domain == "UserService" && (error as NSError).code == 404 {
+							print("[DB] No existing progress found, initializing anonymous user progress...")
+							let progress = try await userService.initializeAnonymousProgress(deviceId: deviceId)
+							print("[DB] Successfully initialized anonymous progress with ID: \(progress.id)")
+							await MainActor.run {
+								updateProgress(from: progress)
+							}
+						} else {
+							print("[DB] Error checking progress: \(error.localizedDescription)")
+							throw error
+						}
+					}
+				}
+				
+				await MainActor.run {
+					self.isInitialized = true
+				}
+			} catch {
+				print("[DB] Error during initialization: \(error.localizedDescription)")
+				// Even if initialization fails, we should still mark as initialized to prevent hanging
+				await MainActor.run {
+					self.isInitialized = true
+				}
+			}
 		}
 	}
 	
@@ -121,7 +158,7 @@ public class DB: ObservableObject {
 			await loadRecentCompletions()
 		} else {
 			do {
-				let progress = try await userService.fetchProgress(userId: deviceId)
+				let progress = try await userService.fetchProgressByDeviceId(deviceId)
 				updateProgress(from: progress)
 				// Also load completions
 				await loadRecentCompletions()
@@ -142,18 +179,38 @@ public class DB: ObservableObject {
 	}
 	
 	public func recordCompletion(routine: Routine) async throws {
-		let today = Date()
-		let calendar = Calendar.current
+		if !isInitialized {
+			print("[DB] Waiting for initialization to complete...")
+			// Wait for initialization with a timeout
+			for _ in 0..<10 { // 1 second timeout
+				if isInitialized { break }
+				try await Task.sleep(nanoseconds: 100_000_000) // 0.1 second
+			}
+			
+			guard isInitialized else {
+				print("[DB] Initialization timed out")
+				throw NSError(domain: "DB", code: 500, userInfo: [
+					NSLocalizedDescriptionKey: "Database initialization timed out"
+				])
+			}
+		}
 		
-		// First record the completion in the completions table
+		let today = Date()
 		let userId = currentUser?.id
+		let deviceIdForCompletion = userId == nil ? deviceId : nil
+		
+		print("[DB] Recording completion for \(userId?.uuidString ?? "anonymous")/\(deviceIdForCompletion?.uuidString ?? "no device")")
+		
+		// Record the completion in the completions table
 		let completionId: UUID = try await userService.recordRoutineCompletion(
 			routineId: routine.id,
 			userId: userId,
-			deviceId: userId == nil ? deviceId : nil
+			deviceId: deviceIdForCompletion
 		)
 		
-		// Then update local state
+		print("[DB] Successfully recorded completion with ID: \(completionId)")
+		
+		// Update local state
 		currentStreak = try await userService.getCurrentStreak(userId: userId ?? deviceId)
 		lastActivity = today
 		totalMinutes += routine.totalDuration / 60
