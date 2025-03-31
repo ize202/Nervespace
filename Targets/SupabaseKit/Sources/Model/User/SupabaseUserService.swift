@@ -79,15 +79,14 @@ public class SupabaseUserService: UserService {
     // MARK: - Profile Management
     
     public func fetchProfile(userId: UUID) async throws -> Model.UserProfile {
-        let query = client.database
+        let response: Model.UserProfile = try await client
             .from("user_profiles")
             .select()
             .eq("id", value: userId)
             .single()
-        
-        let response = try await query.execute()
-        let data = try response.decode(Model.UserProfile.self, using: .snakeCase)
-        return data
+            .execute()
+            .value
+        return response
     }
     
     public func createProfile(appleId: String, email: String?, name: String?) async throws -> Model.UserProfile {
@@ -97,14 +96,13 @@ public class SupabaseUserService: UserService {
             name: name
         )
         
-        let query = client.database
+        let response: Model.UserProfile = try await client
             .from("user_profiles")
             .insert(profile)
             .single()
-        
-        let response = try await query.execute()
-        let data = try response.decode(Model.UserProfile.self, using: .snakeCase)
-        return data
+            .execute()
+            .value
+        return response
     }
     
     public func updateProfile(userId: UUID, name: String?, avatarURL: URL?) async throws -> Model.UserProfile {
@@ -113,19 +111,18 @@ public class SupabaseUserService: UserService {
             avatarURL: avatarURL?.absoluteString
         )
         
-        let query = client.database
+        let response: Model.UserProfile = try await client
             .from("user_profiles")
             .update(update)
             .eq("id", value: userId)
             .single()
-        
-        let response = try await query.execute()
-        let data = try response.decode(Model.UserProfile.self, using: .snakeCase)
-        return data
+            .execute()
+            .value
+        return response
     }
     
     public func deleteProfile(userId: UUID) async throws {
-        try await client.database
+        try await client
             .from("user_profiles")
             .delete()
             .eq("id", value: userId)
@@ -135,51 +132,42 @@ public class SupabaseUserService: UserService {
     // MARK: - Progress Tracking
     
     public func fetchProgress(userId: UUID) async throws -> Model.UserProgress {
-        let query = client.database
+        let response: Model.UserProgress = try await client
             .from("user_progress")
             .select()
             .eq("user_id", value: userId)
             .single()
-        
-        let response = try await query.execute()
-        let data = try response.decode(Model.UserProgress.self, using: .snakeCase)
-        return data
+            .execute()
+            .value
+        return response
     }
     
     public func fetchProgressByDeviceId(_ deviceId: UUID) async throws -> Model.UserProgress {
-        let query = client.database
+        let response: Model.UserProgress = try await client
             .from("user_progress")
             .select()
             .eq("device_id", value: deviceId)
             .single()
-        
-        let response = try await query.execute()
-        let data = try response.decode(Model.UserProgress.self, using: .snakeCase)
-        return data
+            .execute()
+            .value
+        return response
     }
     
     public func initializeProgress(userId: UUID) async throws -> Model.UserProgress {
         let progress = Model.UserProgress(userId: userId)
         
-        let progresses: [Model.UserProgress] = try await client
+        let response: Model.UserProgress = try await client
             .from("user_progress")
             .insert(progress)
+            .single()
             .execute()
             .value
-        
-        guard let created = progresses.first else {
-            throw NSError(domain: "UserService", code: 500, userInfo: [
-                NSLocalizedDescriptionKey: "Failed to initialize user progress"
-            ])
-        }
-        
-        return created
+        return response
     }
     
     public func initializeAnonymousProgress(deviceId: UUID) async throws -> Model.UserProgress {
         print("[DB] Initializing anonymous progress with deviceId: \(deviceId)")
         
-        // Create minimal params for initialization
         let params = InitialProgressParams(
             device_id: deviceId,
             streak: 0,
@@ -190,21 +178,15 @@ public class SupabaseUserService: UserService {
         
         do {
             print("[DB] Sending params to Supabase: \(String(describing: params))")
-            let progresses: [Model.UserProgress] = try await client
+            let response: Model.UserProgress = try await client
                 .from("user_progress")
                 .insert(params)
+                .single()
                 .execute()
                 .value
             
-            guard let created = progresses.first else {
-                print("[DB] No progress returned from Supabase")
-                throw NSError(domain: "UserService", code: 500, userInfo: [
-                    NSLocalizedDescriptionKey: "Failed to initialize anonymous progress"
-                ])
-            }
-            
-            print("[DB] Successfully created anonymous progress: \(String(describing: created))")
-            return created
+            print("[DB] Successfully created anonymous progress: \(String(describing: response))")
+            return response
         } catch {
             print("[DB] Error creating anonymous progress: \(error.localizedDescription)")
             throw error
@@ -227,20 +209,14 @@ public class SupabaseUserService: UserService {
             lastActivity: lastActivity
         )
         
-        let progresses: [Model.UserProgress] = try await client
+        let response: Model.UserProgress = try await client
             .from("user_progress")
             .update(update)
             .eq("user_id", value: userId)
+            .single()
             .execute()
             .value
-        
-        guard let updated = progresses.first else {
-            throw NSError(domain: "UserService", code: 500, userInfo: [
-                NSLocalizedDescriptionKey: "Failed to update user progress"
-            ])
-        }
-        
-        return updated
+        return response
     }
     
     public func updateAnonymousProgress(
@@ -259,20 +235,14 @@ public class SupabaseUserService: UserService {
             lastActivity: lastActivity
         )
         
-        let progresses: [Model.UserProgress] = try await client
+        let response: Model.UserProgress = try await client
             .from("user_progress")
             .update(update)
             .eq("device_id", value: deviceId)
+            .single()
             .execute()
             .value
-        
-        guard let updated = progresses.first else {
-            throw NSError(domain: "UserService", code: 500, userInfo: [
-                NSLocalizedDescriptionKey: "Failed to update anonymous progress"
-            ])
-        }
-        
-        return updated
+        return response
     }
     
     public func migrateAnonymousProgress(
@@ -280,7 +250,7 @@ public class SupabaseUserService: UserService {
         to userId: UUID
     ) async throws {
         // First, update the user_progress entry
-        try await client.database
+        try await client
             .from("user_progress")
             .update([
                 "user_id": userId,
@@ -290,7 +260,7 @@ public class SupabaseUserService: UserService {
             .execute()
         
         // Then, update all routine_completions
-        try await client.database
+        try await client
             .from("routine_completions")
             .update([
                 "user_id": userId,
@@ -312,30 +282,28 @@ public class SupabaseUserService: UserService {
             premiumUntil: premiumUntil
         )
         
-        let query = client.database
+        let response: Model.UserProfile = try await client
             .from("user_profiles")
             .update(update)
             .eq("id", value: userId)
             .single()
-        
-        let response = try await query.execute()
-        let data = try response.decode(Model.UserProfile.self, using: .snakeCase)
-        return data
+            .execute()
+            .value
+        return response
     }
     
     // MARK: - Utility Methods
     
     public func findProfileByAppleId(_ appleId: String) async throws -> Model.UserProfile? {
-        let query = client.database
-            .from("user_profiles")
-            .select()
-            .eq("apple_id", value: appleId)
-            .single()
-        
         do {
-            let response = try await query.execute()
-            let data = try response.decode(Model.UserProfile.self, using: .snakeCase)
-            return data
+            let response: Model.UserProfile = try await client
+                .from("user_profiles")
+                .select()
+                .eq("apple_id", value: appleId)
+                .single()
+                .execute()
+                .value
+            return response
         } catch {
             return nil
         }
@@ -347,21 +315,16 @@ public class SupabaseUserService: UserService {
         userId: UUID?,
         deviceId: UUID?
     ) async throws -> UUID {
-        let query = client.database
+        let response: UUID = try await client
             .rpc("record_routine_completion", params: [
                 "p_routine_id": routineId,
                 "p_duration_minutes": durationMinutes,
                 "p_user_id": userId as Any,
                 "p_device_id": deviceId as Any
             ])
-        
-        let response = try await query.execute()
-        guard let completionId = try? response.decode(UUID.self) else {
-            throw NSError(domain: "UserService", code: 500, userInfo: [
-                NSLocalizedDescriptionKey: "Failed to decode completion ID"
-            ])
-        }
-        return completionId
+            .execute()
+            .value
+        return response
     }
     
     public func getRecentCompletions(
@@ -369,45 +332,51 @@ public class SupabaseUserService: UserService {
         deviceId: UUID?,
         days: Int
     ) async throws -> [Model.RoutineCompletion] {
-        let query = client.database
+        let response: [Model.RoutineCompletion] = try await client
             .rpc("get_recent_completions", params: [
                 "p_user_id": userId as Any,
                 "p_device_id": deviceId as Any,
                 "p_days": days
             ])
-        
-        let response = try await query.execute()
-        let completions = try response.decode([Model.RoutineCompletion].self, using: .snakeCase)
-        return completions
+            .execute()
+            .value
+        return response
     }
     
     public func getCurrentStreak(userId: UUID) async throws -> Int {
-        let progresses: [Model.UserProgress]
+        let query = "user_id.eq.\(userId),device_id.eq.\(userId)"
         
-        // Try to fetch progress based on whether this is a user ID or device ID
         do {
-            progresses = try await client
+            let response: [Model.UserProgress] = try await client
                 .from("user_progress")
                 .select()
-                .or("user_id.eq.\(userId),device_id.eq.\(userId)")
+                .or(query)
                 .execute()
                 .value
+            
+            guard let progress = response.first else {
+                throw NSError(domain: "UserService", code: 404, userInfo: [
+                    NSLocalizedDescriptionKey: "User progress not found"
+                ])
+            }
+            
+            return progress.streak
         } catch {
             // If that fails, try fetching by device ID specifically
-            progresses = try await client
+            let response: [Model.UserProgress] = try await client
                 .from("user_progress")
                 .select()
                 .eq("device_id", value: userId)
                 .execute()
                 .value
+            
+            guard let progress = response.first else {
+                throw NSError(domain: "UserService", code: 404, userInfo: [
+                    NSLocalizedDescriptionKey: "User progress not found"
+                ])
+            }
+            
+            return progress.streak
         }
-        
-        guard let progress = progresses.first else {
-            throw NSError(domain: "UserService", code: 404, userInfo: [
-                NSLocalizedDescriptionKey: "User progress not found"
-            ])
-        }
-        
-        return progress.streak
     }
 } 
