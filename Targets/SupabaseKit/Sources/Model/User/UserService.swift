@@ -9,27 +9,18 @@ public protocol UserService {
     
     // Progress tracking
     func fetchProgress(userId: UUID) async throws -> Model.UserProgress
-    func fetchProgressByDeviceId(_ deviceId: UUID) async throws -> Model.UserProgress
     
     // Routine completions
     func recordRoutineCompletion(
         routineId: String,
         durationMinutes: Int,
-        userId: UUID?,
-        deviceId: UUID?
+        userId: UUID
     ) async throws -> UUID
     
     func getRecentCompletions(
-        userId: UUID?,
-        deviceId: UUID?,
+        userId: UUID,
         days: Int
     ) async throws -> [Model.RoutineCompletion]
-    
-    // Account migration
-    func migrateAnonymousProgress(
-        from deviceId: UUID,
-        to userId: UUID
-    ) async throws
     
     // Premium status
     func updatePremiumStatus(
@@ -44,8 +35,7 @@ public protocol UserService {
 
 public struct UserProgress {
     public let id: UUID
-    public let userId: UUID?
-    public let deviceId: UUID?
+    public let userId: UUID
     public let streak: Int
     public let dailyMinutes: Int
     public let totalMinutes: Int
@@ -54,8 +44,7 @@ public struct UserProgress {
     
     public init(
         id: UUID,
-        userId: UUID?,
-        deviceId: UUID?,
+        userId: UUID,
         streak: Int,
         dailyMinutes: Int,
         totalMinutes: Int,
@@ -64,7 +53,6 @@ public struct UserProgress {
     ) {
         self.id = id
         self.userId = userId
-        self.deviceId = deviceId
         self.streak = streak
         self.dailyMinutes = dailyMinutes
         self.totalMinutes = totalMinutes
@@ -75,23 +63,20 @@ public struct UserProgress {
 
 public struct RoutineCompletion {
     public let id: UUID
-    public let userId: UUID?
-    public let deviceId: UUID?
+    public let userId: UUID
     public let routineId: String
     public let completedAt: Date
     public let durationMinutes: Int
     
     public init(
         id: UUID,
-        userId: UUID?,
-        deviceId: UUID?,
+        userId: UUID,
         routineId: String,
         completedAt: Date,
         durationMinutes: Int
     ) {
         self.id = id
         self.userId = userId
-        self.deviceId = deviceId
         self.routineId = routineId
         self.completedAt = completedAt
         self.durationMinutes = durationMinutes

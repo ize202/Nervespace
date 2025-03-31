@@ -42,17 +42,17 @@ public class DB: ObservableObject {
 	/// Routine completion history
 	@Published public private(set) var recentCompletions: [Model.RoutineCompletion] = []
 	
+	/// For Sign in With Apple (see SignInWithApple.siwft)
+	internal var currentNonce: String?
+	
 	/// Initialization state
 	@Published private(set) var isInitialized = false
 	
 	/// For Supabase to keep track of the Auth State (see AuthGeneral.swift)
 	internal var authStateHandler: AuthStateChangeListenerRegistration?
 	
-	/// For Sign in With Apple (Specifically, for account deletion. Is set when the user signs in with Apple)
+	/// For Sign in With Apple (specifically, for account deletion. Is set when the user signs in with Apple)
 	internal var appleIDCredential: ASAuthorizationAppleIDCredential?
-	
-	/// For Sign in With Apple (see SignInWithApple.siwft)
-	internal var currentNonce: String?
 	
 	private let defaults = UserDefaults.standard
 	private let deviceIdKey = "device_uuid"
@@ -104,12 +104,11 @@ public class DB: ObservableObject {
 	// MARK: - Progress Tracking
 	
 	public func loadProgress() async throws {
-		let progress: Model.UserProgress
-		if authState == .signedIn, let userId = currentUser?.id {
-			progress = try await userService.fetchProgress(userId: userId)
-		} else {
-			progress = try await userService.fetchProgressByDeviceId(deviceId)
+		guard authState == .signedIn, let userId = currentUser?.id else {
+			throw NSError(domain: "SupabaseKit", code: 401, userInfo: [NSLocalizedDescriptionKey: "User must be authenticated"])
 		}
+		
+		let progress = try await userService.fetchProgress(userId: userId)
 		
 		// Update state with server data
 		await MainActor.run {
@@ -127,20 +126,23 @@ public class DB: ObservableObject {
 		routine: SharedKit.Routine,
 		durationMinutes: Int
 	) async throws -> UUID {
-		try await userService.recordRoutineCompletion(
+		guard authState == .signedIn, let userId = currentUser?.id else {
+			throw NSError(domain: "SupabaseKit", code: 401, userInfo: [NSLocalizedDescriptionKey: "User must be authenticated"])
+		}
+		
+		return try await userService.recordRoutineCompletion(
 			routineId: routine.id,
 			durationMinutes: durationMinutes,
-			userId: currentUser?.id,
-			deviceId: currentUser == nil ? deviceId : nil
+			userId: userId
 		)
 	}
 	
 	public func loadRecentCompletions() async {
+		guard authState == .signedIn, let userId = currentUser?.id else { return }
+		
 		do {
-			let userId = currentUser?.id
 			let completions = try await userService.getRecentCompletions(
 				userId: userId,
-				deviceId: userId == nil ? deviceId : nil,
 				days: 30
 			)
 			await MainActor.run {

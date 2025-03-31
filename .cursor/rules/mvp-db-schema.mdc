@@ -8,10 +8,10 @@ alwaysApply: true
 ### This schema supports both authenticated and anonymous users
 
 ```sql
--- User Profiles Table
+-- User Profiles Table (simplified for Sign in with Apple)
 CREATE TABLE public.user_profiles (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    apple_id TEXT UNIQUE,
+    apple_id TEXT UNIQUE NOT NULL,
     email TEXT,
     name TEXT,
     avatar_url TEXT,
@@ -21,43 +21,30 @@ CREATE TABLE public.user_profiles (
     updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 
--- User Progress Table (Simplified)
+-- User Progress Table (simplified, no device_id)
 CREATE TABLE public.user_progress (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID REFERENCES user_profiles(id) ON DELETE CASCADE,
-    device_id UUID UNIQUE,
+    user_id UUID REFERENCES user_profiles(id) ON DELETE CASCADE NOT NULL,
     streak INTEGER DEFAULT 0,
-    daily_minutes INTEGER DEFAULT 0,     -- For daily goal tracking
-    total_minutes INTEGER DEFAULT 0,     -- For lifetime stats
+    daily_minutes INTEGER DEFAULT 0,
+    total_minutes INTEGER DEFAULT 0,
     last_activity DATE,
-    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT check_id_present CHECK (
-        (user_id IS NOT NULL AND device_id IS NULL) OR 
-        (device_id IS NOT NULL AND user_id IS NULL)
-    )
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 
--- Routine Completions Table (Simplified)
+-- Routine Completions Table (simplified, no device_id)
 CREATE TABLE public.routine_completions (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID REFERENCES user_profiles(id) ON DELETE CASCADE,
-    device_id UUID,
+    user_id UUID REFERENCES user_profiles(id) ON DELETE CASCADE NOT NULL,
     routine_id TEXT NOT NULL,
     completed_at TIMESTAMPTZ NOT NULL,
-    duration_minutes INTEGER NOT NULL,
-    CONSTRAINT check_id_present CHECK (
-        (user_id IS NOT NULL AND device_id IS NULL) OR 
-        (device_id IS NOT NULL AND user_id IS NULL)
-    )
+    duration_minutes INTEGER NOT NULL
 );
 
 -- Indexes for performance
 CREATE INDEX idx_user_progress_user_id ON user_progress(user_id);
-CREATE INDEX idx_user_progress_device_id ON user_progress(device_id);
 CREATE INDEX idx_user_progress_last_activity ON user_progress(last_activity);
-
 CREATE INDEX idx_routine_completions_user_id ON routine_completions(user_id);
-CREATE INDEX idx_routine_completions_device_id ON routine_completions(device_id);
 CREATE INDEX idx_routine_completions_completed_at ON routine_completions(completed_at);
 
 -- Enable Row Level Security
@@ -85,36 +72,25 @@ WITH CHECK (auth.uid() = id);
 -- RLS Policies for User Progress
 CREATE POLICY "Users can view own progress"
 ON user_progress FOR SELECT
-USING (
-    (auth.uid()::uuid = user_id) OR 
-    (device_id IS NOT NULL)
-);
+TO authenticated
+USING (auth.uid() = user_id);
 
 CREATE POLICY "Users can update own progress"
 ON user_progress FOR UPDATE
-USING (
-    (auth.uid()::uuid = user_id) OR 
-    (device_id IS NOT NULL)
-)
-WITH CHECK (
-    (auth.uid()::uuid = user_id) OR 
-    (device_id IS NOT NULL)
-);
+TO authenticated
+USING (auth.uid() = user_id)
+WITH CHECK (auth.uid() = user_id);
 
 -- RLS Policies for Routine Completions
 CREATE POLICY "Users can view own completions"
 ON routine_completions FOR SELECT
-USING (
-    (auth.uid()::uuid = user_id) OR 
-    (device_id IS NOT NULL)
-);
+TO authenticated
+USING (auth.uid() = user_id);
 
 CREATE POLICY "Users can insert own completions"
 ON routine_completions FOR INSERT
-WITH CHECK (
-    (auth.uid()::uuid = user_id) OR 
-    (device_id IS NOT NULL)
-);
+TO authenticated
+WITH CHECK (auth.uid() = user_id);
 
 -- Database Functions
 
@@ -122,9 +98,7 @@ WITH CHECK (
 CREATE OR REPLACE FUNCTION record_routine_completion(
     p_routine_id TEXT,
     p_duration_minutes INTEGER,
-    p_completed_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-    p_user_id UUID DEFAULT NULL,
-    p_device_id UUID DEFAULT NULL
+    p_completed_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 )
 RETURNS UUID
 LANGUAGE plpgsql
@@ -139,44 +113,39 @@ BEGIN
     -- Insert the completion
     INSERT INTO routine_completions (
         user_id,
-        device_id,
         routine_id,
         completed_at,
         duration_minutes
     )
     VALUES (
-        p_user_id,
-        p_device_id,
+        auth.uid(),
         p_routine_id,
         p_completed_at,
         p_duration_minutes
     )
     RETURNING id INTO v_completion_id;
 
-    -- Get the last activity date for the user/device
+    -- Get the last activity date for the user
     SELECT last_activity INTO v_last_activity
     FROM user_progress
-    WHERE (p_user_id IS NOT NULL AND user_id = p_user_id)
-       OR (p_device_id IS NOT NULL AND device_id = p_device_id);
+    WHERE user_id = auth.uid();
 
     -- Update or insert user_progress
     INSERT INTO user_progress (
         user_id,
-        device_id,
         streak,
         daily_minutes,
         total_minutes,
         last_activity
     )
     VALUES (
-        p_user_id,
-        p_device_id,
+        auth.uid(),
         1, -- Initial streak
         p_duration_minutes, -- Initial daily minutes
         p_duration_minutes, -- Initial total minutes
         v_current_date
     )
-    ON CONFLICT ON CONSTRAINT check_id_present DO UPDATE
+    ON CONFLICT (user_id) DO UPDATE
     SET 
         streak = CASE 
             WHEN user_progress.last_activity = v_current_date - 1 THEN user_progress.streak + 1
@@ -195,10 +164,7 @@ END;
 $$;
 
 -- Function to get user progress
-CREATE OR REPLACE FUNCTION get_user_progress(
-    p_user_id UUID DEFAULT NULL,
-    p_device_id UUID DEFAULT NULL
-)
+CREATE OR REPLACE FUNCTION get_user_progress()
 RETURNS TABLE (
     streak INTEGER,
     daily_minutes INTEGER,
@@ -220,15 +186,12 @@ BEGIN
         up.total_minutes,
         up.last_activity
     FROM user_progress up
-    WHERE (p_user_id IS NOT NULL AND up.user_id = p_user_id)
-       OR (p_device_id IS NOT NULL AND up.device_id = p_device_id);
+    WHERE up.user_id = auth.uid();
 END;
 $$;
 
 -- Function to get recent completions
 CREATE OR REPLACE FUNCTION get_recent_completions(
-    p_user_id UUID DEFAULT NULL,
-    p_device_id UUID DEFAULT NULL,
     p_days INTEGER DEFAULT 30
 )
 RETURNS TABLE (
@@ -249,8 +212,7 @@ BEGIN
         rc.completed_at,
         rc.duration_minutes
     FROM routine_completions rc
-    WHERE ((p_user_id IS NOT NULL AND rc.user_id = p_user_id)
-        OR (p_device_id IS NOT NULL AND rc.device_id = p_device_id))
+    WHERE rc.user_id = auth.uid()
         AND rc.completed_at >= CURRENT_DATE - p_days
     ORDER BY rc.completed_at DESC;
 END;

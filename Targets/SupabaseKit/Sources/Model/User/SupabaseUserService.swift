@@ -13,8 +13,7 @@ private struct ProfileUpdate: Encodable {
 }
 
 private struct ProgressUpdate: Encodable {
-    let userId: UUID?
-    let deviceId: UUID?
+    let userId: UUID
     let streak: Int?
     let dailyMinutes: Int?
     let totalMinutes: Int?
@@ -22,7 +21,6 @@ private struct ProgressUpdate: Encodable {
     
     enum CodingKeys: String, CodingKey {
         case userId = "user_id"
-        case deviceId = "device_id"
         case streak
         case dailyMinutes = "daily_minutes"
         case totalMinutes = "total_minutes"
@@ -40,43 +38,9 @@ private struct PremiumStatusUpdate: Encodable {
     }
 }
 
-private struct RoutineCompletionParams: Encodable {
-    let p_routine_id: String
-    let p_user_id: String?
-    let p_device_id: String?
-}
-
-private struct GetRecentCompletionsParams: Encodable {
-    let p_user_id: String?
-    let p_device_id: String?
-    let p_days: Int
-}
-
-private struct InitialProgressParams: Encodable {
-    let device_id: UUID
-    let streak: Int
-    let daily_minutes: Int
-    let total_minutes: Int
-    let last_activity: Date?
-    
-    enum CodingKeys: String, CodingKey {
-        case device_id
-        case streak
-        case daily_minutes
-        case total_minutes
-        case last_activity
-    }
-}
-
 private struct RecordRoutineCompletionParams: Encodable {
     let p_routine_id: String
     let p_duration_minutes: Int
-    let p_user_id: String?
-    let p_device_id: String?
-}
-
-private struct MigrateProgressParams: Encodable {
-    let p_device_id: String
     let p_user_id: String
 }
 
@@ -153,17 +117,6 @@ public class SupabaseUserService: UserService {
         return response
     }
     
-    public func fetchProgressByDeviceId(_ deviceId: UUID) async throws -> Model.UserProgress {
-        let response: Model.UserProgress = try await client
-            .from("user_progress")
-            .select()
-            .eq("device_id", value: deviceId)
-            .single()
-            .execute()
-            .value
-        return response
-    }
-    
     public func initializeProgress(userId: UUID) async throws -> Model.UserProgress {
         let progress = Model.UserProgress(userId: userId)
         
@@ -176,34 +129,6 @@ public class SupabaseUserService: UserService {
         return response
     }
     
-    public func initializeAnonymousProgress(deviceId: UUID) async throws -> Model.UserProgress {
-        print("[DB] Initializing anonymous progress with deviceId: \(deviceId)")
-        
-        let params = InitialProgressParams(
-            device_id: deviceId,
-            streak: 0,
-            daily_minutes: 0,
-            total_minutes: 0,
-            last_activity: nil
-        )
-        
-        do {
-            print("[DB] Sending params to Supabase: \(String(describing: params))")
-            let response: Model.UserProgress = try await client
-                .from("user_progress")
-                .insert(params)
-                .single()
-                .execute()
-                .value
-            
-            print("[DB] Successfully created anonymous progress: \(String(describing: response))")
-            return response
-        } catch {
-            print("[DB] Error creating anonymous progress: \(error.localizedDescription)")
-            throw error
-        }
-    }
-    
     public func updateProgress(
         userId: UUID,
         streak: Int?,
@@ -213,7 +138,6 @@ public class SupabaseUserService: UserService {
     ) async throws -> Model.UserProgress {
         let update = ProgressUpdate(
             userId: userId,
-            deviceId: nil,
             streak: streak,
             dailyMinutes: dailyMinutes,
             totalMinutes: totalMinutes,
@@ -230,44 +154,36 @@ public class SupabaseUserService: UserService {
         return response
     }
     
-    public func updateAnonymousProgress(
-        deviceId: UUID,
-        streak: Int?,
-        dailyMinutes: Int?,
-        totalMinutes: Int?,
-        lastActivity: Date?
-    ) async throws -> Model.UserProgress {
-        let update = ProgressUpdate(
-            userId: nil,
-            deviceId: deviceId,
-            streak: streak,
-            dailyMinutes: dailyMinutes,
-            totalMinutes: totalMinutes,
-            lastActivity: lastActivity
-        )
-        
-        let response: Model.UserProgress = try await client
-            .from("user_progress")
-            .update(update)
-            .eq("device_id", value: deviceId)
-            .single()
-            .execute()
-            .value
-        return response
-    }
+    // MARK: - Routine Completions
     
-    public func migrateAnonymousProgress(
-        from deviceId: UUID,
-        to userId: UUID
-    ) async throws {
-        let params = MigrateProgressParams(
-            p_device_id: deviceId.uuidString,
+    public func recordRoutineCompletion(
+        routineId: String,
+        durationMinutes: Int,
+        userId: UUID
+    ) async throws -> UUID {
+        let params = RecordRoutineCompletionParams(
+            p_routine_id: routineId,
+            p_duration_minutes: durationMinutes,
             p_user_id: userId.uuidString
         )
         
-        try await client
-            .rpc("migrate_anonymous_progress", params: params)
+        let response: UUID = try await client
+            .rpc("record_routine_completion", params: params)
             .execute()
+            .value
+        
+        return response
+    }
+    
+    public func getRecentCompletions(
+        userId: UUID,
+        days: Int
+    ) async throws -> [Model.RoutineCompletion] {
+        let response: [Model.RoutineCompletion] = try await client
+            .rpc("get_recent_completions", params: ["p_days": days])
+            .execute()
+            .value
+        return response
     }
     
     // MARK: - Premium Status
@@ -295,94 +211,13 @@ public class SupabaseUserService: UserService {
     // MARK: - Utility Methods
     
     public func findProfileByAppleId(_ appleId: String) async throws -> Model.UserProfile? {
-        do {
-            let response: Model.UserProfile = try await client
-                .from("user_profiles")
-                .select()
-                .eq("apple_id", value: appleId)
-                .single()
-                .execute()
-                .value
-            return response
-        } catch {
-            return nil
-        }
-    }
-    
-    public func recordRoutineCompletion(
-        routineId: String,
-        durationMinutes: Int,
-        userId: UUID?,
-        deviceId: UUID?
-    ) async throws -> UUID {
-        let params = RecordRoutineCompletionParams(
-            p_routine_id: routineId,
-            p_duration_minutes: durationMinutes,
-            p_user_id: userId?.uuidString,
-            p_device_id: deviceId?.uuidString
-        )
-        
-        let response: UUID = try await client
-            .rpc("record_routine_completion", params: params)
+        let response: Model.UserProfile? = try? await client
+            .from("user_profiles")
+            .select()
+            .eq("apple_id", value: appleId)
+            .single()
             .execute()
             .value
-        
         return response
-    }
-    
-    public func getRecentCompletions(
-        userId: UUID?,
-        deviceId: UUID?,
-        days: Int
-    ) async throws -> [Model.RoutineCompletion] {
-        let params = GetRecentCompletionsParams(
-            p_user_id: userId?.uuidString,
-            p_device_id: deviceId?.uuidString,
-            p_days: days
-        )
-        
-        let response: [Model.RoutineCompletion] = try await client
-            .rpc("get_recent_completions", params: params)
-            .execute()
-            .value
-        
-        return response
-    }
-    
-    public func getCurrentStreak(userId: UUID) async throws -> Int {
-        let query = "user_id.eq.\(userId),device_id.eq.\(userId)"
-        
-        do {
-            let response: [Model.UserProgress] = try await client
-                .from("user_progress")
-                .select()
-                .or(query)
-                .execute()
-                .value
-            
-            guard let progress = response.first else {
-                throw NSError(domain: "UserService", code: 404, userInfo: [
-                    NSLocalizedDescriptionKey: "User progress not found"
-                ])
-            }
-            
-            return progress.streak
-        } catch {
-            // If that fails, try fetching by device ID specifically
-            let response: [Model.UserProgress] = try await client
-                .from("user_progress")
-                .select()
-                .eq("device_id", value: userId)
-                .execute()
-                .value
-            
-            guard let progress = response.first else {
-                throw NSError(domain: "UserService", code: 404, userInfo: [
-                    NSLocalizedDescriptionKey: "User progress not found"
-                ])
-            }
-            
-            return progress.streak
-        }
     }
 } 

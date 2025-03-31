@@ -49,8 +49,7 @@ public enum Model {
 
     public struct UserProgress: Identifiable, Codable, Hashable {
         public let id: UUID
-        public let userId: UUID?
-        public let deviceId: UUID?
+        public let userId: UUID
         public let streak: Int
         public let dailyMinutes: Int
         public let totalMinutes: Int
@@ -59,8 +58,7 @@ public enum Model {
         
         public init(
             id: UUID = UUID(),
-            userId: UUID? = nil,
-            deviceId: UUID? = nil,
+            userId: UUID,
             streak: Int = 0,
             dailyMinutes: Int = 0,
             totalMinutes: Int = 0,
@@ -69,7 +67,6 @@ public enum Model {
         ) {
             self.id = id
             self.userId = userId
-            self.deviceId = deviceId
             self.streak = streak
             self.dailyMinutes = dailyMinutes
             self.totalMinutes = totalMinutes
@@ -77,20 +74,9 @@ public enum Model {
             self.createdAt = createdAt
         }
         
-        // Convenience initializer for authenticated users
-        public init(userId: UUID) {
-            self.init(userId: userId, deviceId: nil)
-        }
-        
-        // Convenience initializer for anonymous users
-        public init(deviceId: UUID) {
-            self.init(userId: nil, deviceId: deviceId)
-        }
-        
         enum CodingKeys: String, CodingKey {
             case id
             case userId = "user_id"
-            case deviceId = "device_id"
             case streak
             case dailyMinutes = "daily_minutes"
             case totalMinutes = "total_minutes"
@@ -106,8 +92,7 @@ public enum Model {
             dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
             
             id = try container.decode(UUID.self, forKey: .id)
-            userId = try container.decodeIfPresent(UUID.self, forKey: .userId)
-            deviceId = try container.decodeIfPresent(UUID.self, forKey: .deviceId)
+            userId = try container.decode(UUID.self, forKey: .userId)
             streak = try container.decode(Int.self, forKey: .streak)
             dailyMinutes = try container.decode(Int.self, forKey: .dailyMinutes)
             totalMinutes = try container.decode(Int.self, forKey: .totalMinutes)
@@ -145,23 +130,20 @@ public enum Model {
 
     public struct RoutineCompletion: Identifiable, Codable, Hashable {
         public let id: UUID
-        public let userId: UUID?
-        public let deviceId: UUID?
+        public let userId: UUID
         public let routineId: String
         public let completedAt: Date
         public let durationMinutes: Int
         
         public init(
             id: UUID = UUID(),
-            userId: UUID? = nil,
-            deviceId: UUID? = nil,
+            userId: UUID,
             routineId: String,
             completedAt: Date = Date(),
             durationMinutes: Int
         ) {
             self.id = id
             self.userId = userId
-            self.deviceId = deviceId
             self.routineId = routineId
             self.completedAt = completedAt
             self.durationMinutes = durationMinutes
@@ -170,7 +152,6 @@ public enum Model {
         enum CodingKeys: String, CodingKey {
             case id
             case userId = "user_id"
-            case deviceId = "device_id"
             case routineId = "routine_id"
             case completedAt = "completed_at"
             case durationMinutes = "duration_minutes"
