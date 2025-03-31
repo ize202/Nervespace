@@ -55,7 +55,6 @@ private struct GetRecentCompletionsParams: Encodable {
 
 private struct InitialProgressParams: Encodable {
     let device_id: UUID
-    let user_id: UUID?
     let streak: Int
     let routine_completions: Int
     let total_minutes: Int
@@ -63,11 +62,10 @@ private struct InitialProgressParams: Encodable {
     
     enum CodingKeys: String, CodingKey {
         case device_id
-        case user_id
         case streak
-        case routine_completions
-        case total_minutes
-        case last_activity
+        case routine_completions = "routine_completions"
+        case total_minutes = "total_minutes"
+        case last_activity = "last_activity"
     }
 }
 
@@ -208,13 +206,21 @@ public class SupabaseUserService: UserService {
     
     public func initializeAnonymousProgress(deviceId: UUID) async throws -> UserProgress {
         print("[DB] Initializing anonymous progress with deviceId: \(deviceId)")
-        let progress = UserProgress(deviceId: deviceId)
+        
+        // Create minimal params for initialization
+        let params = InitialProgressParams(
+            device_id: deviceId,
+            streak: 0,
+            routine_completions: 0,
+            total_minutes: 0,
+            last_activity: nil
+        )
         
         do {
-            print("[DB] Sending progress to Supabase: \(String(describing: progress))")
+            print("[DB] Sending params to Supabase: \(String(describing: params))")
             let progresses: [UserProgress] = try await client
                 .from("user_progress")
-                .insert(progress)
+                .insert(params)
                 .execute()
                 .value
             

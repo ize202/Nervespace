@@ -54,4 +54,61 @@ public struct UserProgress: Identifiable, Codable, Hashable {
         case createdAt = "created_at"
         case updatedAt = "updated_at"
     }
+    
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        
+        // Custom date decoding
+        let dateFormatter = ISO8601DateFormatter()
+        dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        
+        id = try container.decode(UUID.self, forKey: .id)
+        userId = try container.decodeIfPresent(UUID.self, forKey: .userId)
+        deviceId = try container.decodeIfPresent(UUID.self, forKey: .deviceId)
+        streak = try container.decode(Int.self, forKey: .streak)
+        routineCompletions = try container.decode(Int.self, forKey: .routineCompletions)
+        totalMinutes = try container.decode(Int.self, forKey: .totalMinutes)
+        
+        // Handle date decoding with multiple formats
+        if let lastActivityString = try container.decodeIfPresent(String.self, forKey: .lastActivity) {
+            if let date = dateFormatter.date(from: lastActivityString) {
+                lastActivity = date
+            } else {
+                // Try without fractional seconds
+                dateFormatter.formatOptions = [.withInternetDateTime]
+                lastActivity = dateFormatter.date(from: lastActivityString)
+            }
+        } else {
+            lastActivity = nil
+        }
+        
+        // Reset formatter options for created_at and updated_at
+        dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        
+        // Handle created_at with fallback to current date
+        if let createdAtString = try container.decodeIfPresent(String.self, forKey: .createdAt) {
+            if let date = dateFormatter.date(from: createdAtString) {
+                createdAt = date
+            } else {
+                // Try without fractional seconds
+                dateFormatter.formatOptions = [.withInternetDateTime]
+                createdAt = dateFormatter.date(from: createdAtString) ?? Date()
+            }
+        } else {
+            createdAt = Date()
+        }
+        
+        // Handle updated_at with fallback to current date
+        if let updatedAtString = try container.decodeIfPresent(String.self, forKey: .updatedAt) {
+            if let date = dateFormatter.date(from: updatedAtString) {
+                updatedAt = date
+            } else {
+                // Try without fractional seconds
+                dateFormatter.formatOptions = [.withInternetDateTime]
+                updatedAt = dateFormatter.date(from: updatedAtString) ?? Date()
+            }
+        } else {
+            updatedAt = Date()
+        }
+    }
 } 
