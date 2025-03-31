@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 55;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -32,6 +32,7 @@
 		34A6D5554C6E86F341EC61B2 /* RequestType.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5DFA5E09A8701AD67D4ECAB /* RequestType.swift */; };
 		37235766652209AE0BFBB4BC /* BookmarkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C2ECC22973D7C1A97317E4D /* BookmarkManager.swift */; };
 		378EFA1D4B6C986FDC481125 /* SharedKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 39E86B5FF5E957E5D088F40B /* SharedKit.framework */; };
+		3797008718C84B73B92DA49A /* RoutineCompletionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4065C60AB9E5466ACC434A9E /* RoutineCompletionView.swift */; };
 		39323B12200564DF86A723E3 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 2A95F18B032436B71DBB4D08 /* Supabase */; };
 		3C25A9005BCDA83403899218 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5C09F336EAC3018DF777EA4A /* Assets.xcassets */; };
 		3F285921495C600CA69CD5CA /* Supabase-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0A6F5D777272D1E306BA4BB9 /* Supabase-Info.plist */; };
@@ -297,6 +298,7 @@
 		3A1DD652E263B114BC2B50D9 /* InAppNotificationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InAppNotificationView.swift; sourceTree = "<group>"; };
 		3A568219BB341E471E05C2C0 /* AuthKitError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthKitError.swift; sourceTree = "<group>"; };
 		3FCF9A295AE96C37736854E0 /* TuistBundle+SharedKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistBundle+SharedKit.swift"; sourceTree = "<group>"; };
+		4065C60AB9E5466ACC434A9E /* RoutineCompletionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineCompletionView.swift; sourceTree = "<group>"; };
 		448A821E0020473F069733A8 /* AuthGeneral.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthGeneral.swift; sourceTree = "<group>"; };
 		4634A94D674EB513386D2C52 /* SignInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInView.swift; sourceTree = "<group>"; };
 		4C0FB06C6665D672F2E3F45C /* BiometricAuth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BiometricAuth.swift; sourceTree = "<group>"; };
@@ -324,7 +326,7 @@
 		79594A6344FB719426E5AF8D /* askUserFor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = askUserFor.swift; sourceTree = "<group>"; };
 		7B21ECAA94982679FD4F01DB /* Plan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Plan.swift; sourceTree = "<group>"; };
 		7B96390C931279366EC8AD1D /* AnalyticsKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = AnalyticsKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		7CE6AF7F72F5552A74F3A7B1 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		7CE6AF7F72F5552A74F3A7B1 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		813FF311671CDA4CFBB4342D /* NotificationsPermissionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsPermissionView.swift; sourceTree = "<group>"; };
 		83A9214733C3AC2CFF832873 /* TuistBundle+Nervespace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistBundle+Nervespace.swift"; sourceTree = "<group>"; };
 		845E04FFC5739ED0DE0AD18F /* SupabaseKit-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "SupabaseKit-Info.plist"; sourceTree = "<group>"; };
@@ -922,6 +924,7 @@
 				DF747F3614BCE4B335F57E62 /* ActiveSessionView.swift */,
 				16D53C5DB25242D48C9A8614 /* CircularProgressView.swift */,
 				E2840F9D5CBF284ABBB70BCD /* ExerciseDetailView.swift */,
+				4065C60AB9E5466ACC434A9E /* RoutineCompletionView.swift */,
 				15989630AEF2469047AE2505 /* RoutineDetailView.swift */,
 				3382516E12C8CB796FA8811A /* SettingsRowItem.swift */,
 				2A30C7E4515091374D43BE5A /* SnapCarousel.swift */,
@@ -1446,6 +1449,7 @@
 				F0E81C883C30503D2B8AC781 /* ActiveSessionView.swift in Sources */,
 				D0E0829C06F292050D66A833 /* CircularProgressView.swift in Sources */,
 				5E8DA7FF62F08794025361FB /* ExerciseDetailView.swift in Sources */,
+				3797008718C84B73B92DA49A /* RoutineCompletionView.swift in Sources */,
 				1E8752F4D4EB28AF00A5B1EF /* RoutineDetailView.swift in Sources */,
 				6712A1D6389D74911B57F6E6 /* SettingsRowItem.swift in Sources */,
 				CA0A5A60B953D2D32EDB42E1 /* SnapCarousel.swift in Sources */,
@@ -1554,7 +1558,10 @@
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
+					"$(inherited)",
+					DEBUG,
+				);
 				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -1586,7 +1593,10 @@
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
+					"$(inherited)",
+					DEBUG,
+				);
 				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -1757,7 +1767,6 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Derived/Entitlements/Nervespace.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				DEVELOPMENT_TEAM = NMXU2ZADVX;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = "Derived/InfoPlists/Nervespace-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -1765,7 +1774,6 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.56;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.slips.nervespace;
 				PRODUCT_NAME = Nervespace;
@@ -1787,7 +1795,6 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Derived/Entitlements/Nervespace.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				DEVELOPMENT_TEAM = NMXU2ZADVX;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = "Derived/InfoPlists/Nervespace-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -1795,7 +1802,6 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.56;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.slips.nervespace;
 				PRODUCT_NAME = Nervespace;
@@ -1803,7 +1809,10 @@
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
+					"$(inherited)",
+					DEBUG,
+				);
 				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -1835,7 +1844,10 @@
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
+					"$(inherited)",
+					DEBUG,
+				);
 				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -1902,7 +1914,10 @@
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
+					"$(inherited)",
+					DEBUG,
+				);
 				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -1993,7 +2008,10 @@
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
+					"$(inherited)",
+					DEBUG,
+				);
 				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -2093,7 +2111,10 @@
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = (
+					"$(inherited)",
+					DEBUG,
+				);
 				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;

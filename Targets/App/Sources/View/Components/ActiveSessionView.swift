@@ -12,6 +12,7 @@ public struct ActiveSessionView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var progressValue: Double = 0
     @State private var showExerciseDetail = false
+    @State private var showingCompletion = false
     
     public init(routine: Routine, customDurations: [String: Int]) {
         self.routine = routine
@@ -166,6 +167,9 @@ public struct ActiveSessionView: View {
                 ExerciseDetailView(exercise: exercise)
             }
         }
+        .fullScreenCover(isPresented: $showingCompletion) {
+            RoutineCompletionView(routine: routine)
+        }
     }
     
     private func timeString(from seconds: Int) -> String {
@@ -204,8 +208,7 @@ public struct ActiveSessionView: View {
                     // Workout complete
                     timer?.invalidate()
                     timer = nil
-                    // TODO: Show workout complete screen
-                    dismiss()
+                    showingCompletion = true
                 }
             }
         }
