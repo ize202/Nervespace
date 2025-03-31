@@ -59,9 +59,9 @@
 		6D755810CAB2E032B92EDBB5 /* openAppInSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = E792EB44A5FA4D059ECCAD19 /* openAppInSettings.swift */; };
 		715169DF84AFCBA856E6EB71 /* getPlistEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = E015553A7F98EF624CB69E09 /* getPlistEntry.swift */; };
 		71BA8BA640E472796457CDDB /* ProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5680309FE39BC8223920FFD0 /* ProgressView.swift */; };
+		735F57ECF2158D6B9578A52C /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2257224C0CE5130AC891C98 /* Models.swift */; };
 		75B2D55D29E9F430B58A2D35 /* currentPlatform.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B45027C04793D1C7C5909B /* currentPlatform.swift */; };
 		765469CBCD1F16CFD013590C /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65AE6300BE637983E99BF16A /* Constants.swift */; };
-		792CD762D79FD27E7B9B29BC /* UserProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FE7EDF59E6D15650A3D653D /* UserProgress.swift */; };
 		79DB6C3455227F4E62D49C1E /* if.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C6F0DD2685F535945971DF /* if.swift */; };
 		818936A21734A89C82C2591B /* CheckmarkToggle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38EC50610E4B4466058B8E01 /* CheckmarkToggle.swift */; };
 		835DFE1BB77D212B4A938AC5 /* SupabaseKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5F30ADB8BC53945EEF346BDA /* SupabaseKit.framework */; };
@@ -119,7 +119,6 @@
 		F44676509FDFBA07126F8641 /* PlanDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA592D584CE1DAC849EA9F2D /* PlanDetailView.swift */; };
 		F4A629B961F8144B9F8EA13D /* OneSignal-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8FE3DE787DCFD28B3DC075CE /* OneSignal-Info.plist */; };
 		F4F252C9D438A26CC4F592A3 /* WhatsNewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B41B98092119FB95092A546 /* WhatsNewView.swift */; };
-		F64203672ED5D301083CB8DB /* UserProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A9CD7C3F832361E212F90E4 /* UserProfile.swift */; };
 		F7C4629C557B760D327D6751 /* ExploreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EC0846D7CD91621E5443B23 /* ExploreView.swift */; };
 		F91D9E9281A73705484A68ED /* ShowRequestSheetWhenNeededModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 681108479F00858CF5D712F9 /* ShowRequestSheetWhenNeededModifier.swift */; };
 		FC1804FD65466837A88ECE16 /* CrashlyticsKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 288FC12754F85FB9ED11DD7F /* CrashlyticsKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -311,7 +310,6 @@
 		5659C5D7AD221C5697002B98 /* requireLogin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = requireLogin.swift; sourceTree = "<group>"; };
 		5680309FE39BC8223920FFD0 /* ProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressView.swift; sourceTree = "<group>"; };
 		568A7E9396109819AEB17150 /* BookmarkedRoutinesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkedRoutinesView.swift; sourceTree = "<group>"; };
-		5A9CD7C3F832361E212F90E4 /* UserProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfile.swift; sourceTree = "<group>"; };
 		5ABB9FEAD6E86F6A57C86CA8 /* squircle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = squircle.swift; sourceTree = "<group>"; };
 		5B27CBD2795F983D1F48697D /* captureViewActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = captureViewActivity.swift; sourceTree = "<group>"; };
 		5C09F336EAC3018DF777EA4A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -343,7 +341,6 @@
 		9832E64FAC80EB454827E3C3 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		9A6C05EE090C2810E6906508 /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
 		9E6D35A5E2D34B85DD76DC94 /* Nervespace-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "Nervespace-Info.plist"; sourceTree = "<group>"; };
-		9FE7EDF59E6D15650A3D653D /* UserProgress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProgress.swift; sourceTree = "<group>"; };
 		A02B81F1B672F870A7DAECC1 /* NotifKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = NotifKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A25FDB8C55E8EE2B7738981C /* onAppearAndChange.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = onAppearAndChange.swift; sourceTree = "<group>"; };
 		A3AFEF9E228126C5D9312328 /* Analytics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Analytics.swift; sourceTree = "<group>"; };
@@ -354,6 +351,7 @@
 		B055696983C91B9B522BF4E1 /* CategoryListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryListView.swift; sourceTree = "<group>"; };
 		B1B46AE411535472D53C8A05 /* WebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebView.swift; sourceTree = "<group>"; };
 		B1C6F0DD2685F535945971DF /* if.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = if.swift; sourceTree = "<group>"; };
+		B2257224C0CE5130AC891C98 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		B49BB65485C8AD2F12F9C1DA /* ExerciseLibrary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseLibrary.swift; sourceTree = "<group>"; };
 		B91DA9A946B618DF10C7A55C /* DeveloperSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperSettingsView.swift; sourceTree = "<group>"; };
 		BB440B4C9B973BDE25EE1EA4 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -711,10 +709,9 @@
 		6A2A33AADC3104D50BD04E7D /* User */ = {
 			isa = PBXGroup;
 			children = (
+				B2257224C0CE5130AC891C98 /* Models.swift */,
 				313A0719E138101EB0C1B41A /* RoutineCompletion.swift */,
 				FB518411EAE3C7FA9054FCC8 /* SupabaseUserService.swift */,
-				5A9CD7C3F832361E212F90E4 /* UserProfile.swift */,
-				9FE7EDF59E6D15650A3D653D /* UserProgress.swift */,
 				1763702111A0A093814B41BF /* UserService.swift */,
 			);
 			path = User;
@@ -1410,10 +1407,9 @@
 				8CEAB25115A63D8452C7790D /* AuthKitError.swift in Sources */,
 				C93F1D8A78A7DFE88844E617 /* SignInWithApple.swift in Sources */,
 				978270648561AA9A6516EF73 /* SupabaseBackend.swift in Sources */,
+				735F57ECF2158D6B9578A52C /* Models.swift in Sources */,
 				C9AB733F7F2A3814B471E284 /* RoutineCompletion.swift in Sources */,
 				1590D6A919B6E1F3A2B3A8A4 /* SupabaseUserService.swift in Sources */,
-				F64203672ED5D301083CB8DB /* UserProfile.swift in Sources */,
-				792CD762D79FD27E7B9B29BC /* UserProgress.swift in Sources */,
 				A5DD577F098553E951EC427E /* UserService.swift in Sources */,
 				1EEC65B91A20DE2081E77E0D /* AccountSettingsView.swift in Sources */,
 				1A886B36BFAB1408BF4ED32B /* ReAuthSheet.swift in Sources */,
@@ -1773,7 +1769,6 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Derived/Entitlements/Nervespace.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				DEVELOPMENT_TEAM = NMXU2ZADVX;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = "Derived/InfoPlists/Nervespace-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -1802,7 +1797,6 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Derived/Entitlements/Nervespace.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				DEVELOPMENT_TEAM = NMXU2ZADVX;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = "Derived/InfoPlists/Nervespace-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;

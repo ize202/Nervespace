@@ -79,20 +79,15 @@ public class SupabaseUserService: UserService {
     // MARK: - Profile Management
     
     public func fetchProfile(userId: UUID) async throws -> UserProfile {
-        let profiles: [UserProfile] = try await client
+        let query = client.database
             .from("user_profiles")
             .select()
             .eq("id", value: userId)
-            .execute()
-            .value
+            .single()
         
-        guard let profile = profiles.first else {
-            throw NSError(domain: "UserService", code: 404, userInfo: [
-                NSLocalizedDescriptionKey: "User profile not found"
-            ])
-        }
-        
-        return profile
+        let response = try await query.execute()
+        let data = try response.decode(UserProfile.self, using: .snakeCase)
+        return data
     }
     
     public func createProfile(appleId: String, email: String?, name: String?) async throws -> UserProfile {
@@ -102,22 +97,14 @@ public class SupabaseUserService: UserService {
             name: name
         )
         
-        let profiles: [UserProfile] = try await client
+        let query = client.database
             .from("user_profiles")
             .insert(profile)
-            .execute()
-            .value
+            .single()
         
-        guard let created = profiles.first else {
-            throw NSError(domain: "UserService", code: 500, userInfo: [
-                NSLocalizedDescriptionKey: "Failed to create user profile"
-            ])
-        }
-        
-        // Initialize progress for the new user
-        _ = try await initializeProgress(userId: created.id)
-        
-        return created
+        let response = try await query.execute()
+        let data = try response.decode(UserProfile.self, using: .snakeCase)
+        return data
     }
     
     public func updateProfile(userId: UUID, name: String?, avatarURL: URL?) async throws -> UserProfile {
@@ -126,24 +113,19 @@ public class SupabaseUserService: UserService {
             avatarURL: avatarURL?.absoluteString
         )
         
-        let profiles: [UserProfile] = try await client
+        let query = client.database
             .from("user_profiles")
             .update(update)
             .eq("id", value: userId)
-            .execute()
-            .value
+            .single()
         
-        guard let updated = profiles.first else {
-            throw NSError(domain: "UserService", code: 500, userInfo: [
-                NSLocalizedDescriptionKey: "Failed to update user profile"
-            ])
-        }
-        
-        return updated
+        let response = try await query.execute()
+        let data = try response.decode(UserProfile.self, using: .snakeCase)
+        return data
     }
     
     public func deleteProfile(userId: UUID) async throws {
-        try await client
+        try await client.database
             .from("user_profiles")
             .delete()
             .eq("id", value: userId)
@@ -320,39 +302,43 @@ public class SupabaseUserService: UserService {
     
     // MARK: - Premium Status
     
-    public func updatePremiumStatus(userId: UUID, isPremium: Bool, premiumUntil: Date?) async throws -> UserProfile {
+    public func updatePremiumStatus(
+        userId: UUID,
+        isPremium: Bool,
+        premiumUntil: Date?
+    ) async throws -> UserProfile {
         let update = PremiumStatusUpdate(
             isPremium: isPremium,
             premiumUntil: premiumUntil
         )
         
-        let profiles: [UserProfile] = try await client
+        let query = client.database
             .from("user_profiles")
             .update(update)
             .eq("id", value: userId)
-            .execute()
-            .value
+            .single()
         
-        guard let updated = profiles.first else {
-            throw NSError(domain: "UserService", code: 500, userInfo: [
-                NSLocalizedDescriptionKey: "Failed to update premium status"
-            ])
-        }
-        
-        return updated
+        let response = try await query.execute()
+        let data = try response.decode(UserProfile.self, using: .snakeCase)
+        return data
     }
     
     // MARK: - Utility Methods
     
     public func findProfileByAppleId(_ appleId: String) async throws -> UserProfile? {
-        let profiles: [UserProfile] = try await client
+        let query = client.database
             .from("user_profiles")
             .select()
             .eq("apple_id", value: appleId)
-            .execute()
-            .value
+            .single()
         
-        return profiles.first
+        do {
+            let response = try await query.execute()
+            let data = try response.decode(UserProfile.self, using: .snakeCase)
+            return data
+        } catch {
+            return nil
+        }
     }
     
     public func recordRoutineCompletion(
@@ -361,7 +347,6 @@ public class SupabaseUserService: UserService {
         userId: UUID?,
         deviceId: UUID?
     ) async throws -> UUID {
-        // Call the record_routine_completion function which handles both tables
         let query = client.database
             .rpc("record_routine_completion", params: [
                 "p_routine_id": routineId,
@@ -384,7 +369,6 @@ public class SupabaseUserService: UserService {
         deviceId: UUID?,
         days: Int
     ) async throws -> [RoutineCompletion] {
-        // Call the get_recent_completions function
         let query = client.database
             .rpc("get_recent_completions", params: [
                 "p_user_id": userId as Any,

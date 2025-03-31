@@ -10,29 +10,6 @@ public protocol UserService {
     // Progress tracking
     func fetchProgress(userId: UUID) async throws -> UserProgress
     func fetchProgressByDeviceId(_ deviceId: UUID) async throws -> UserProgress
-    func initializeProgress(userId: UUID) async throws -> UserProgress
-    func initializeAnonymousProgress(deviceId: UUID) async throws -> UserProgress
-    func updateProgress(
-        userId: UUID,
-        streak: Int?,
-        routineCompletions: Int?,
-        totalMinutes: Int?,
-        lastActivity: Date?
-    ) async throws -> UserProgress
-    func updateAnonymousProgress(
-        deviceId: UUID,
-        streak: Int?,
-        routineCompletions: Int?,
-        totalMinutes: Int?,
-        lastActivity: Date?
-    ) async throws -> UserProgress
-    func migrateAnonymousProgress(from deviceId: UUID, to userId: UUID) async throws -> UserProgress
-    
-    // Premium status
-    func updatePremiumStatus(userId: UUID, isPremium: Bool, premiumUntil: Date?) async throws -> UserProfile
-    
-    // Utility methods
-    func findProfileByAppleId(_ appleId: String) async throws -> UserProfile?
     
     // Routine completions
     func recordRoutineCompletion(
@@ -48,7 +25,21 @@ public protocol UserService {
         days: Int
     ) async throws -> [RoutineCompletion]
     
-    func getCurrentStreak(userId: UUID) async throws -> Int
+    // Account migration
+    func migrateAnonymousProgress(
+        from deviceId: UUID,
+        to userId: UUID
+    ) async throws
+    
+    // Premium status
+    func updatePremiumStatus(
+        userId: UUID,
+        isPremium: Bool,
+        premiumUntil: Date?
+    ) async throws -> UserProfile
+    
+    // Utility methods
+    func findProfileByAppleId(_ appleId: String) async throws -> UserProfile?
 }
 
 public struct UserProgress {
