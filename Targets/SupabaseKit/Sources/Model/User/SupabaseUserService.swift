@@ -249,24 +249,28 @@ public class SupabaseUserService: UserService {
         from deviceId: UUID,
         to userId: UUID
     ) async throws {
+        struct UpdateParams: Encodable {
+            let user_id: String
+            let device_id: String?
+        }
+        
+        let updateParams = UpdateParams(
+            user_id: userId.uuidString,
+            device_id: nil
+        )
+        
         // First, update the user_progress entry
         try await client
             .from("user_progress")
-            .update([
-                "user_id": userId,
-                "device_id": nil
-            ])
-            .eq("device_id", value: deviceId)
+            .update(updateParams)
+            .eq("device_id", value: deviceId.uuidString)
             .execute()
         
         // Then, update all routine_completions
         try await client
             .from("routine_completions")
-            .update([
-                "user_id": userId,
-                "device_id": nil
-            ])
-            .eq("device_id", value: deviceId)
+            .update(updateParams)
+            .eq("device_id", value: deviceId.uuidString)
             .execute()
     }
     
@@ -315,16 +319,24 @@ public class SupabaseUserService: UserService {
         userId: UUID?,
         deviceId: UUID?
     ) async throws -> UUID {
-        let response: UUID = try await client
-            .rpc("record_routine_completion", params: [
-                "p_routine_id": routineId,
-                "p_duration_minutes": durationMinutes,
-                "p_user_id": userId as Any,
-                "p_device_id": deviceId as Any
-            ])
+        struct RPCParams: Encodable {
+            let p_routine_id: String
+            let p_duration_minutes: Int
+            let p_user_id: String?
+            let p_device_id: String?
+        }
+        
+        let params = RPCParams(
+            p_routine_id: routineId,
+            p_duration_minutes: durationMinutes,
+            p_user_id: userId?.uuidString,
+            p_device_id: deviceId?.uuidString
+        )
+        
+        return try await client
+            .rpc("record_routine_completion", params: params)
             .execute()
             .value
-        return response
     }
     
     public func getRecentCompletions(
@@ -332,15 +344,22 @@ public class SupabaseUserService: UserService {
         deviceId: UUID?,
         days: Int
     ) async throws -> [Model.RoutineCompletion] {
-        let response: [Model.RoutineCompletion] = try await client
-            .rpc("get_recent_completions", params: [
-                "p_user_id": userId as Any,
-                "p_device_id": deviceId as Any,
-                "p_days": days
-            ])
+        struct RPCParams: Encodable {
+            let p_user_id: String?
+            let p_device_id: String?
+            let p_days: Int
+        }
+        
+        let params = RPCParams(
+            p_user_id: userId?.uuidString,
+            p_device_id: deviceId?.uuidString,
+            p_days: days
+        )
+        
+        return try await client
+            .rpc("get_recent_completions", params: params)
             .execute()
             .value
-        return response
     }
     
     public func getCurrentStreak(userId: UUID) async throws -> Int {

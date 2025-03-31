@@ -187,6 +187,7 @@ struct RoutineCompletionView: View {
     
     private func addToStreak() async {
         isUpdating = true
+        // No need to update streak manually anymore as it's handled by the database function
         dismiss()
         isUpdating = false
     }

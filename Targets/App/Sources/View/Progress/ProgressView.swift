@@ -15,7 +15,7 @@ struct ProgressView: View {
     
     private var currentMinutes: Int {
         guard let lastActivity = db.lastActivity else { return 0 }
-        return calendar.isDateInToday(lastActivity) ? (db.totalMinutes % (24 * 60)) : 0
+        return calendar.isDateInToday(lastActivity) ? db.dailyMinutes : 0
     }
     
     var body: some View {

@@ -206,7 +206,14 @@ public struct ActiveSessionView: View {
     private func completeRoutine() async {
         isUpdating = true
         do {
-            completionId = try await db.recordCompletion(routine: routine)
+            // Record completion with duration
+            let totalDuration = routine.exercises.reduce(0) { sum, exercise in
+                sum + (customDurations[exercise.exercise.id] ?? exercise.duration)
+            }
+            completionId = try await db.recordCompletion(
+                routine: routine,
+                durationMinutes: totalDuration / 60
+            )
             showingCompletion = true
         } catch {
             showError = true

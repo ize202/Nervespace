@@ -6,11 +6,13 @@ struct CompletedRoutine: Identifiable {
     let id: UUID
     let routine: Routine
     let date: Date
+    let durationMinutes: Int
     
-    init(completion: RoutineCompletion) {
+    init(completion: Model.RoutineCompletion) {
         self.id = completion.id
         self.routine = RoutineLibrary.routines.first { $0.id == completion.routineId } ?? RoutineLibrary.routines[0]
         self.date = completion.completedAt
+        self.durationMinutes = completion.durationMinutes
     }
 }
 
@@ -111,7 +113,7 @@ struct HistoryView: View {
                                                     .font(.headline)
                                                     .foregroundColor(.white)
                                                 
-                                                Text("\(completed.routine.exercises.count) exercises • \(completed.routine.totalDuration / 60) min")
+                                                Text("\(completed.routine.exercises.count) exercises • \(completed.durationMinutes) min")
                                                     .font(.subheadline)
                                                     .foregroundColor(.white.opacity(0.6))
                                             }

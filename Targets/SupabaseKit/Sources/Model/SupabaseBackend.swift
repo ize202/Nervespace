@@ -123,23 +123,16 @@ public class DB: ObservableObject {
 		await loadRecentCompletions()
 	}
 	
-	public func recordCompletion(routine: SharedKit.Routine) async throws -> UUID {
-		let userId = currentUser?.id
-		let deviceIdForCompletion = userId == nil ? deviceId : nil
-		let durationMinutes = routine.totalDuration / 60
-		
-		// Record completion directly to Supabase - it will handle all updates
-		let completionId = try await userService.recordRoutineCompletion(
+	public func recordCompletion(
+		routine: SharedKit.Routine,
+		durationMinutes: Int
+	) async throws -> UUID {
+		try await userService.recordRoutineCompletion(
 			routineId: routine.id,
 			durationMinutes: durationMinutes,
-			userId: userId,
-			deviceId: deviceIdForCompletion
+			userId: currentUser?.id,
+			deviceId: currentUser == nil ? deviceId : nil
 		)
-		
-		// Refresh our state from server
-		try await loadProgress()
-		
-		return completionId
 	}
 	
 	public func loadRecentCompletions() async {
