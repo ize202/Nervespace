@@ -12,12 +12,31 @@ struct ExerciseDetailView: View {
             ScrollView {
                 VStack(spacing: 24) {
                     // Thumbnail Image
-                    Image(exercise.thumbnailName)
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 280)
-                        .clipped()
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 24)
+                            .fill(
+                                LinearGradient(
+                                    colors: [
+                                        Color.brandPrimary.opacity(0.1),
+                                        Color.brandPrimary.opacity(0.05)
+                                    ],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 24)
+                                    .strokeBorder(Color.brandPrimary.opacity(0.2), lineWidth: 1)
+                            )
+                        
+                        Image(exercise.thumbnailName)
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .clipShape(RoundedRectangle(cornerRadius: 16))
+                            .padding(32)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 320)
                     
                     VStack(spacing: 32) {
                         // Title and Duration
