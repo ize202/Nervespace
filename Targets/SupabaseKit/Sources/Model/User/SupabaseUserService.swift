@@ -50,7 +50,7 @@ public class SupabaseUserService: UserService {
     // MARK: - Profile Management
     
     public func fetchProfile(userId: UUID) async throws -> UserProfile {
-        let profiles: [UserProfile] = try await client.database
+        let profiles: [UserProfile] = try await client
             .from("user_profiles")
             .select()
             .eq("id", value: userId)
@@ -73,7 +73,7 @@ public class SupabaseUserService: UserService {
             name: name
         )
         
-        let profiles: [UserProfile] = try await client.database
+        let profiles: [UserProfile] = try await client
             .from("user_profiles")
             .insert(profile)
             .execute()
@@ -97,7 +97,7 @@ public class SupabaseUserService: UserService {
             avatarURL: avatarURL?.absoluteString
         )
         
-        let profiles: [UserProfile] = try await client.database
+        let profiles: [UserProfile] = try await client
             .from("user_profiles")
             .update(update)
             .eq("id", value: userId)
@@ -114,7 +114,7 @@ public class SupabaseUserService: UserService {
     }
     
     public func deleteProfile(userId: UUID) async throws {
-        try await client.database
+        try await client
             .from("user_profiles")
             .delete()
             .eq("id", value: userId)
@@ -124,7 +124,7 @@ public class SupabaseUserService: UserService {
     // MARK: - Progress Tracking
     
     public func fetchProgress(userId: UUID) async throws -> UserProgress {
-        let progresses: [UserProgress] = try await client.database
+        let progresses: [UserProgress] = try await client
             .from("user_progress")
             .select()
             .eq("user_id", value: userId)
@@ -141,7 +141,7 @@ public class SupabaseUserService: UserService {
     }
     
     public func fetchProgressByDeviceId(_ deviceId: UUID) async throws -> UserProgress {
-        let progresses: [UserProgress] = try await client.database
+        let progresses: [UserProgress] = try await client
             .from("user_progress")
             .select()
             .eq("device_id", value: deviceId)
@@ -160,7 +160,7 @@ public class SupabaseUserService: UserService {
     public func initializeProgress(userId: UUID) async throws -> UserProgress {
         let progress = UserProgress(userId: userId)
         
-        let progresses: [UserProgress] = try await client.database
+        let progresses: [UserProgress] = try await client
             .from("user_progress")
             .insert(progress)
             .execute()
@@ -178,7 +178,7 @@ public class SupabaseUserService: UserService {
     public func initializeAnonymousProgress(deviceId: UUID) async throws -> UserProgress {
         let progress = UserProgress(deviceId: deviceId)
         
-        let progresses: [UserProgress] = try await client.database
+        let progresses: [UserProgress] = try await client
             .from("user_progress")
             .insert(progress)
             .execute()
@@ -209,7 +209,7 @@ public class SupabaseUserService: UserService {
             lastActivity: lastActivity
         )
         
-        let progresses: [UserProgress] = try await client.database
+        let progresses: [UserProgress] = try await client
             .from("user_progress")
             .update(update)
             .eq("user_id", value: userId)
@@ -241,7 +241,7 @@ public class SupabaseUserService: UserService {
             lastActivity: lastActivity
         )
         
-        let progresses: [UserProgress] = try await client.database
+        let progresses: [UserProgress] = try await client
             .from("user_progress")
             .update(update)
             .eq("device_id", value: deviceId)
@@ -272,7 +272,7 @@ public class SupabaseUserService: UserService {
         )
         
         // Insert the new progress
-        let progresses: [UserProgress] = try await client.database
+        let progresses: [UserProgress] = try await client
             .from("user_progress")
             .insert(update)
             .execute()
@@ -285,7 +285,7 @@ public class SupabaseUserService: UserService {
         }
         
         // Delete the anonymous progress
-        try await client.database
+        try await client
             .from("user_progress")
             .delete()
             .eq("device_id", value: deviceId)
@@ -302,7 +302,7 @@ public class SupabaseUserService: UserService {
             premiumUntil: premiumUntil
         )
         
-        let profiles: [UserProfile] = try await client.database
+        let profiles: [UserProfile] = try await client
             .from("user_profiles")
             .update(update)
             .eq("id", value: userId)
@@ -321,7 +321,7 @@ public class SupabaseUserService: UserService {
     // MARK: - Utility Methods
     
     public func findProfileByAppleId(_ appleId: String) async throws -> UserProfile? {
-        let profiles: [UserProfile] = try await client.database
+        let profiles: [UserProfile] = try await client
             .from("user_profiles")
             .select()
             .eq("apple_id", value: appleId)
