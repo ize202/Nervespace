@@ -145,8 +145,8 @@ class OnboardingViewModel: ObservableObject {
 		// Track start of onboarding
 		Analytics.capture(
 			.info,
-			id: "onboarding_view",
-			longDescription: "Started onboarding: welcome screen",
+			id: "onboarding_step_1",
+			longDescription: "Welcome screen",
 			source: .general
 		)
 	}
@@ -159,11 +159,11 @@ class OnboardingViewModel: ObservableObject {
 		
 		currentScreen = OnboardingScreen.allCases[currentIndex + 1]
 		
-		// Track progression to next screen
+		// Track step number (adding 2 because first step was tracked in init)
 		Analytics.capture(
 			.info,
-			id: "onboarding_view",
-			longDescription: "Progressed to: \(currentScreen)",
+			id: "onboarding_step_\(currentIndex + 2)",
+			longDescription: "\(currentScreen)",
 			source: .general
 		)
 	}
@@ -197,7 +197,12 @@ struct ShowOnboardingViewOnFirstLaunchEverModifier: ViewModifier {
 				OnboardingView {
 					withAnimation(.bouncy) {
 						showOnboarding = false
-						Analytics.capture(.success, id: "onboarding_completed", source: .general)
+						Analytics.capture(
+							.success,
+							id: "onboarding_completed",
+							longDescription: "Completed onboarding",
+							source: .general
+						)
 					}
 				}
 				.transition(.opacity)
@@ -212,7 +217,12 @@ struct ShowOnboardingViewOnFirstLaunchEverModifier: ViewModifier {
 			} else {
 				self.showOnboarding = lastAppVersionAppWasOpenedAt == "NONE"
 				if lastAppVersionAppWasOpenedAt == "NONE" {
-					Analytics.capture(.info, id: "onboarding_started", source: .general)
+					Analytics.capture(
+						.info,
+						id: "onboarding_started",
+						longDescription: "Started onboarding",
+						source: .general
+					)
 				}
 			}
 		}
