@@ -41,7 +41,7 @@ enum OnboardingScreen: Int, CaseIterable {
 		case .moodCheck:
 			return "How are you feeling right now?"
 		case .resetPlan:
-			return "Here's your personalized 3-day reset path"
+			return "Here's your 4-day reset path"
 		case .breathingExercise:
 			return "Let's start your first breath reset"
 		case .breathingCompletion:

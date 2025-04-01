@@ -504,8 +504,9 @@ struct ResetPlanScreen: View {
         ) {
             VStack(spacing: 16) {
                 PlanDayView(day: 1, title: "Grounding Breath", isLocked: false)
-                PlanDayView(day: 2, title: "Release Tension", isLocked: true)
-                PlanDayView(day: 3, title: "Full Reset", isLocked: true)
+                PlanDayView(day: 2, title: "Somatic Ease", isLocked: true)
+                PlanDayView(day: 3, title: "Evening Calm", isLocked: true)
+                PlanDayView(day: 4, title: "Posture Reset", isLocked: true)
             }
             .padding(.vertical, 20)
         }
@@ -779,8 +780,9 @@ struct ProgressScreen: View {
                 
                 VStack(spacing: 16) {
                     PlanDayView(day: 1, title: "Grounding Breath", isLocked: false)
-                    PlanDayView(day: 2, title: "Release Tension", isLocked: true)
-                    PlanDayView(day: 3, title: "Full Reset", isLocked: true)
+                    PlanDayView(day: 2, title: "Somatic Ease", isLocked: true)
+                    PlanDayView(day: 3, title: "Evening Calm", isLocked: true)
+                    PlanDayView(day: 4, title: "Posture Reset", isLocked: true)
                 }
             }
             .padding(.vertical, 20)
