@@ -144,7 +144,7 @@ struct WelcomeScreen: View {
     let exercises = [
         ("figure.mind.and.body", "Somatic"),
         ("lungs", "Breathwork"),
-        ("heart.circle", "Nervous System"),
+        ("figure.yoga", "Yoga"),
         ("sparkles", "Recovery")
     ]
     
@@ -165,24 +165,24 @@ struct WelcomeScreen: View {
             LazyVGrid(columns: [
                 GridItem(.flexible()),
                 GridItem(.flexible())
-            ], spacing: 20) {
+            ], spacing: 24) {
                 ForEach(exercises, id: \.0) { systemName, title in
-                    VStack(spacing: 12) {
+                    VStack(spacing: 16) {
                         Image(systemName: systemName)
-                            .font(.system(size: 32, weight: .light))
+                            .font(.system(size: 44, weight: .light))
                             .foregroundColor(.brandPrimary)
-                            .frame(width: 64, height: 64)
+                            .frame(width: 96, height: 96)
                             .background(
-                                RoundedRectangle(cornerRadius: 16)
+                                RoundedRectangle(cornerRadius: 24)
                                     .fill(Color.baseBlack)
                                     .overlay(
-                                        RoundedRectangle(cornerRadius: 16)
+                                        RoundedRectangle(cornerRadius: 24)
                                             .stroke(Color.brandPrimary.opacity(0.3), lineWidth: 1)
                                     )
                             )
                         
                         Text(title)
-                            .font(.system(size: 13, weight: .medium))
+                            .font(.system(size: 15, weight: .medium))
                             .foregroundColor(.baseWhite.opacity(0.7))
                     }
                 }

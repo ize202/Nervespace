@@ -29,9 +29,9 @@ enum OnboardingScreen: Int, CaseIterable {
 	var title: String {
 		switch self {
 		case .welcome:
-			return "Welcome to Your Nervous System Reset"
+			return "Welcome to Form"
 		case .motivation:
-			return "What brings you to NerveSpace today?"
+			return "What brings you to Form today?"
 		case .tensionAreas:
 			return "Where do you feel the most tension in your body?"
 		case .timeCommitment:
@@ -43,7 +43,7 @@ enum OnboardingScreen: Int, CaseIterable {
 		case .resetPlan:
 			return "Here's your personalized 3-day reset path"
 		case .breathingExercise:
-			return "Let's take your first reset breath"
+			return "Let's start your first breath reset"
 		case .breathingCompletion:
 			return "Reset complete."
 		case .progress:
@@ -54,9 +54,9 @@ enum OnboardingScreen: Int, CaseIterable {
 	var subtitle: String {
 		switch self {
 		case .welcome:
-			return "You're here because you want to feel better — less stressed, more grounded, more you."
+			return "You're here because you want to feel better, less stressed, more grounded, more you."
 		case .motivation:
-			return "Choose what you're seeking — this helps us shape your journey."
+			return "Choose what you're seeking, this helps us shape your journey."
 		case .tensionAreas:
 			return "Your body holds what your mind suppresses. Let's listen."
 		case .timeCommitment:
@@ -68,7 +68,7 @@ enum OnboardingScreen: Int, CaseIterable {
 		case .resetPlan:
 			return "Built from your answers to fit your energy and needs."
 		case .breathingExercise:
-			return "No movement needed — just follow the rhythm."
+			return "No movement needed, just follow the rhythm."
 		case .breathingCompletion:
 			return "Your body felt that. Just 3 breaths made a difference."
 		case .progress:
