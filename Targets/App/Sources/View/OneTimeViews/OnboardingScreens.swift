@@ -13,13 +13,17 @@ struct OnboardingScreenContainer<Content: View>: View {
     let showNextButton: Bool
     let nextButtonTitle: String
     let onNext: () -> Void
+    let onBack: () -> Void
+    let progress: CGFloat
     
     init(
         title: String,
         subtitle: String,
+        progress: CGFloat,
         showNextButton: Bool = true,
         nextButtonTitle: String = "Continue",
         onNext: @escaping () -> Void = {},
+        onBack: @escaping () -> Void = {},
         @ViewBuilder content: () -> Content
     ) {
         self.title = title
@@ -27,6 +31,8 @@ struct OnboardingScreenContainer<Content: View>: View {
         self.showNextButton = showNextButton
         self.nextButtonTitle = nextButtonTitle
         self.onNext = onNext
+        self.onBack = onBack
+        self.progress = progress
         self.content = content()
     }
     
@@ -35,35 +41,58 @@ struct OnboardingScreenContainer<Content: View>: View {
             ZStack {
                 Color.baseBlack.ignoresSafeArea()
                 
-                ScrollView(showsIndicators: false) {
-                    VStack(alignment: .leading, spacing: 32) {
-                        VStack(alignment: .leading, spacing: 12) {
-                            Text(title)
-                                .font(.system(size: 34, weight: .bold))
+                VStack(alignment: .leading, spacing: 0) {
+                    // Top Navigation Bar
+                    HStack(spacing: 16) {
+                        Button(action: onBack) {
+                            Image(systemName: "arrow.left")
+                                .font(.system(size: 24, weight: .medium))
                                 .foregroundColor(.baseWhite)
-                                .multilineTextAlignment(.leading)
-                                .fixedSize(horizontal: false, vertical: true)
-                            
-                            Text(subtitle)
-                                .font(.system(size: 17, weight: .regular))
-                                .foregroundColor(.baseWhite.opacity(0.7))
-                                .multilineTextAlignment(.leading)
-                                .fixedSize(horizontal: false, vertical: true)
                         }
-                        .padding(.top, 48)
-                        .padding(.horizontal, 24)
                         
-                        content
-                            .padding(.horizontal, 24)
-                        
-                        Spacer(minLength: 100)
+                        GeometryReader { barGeometry in
+                            ZStack(alignment: .leading) {
+                                Rectangle()
+                                    .fill(Color.baseWhite.opacity(0.1))
+                                    .frame(height: 4)
+                                    .cornerRadius(2)
+                                
+                                Rectangle()
+                                    .fill(Color.baseWhite)
+                                    .frame(width: barGeometry.size.width * progress, height: 4)
+                                    .cornerRadius(2)
+                            }
+                        }
+                        .frame(height: 4)
                     }
-                    .frame(minHeight: geometry.size.height)
-                }
-                
-                if showNextButton {
-                    VStack {
-                        Spacer()
+                    .padding(.horizontal, 24)
+                    .padding(.top, 8)
+                    
+                    ScrollView(showsIndicators: false) {
+                        VStack(alignment: .leading, spacing: 24) {
+                            // Title and Subtitle
+                            VStack(alignment: .leading, spacing: 12) {
+                                Text(title)
+                                    .font(.system(size: 34, weight: .bold))
+                                    .foregroundColor(.baseWhite)
+                                    .fixedSize(horizontal: false, vertical: true)
+                                
+                                if !subtitle.isEmpty {
+                                    Text(subtitle)
+                                        .font(.system(size: 17, weight: .regular))
+                                        .foregroundColor(.baseWhite.opacity(0.7))
+                                        .fixedSize(horizontal: false, vertical: true)
+                                }
+                            }
+                            .padding(.top, 32)
+                            
+                            content
+                                .padding(.top, 24)
+                        }
+                        .padding(.horizontal, 24)
+                    }
+                    
+                    if showNextButton {
                         Button(action: onNext) {
                             Text(nextButtonTitle)
                                 .font(.system(size: 17, weight: .semibold))
@@ -74,17 +103,37 @@ struct OnboardingScreenContainer<Content: View>: View {
                                 .cornerRadius(16)
                         }
                         .padding(.horizontal, 24)
-                        .padding(.bottom, 32)
+                        .padding(.vertical, 16)
                         .background(
                             Color.baseBlack
-                                .edgesIgnoringSafeArea(.bottom)
                                 .shadow(color: .black.opacity(0.25), radius: 16, x: 0, y: -8)
                         )
                     }
                 }
             }
         }
-        .preferredColorScheme(.dark)
+    }
+}
+
+// Helper extension for glassmorphism effect
+extension View {
+    func glassmorphism() -> some View {
+        self
+            .background(
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(Color.baseWhite.opacity(0.05))
+                    .background(
+                        RoundedRectangle(cornerRadius: 16)
+                            .fill(Color.baseBlack)
+                            .opacity(0.5)
+                            .blur(radius: 8)
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 16)
+                            .stroke(Color.baseWhite.opacity(0.1), lineWidth: 1)
+                    )
+            )
+            .compositingGroup()
     }
 }
 
@@ -104,10 +153,15 @@ struct WelcomeScreen: View {
         OnboardingScreenContainer(
             title: OnboardingScreen.welcome.title,
             subtitle: OnboardingScreen.welcome.subtitle,
-            nextButtonTitle: "Let's begin"
+            progress: 0.1,
+            nextButtonTitle: "Let's begin",
+            onNext: {
+                viewModel.moveToNextScreen()
+            },
+            onBack: {
+                viewModel.moveToPreviousScreen()
+            }
         ) {
-            viewModel.moveToNextScreen()
-        } content: {
             LazyVGrid(columns: [
                 GridItem(.flexible()),
                 GridItem(.flexible())
@@ -144,31 +198,32 @@ struct MotivationScreen: View {
     @ObservedObject var viewModel: OnboardingViewModel
     
     let motivations = [
-        ("😣", "I feel anxious or overwhelmed a lot"),
-        ("🌙", "I struggle with sleep or tension at night"),
-        ("⚡️", "I want more calm and focus during the day"),
-        ("🧘", "I need a consistent way to reset"),
-        ("🤔", "I'm just curious — but I know I need this")
+        "I feel anxious or overwhelmed a lot",
+        "I struggle with sleep or tension at night",
+        "I want more calm and focus during the day",
+        "I need a consistent way to reset",
+        "I'm just curious — but I know I need this"
     ]
     
     var body: some View {
         OnboardingScreenContainer(
             title: OnboardingScreen.motivation.title,
-            subtitle: OnboardingScreen.motivation.subtitle
+            subtitle: OnboardingScreen.motivation.subtitle,
+            progress: 0.2,
+            onNext: {
+                viewModel.moveToNextScreen()
+            },
+            onBack: {
+                viewModel.moveToPreviousScreen()
+            }
         ) {
-            viewModel.moveToNextScreen()
-        } content: {
-            VStack(alignment: .leading, spacing: 12) {
-                ForEach(motivations, id: \.1) { emoji, text in
+            VStack(spacing: 12) {
+                ForEach(motivations, id: \.self) { text in
                     Button(action: {
                         viewModel.selections.motivation = text
                         viewModel.moveToNextScreen()
                     }) {
-                        HStack(alignment: .center, spacing: 16) {
-                            Text(emoji)
-                                .font(.system(size: 32))
-                                .frame(width: 44, alignment: .center)
-                            
+                        HStack(alignment: .center, spacing: 16) {                            
                             Text(text)
                                 .font(.system(size: 17, weight: .regular))
                                 .foregroundColor(.baseWhite)
@@ -183,13 +238,10 @@ struct MotivationScreen: View {
                         }
                         .padding(.vertical, 16)
                         .padding(.horizontal, 20)
-                        .background(
+                        .glassmorphism()
+                        .overlay(
                             RoundedRectangle(cornerRadius: 16)
-                                .fill(Color.baseBlack)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 16)
-                                        .stroke(Color.baseWhite.opacity(0.1), lineWidth: 1)
-                                )
+                                .fill(Color.brandPrimary.opacity(viewModel.selections.motivation == text ? 0.1 : 0))
                         )
                     }
                     .buttonStyle(.plain)
@@ -219,11 +271,18 @@ struct TensionAreasScreen: View {
     var body: some View {
         OnboardingScreenContainer(
             title: OnboardingScreen.tensionAreas.title,
-            subtitle: OnboardingScreen.tensionAreas.subtitle
+            subtitle: OnboardingScreen.tensionAreas.subtitle,
+            progress: 0.3,
+            showNextButton: true,
+            nextButtonTitle: "Continue",
+            onNext: {
+                viewModel.moveToNextScreen()
+            },
+            onBack: {
+                viewModel.moveToPreviousScreen()
+            }
         ) {
-            viewModel.moveToNextScreen()
-        } content: {
-            VStack(alignment: .leading, spacing: 12) {
+            VStack(spacing: 12) {
                 ForEach(tensionAreas, id: \.self) { area in
                     Button(action: {
                         if viewModel.selections.tensionAreas.contains(area) {
@@ -232,7 +291,7 @@ struct TensionAreasScreen: View {
                             viewModel.selections.tensionAreas.insert(area)
                         }
                     }) {
-                        HStack {
+                        HStack(alignment: .center, spacing: 16) {
                             Text(area)
                                 .font(.system(size: 17, weight: .regular))
                                 .foregroundColor(.baseWhite)
@@ -243,20 +302,14 @@ struct TensionAreasScreen: View {
                             if viewModel.selections.tensionAreas.contains(area) {
                                 Image(systemName: "checkmark.circle.fill")
                                     .foregroundColor(.brandPrimary)
-                            } else {
-                                Image(systemName: "circle")
-                                    .foregroundColor(.baseWhite.opacity(0.3))
                             }
                         }
                         .padding(.vertical, 16)
                         .padding(.horizontal, 20)
-                        .background(
+                        .glassmorphism()
+                        .overlay(
                             RoundedRectangle(cornerRadius: 16)
-                                .fill(Color.baseBlack)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 16)
-                                        .stroke(Color.baseWhite.opacity(0.1), lineWidth: 1)
-                                )
+                                .fill(Color.brandPrimary.opacity(viewModel.selections.tensionAreas.contains(area) ? 0.1 : 0))
                         )
                     }
                     .buttonStyle(.plain)
@@ -273,31 +326,35 @@ struct TimeCommitmentScreen: View {
     @ObservedObject var viewModel: OnboardingViewModel
     
     let timeOptions = [
-        ("⏱", "2 minutes — I want something quick I can stick to"),
-        ("🧘", "5 minutes — I can make a little space"),
-        ("🕰", "10+ minutes — I'm ready to go deeper"),
-        ("🔄", "It depends — I'll take it day by day")
+        "2 minutes — I want something quick I can stick to",
+        "5 minutes — I can make a little space",
+        "10+ minutes — I'm ready to go deeper",
+        "It depends — I'll take it day by day"
     ]
     
     var body: some View {
         OnboardingScreenContainer(
             title: OnboardingScreen.timeCommitment.title,
-            subtitle: OnboardingScreen.timeCommitment.subtitle
+            subtitle: OnboardingScreen.timeCommitment.subtitle,
+            progress: 0.4,
+            onNext: {
+                viewModel.moveToNextScreen()
+            },
+            onBack: {
+                viewModel.moveToPreviousScreen()
+            }
         ) {
-            viewModel.moveToNextScreen()
-        } content: {
             VStack(spacing: 12) {
-                ForEach(timeOptions, id: \.1) { emoji, text in
+                ForEach(timeOptions, id: \.self) { text in
                     Button(action: {
                         viewModel.selections.timeCommitment = text
                         viewModel.moveToNextScreen()
                     }) {
-                        HStack(spacing: 16) {
-                            Text(emoji)
-                                .font(.title)
-                            
+                        HStack(alignment: .center, spacing: 16) {
                             Text(text)
-                                .font(.body)
+                                .font(.system(size: 17, weight: .regular))
+                                .foregroundColor(.baseWhite)
+                                .multilineTextAlignment(.leading)
                             
                             Spacer()
                             
@@ -306,11 +363,12 @@ struct TimeCommitmentScreen: View {
                                     .foregroundColor(.brandPrimary)
                             }
                         }
-                        .padding()
-                        .background(
-                            RoundedRectangle(cornerRadius: 12)
-                                .fill(Color.white)
-                                .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 4)
+                        .padding(.vertical, 16)
+                        .padding(.horizontal, 20)
+                        .glassmorphism()
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 16)
+                                .fill(Color.brandPrimary.opacity(viewModel.selections.timeCommitment == text ? 0.1 : 0))
                         )
                     }
                     .buttonStyle(.plain)
@@ -332,7 +390,6 @@ struct ReminderScreen: View {
             DispatchQueue.main.async {
                 hasRequestedPermission = true
                 if granted {
-                    // Schedule the notification for the selected time
                     scheduleNotification()
                 }
                 viewModel.moveToNextScreen()
@@ -346,17 +403,11 @@ struct ReminderScreen: View {
         content.body = "Take a moment to ground yourself and reset your nervous system."
         content.sound = .default
         
-        // Create date components from the selected time
         let calendar = Calendar.current
         let components = calendar.dateComponents([.hour, .minute], from: viewModel.selections.reminderTime)
-        
-        // Create the trigger
         let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: true)
-        
-        // Create the request
         let request = UNNotificationRequest(identifier: "dailyReset", content: content, trigger: trigger)
         
-        // Add the request
         UNUserNotificationCenter.current().add(request)
     }
     
@@ -364,19 +415,26 @@ struct ReminderScreen: View {
         OnboardingScreenContainer(
             title: OnboardingScreen.reminder.title,
             subtitle: OnboardingScreen.reminder.subtitle,
-            nextButtonTitle: hasRequestedPermission ? "Skip" : "Set Reminder"
-        ) {
-            if !hasRequestedPermission {
-                requestNotificationPermission()
-            } else {
-                viewModel.moveToNextScreen()
+            progress: 0.5,
+            nextButtonTitle: hasRequestedPermission ? "Skip" : "Set Reminder",
+            onNext: {
+                if !hasRequestedPermission {
+                    requestNotificationPermission()
+                } else {
+                    viewModel.moveToNextScreen()
+                }
+            },
+            onBack: {
+                viewModel.moveToPreviousScreen()
             }
-        } content: {
+        ) {
             VStack(spacing: 24) {
                 DatePicker("Select Time", selection: $viewModel.selections.reminderTime, displayedComponents: .hourAndMinute)
                     .datePickerStyle(.wheel)
                     .labelsHidden()
                     .colorScheme(.dark)
+                    .accentColor(.brandPrimary)
+                    .background(Color.baseBlack)
             }
             .padding(.vertical, 20)
         }
@@ -391,10 +449,15 @@ struct MoodCheckScreen: View {
     var body: some View {
         OnboardingScreenContainer(
             title: OnboardingScreen.moodCheck.title,
-            subtitle: OnboardingScreen.moodCheck.subtitle
+            subtitle: OnboardingScreen.moodCheck.subtitle,
+            progress: 0.6,
+            onNext: {
+                viewModel.moveToNextScreen()
+            },
+            onBack: {
+                viewModel.moveToPreviousScreen()
+            }
         ) {
-            viewModel.moveToNextScreen()
-        } content: {
             VStack(spacing: 24) {
                 HStack {
                     Text("Overwhelmed")
@@ -430,14 +493,19 @@ struct ResetPlanScreen: View {
         OnboardingScreenContainer(
             title: OnboardingScreen.resetPlan.title,
             subtitle: OnboardingScreen.resetPlan.subtitle,
-            nextButtonTitle: "Start Day 1 Now"
-        ) {
-            if !hasRequestedReview {
-                requestReview()
-            } else {
-                viewModel.moveToNextScreen()
+            progress: 0.7,
+            nextButtonTitle: "Start Day 1 Now",
+            onNext: {
+                if !hasRequestedReview {
+                    requestReview()
+                } else {
+                    viewModel.moveToNextScreen()
+                }
+            },
+            onBack: {
+                viewModel.moveToPreviousScreen()
             }
-        } content: {
+        ) {
             VStack(spacing: 16) {
                 PlanDayView(day: 1, title: "Grounding Breath", isLocked: false)
                 PlanDayView(day: 2, title: "Release Tension", isLocked: true)
@@ -470,14 +538,7 @@ struct PlanDayView: View {
         }
         .padding(.vertical, 16)
         .padding(.horizontal, 20)
-        .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color.baseBlack)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 16)
-                        .stroke(Color.baseWhite.opacity(0.1), lineWidth: 1)
-                )
-        )
+        .glassmorphism()
     }
 }
 
@@ -494,10 +555,15 @@ struct BreathingExerciseScreen: View {
         OnboardingScreenContainer(
             title: OnboardingScreen.breathingExercise.title,
             subtitle: OnboardingScreen.breathingExercise.subtitle,
-            showNextButton: false
+            progress: 0.8,
+            showNextButton: false,
+            onNext: {
+                viewModel.moveToNextScreen()
+            },
+            onBack: {
+                viewModel.moveToPreviousScreen()
+            }
         ) {
-            viewModel.moveToNextScreen()
-        } content: {
             VStack(spacing: 40) {
                 ZStack {
                     Circle()
@@ -546,15 +612,21 @@ struct BreathingExerciseScreen: View {
 
 struct ProgressScreen: View {
     @ObservedObject var viewModel: OnboardingViewModel
+    let onCompletion: () -> Void
     
     var body: some View {
         OnboardingScreenContainer(
             title: OnboardingScreen.progress.title,
             subtitle: OnboardingScreen.progress.subtitle,
-            nextButtonTitle: "Unlock Full Plan"
+            progress: 0.9,
+            nextButtonTitle: "Unlock Full Plan",
+            onNext: {
+                onCompletion()
+            },
+            onBack: {
+                viewModel.moveToPreviousScreen()
+            }
         ) {
-            viewModel.moveToNextScreen()
-        } content: {
             VStack(spacing: 24) {
                 ProgressBar(progress: 0.33)
                     .frame(height: 8)
@@ -623,7 +695,9 @@ struct OnboardingScreen_Previews: PreviewProvider {
                 BreathingExerciseScreen(viewModel: OnboardingViewModel())
                     .previewDisplayName("Breathing Exercise")
                 
-                ProgressScreen(viewModel: OnboardingViewModel())
+                ProgressScreen(viewModel: OnboardingViewModel()) {
+                    // Placeholder for onCompletion
+                }
                     .previewDisplayName("Progress")
             }
         }

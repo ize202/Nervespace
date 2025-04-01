@@ -78,6 +78,7 @@ struct OnboardingSelections {
 	var motivation: String = ""
 	var tensionAreas: Set<String> = []
 	var timeCommitment: String = ""
+	var workoutFrequency: String = ""
 	var reminderTime: Date = Date()
 	var initialMood: Double = 0.5
 }
@@ -112,7 +113,7 @@ struct OnboardingView: View {
 				case .breathingExercise:
 					BreathingExerciseScreen(viewModel: viewModel)
 				case .progress:
-					ProgressScreen(viewModel: viewModel)
+					ProgressScreen(viewModel: viewModel, onCompletion: onCompletion)
 				}
 			}
 			.transition(.asymmetric(
@@ -120,11 +121,6 @@ struct OnboardingView: View {
 				removal: .move(edge: .leading)
 			))
 			.animation(.easeInOut, value: viewModel.currentScreen)
-		}
-		.onChange(of: viewModel.currentScreen) { newScreen in
-			if newScreen == .progress {
-				onCompletion()
-			}
 		}
 	}
 }
@@ -149,6 +145,12 @@ class OnboardingViewModel: ObservableObject {
 			return
 		}
 		currentScreen = OnboardingScreen.allCases[currentIndex - 1]
+	}
+	
+	func completeOnboarding() {
+		// This will be called from the Progress screen's final button
+		currentScreen = .progress // Ensure we're on the progress screen
+		// Any final cleanup or data saving can go here
 	}
 }
 
