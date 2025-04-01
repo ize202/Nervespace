@@ -11,6 +11,7 @@
 		01AEA0BB740450A2255E553E /* PlanLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCC9A6D9AC91F714ACB2D458 /* PlanLibrary.swift */; };
 		021192EB3086C9181B9C8117 /* Sentry in Frameworks */ = {isa = PBXBuildFile; productRef = 07C590DF8EEB4A0EAB809B98 /* Sentry */; };
 		02ED4C1F7C4E8B7432BAB368 /* requireLogin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5659C5D7AD221C5697002B98 /* requireLogin.swift */; };
+		08D257D59DB18322ED1F5659 /* SuperwallKit in Frameworks */ = {isa = PBXBuildFile; productRef = F9976F589F12A217D8BA637F /* SuperwallKit */; };
 		0F113178ED631727CB3AF7BB /* TextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31773E0091EAC17A2A2E11F0 /* TextField.swift */; };
 		15310DBE1940D5F200B265D2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FAE741F68BDCA070A422A0F3 /* Assets.xcassets */; };
 		1590D6A919B6E1F3A2B3A8A4 /* SupabaseUserService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB518411EAE3C7FA9054FCC8 /* SupabaseUserService.swift */; };
@@ -404,6 +405,7 @@
 				2B857DD0EC9B9248B272BEE2 /* SharedKit.framework in Frameworks */,
 				835DFE1BB77D212B4A938AC5 /* SupabaseKit.framework in Frameworks */,
 				32AE0B76A515FD7214260461 /* OneSignalFramework in Frameworks */,
+				08D257D59DB18322ED1F5659 /* SuperwallKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1152,6 +1154,7 @@
 			name = Nervespace;
 			packageProductDependencies = (
 				188C0B847C7B0939BB7DBF05 /* OneSignalFramework */,
+				F9976F589F12A217D8BA637F /* SuperwallKit */,
 			);
 			productName = Nervespace;
 			productReference = E8A6EE964B30D294427E8570 /* Nervespace.app */;
@@ -1266,6 +1269,7 @@
 				3C86889F98F61E7426ABCF72 /* XCRemoteSwiftPackageReference "sentry-cocoa" */,
 				94FB7EDC10CC0A99BA27E925 /* XCRemoteSwiftPackageReference "mixpanel-swift" */,
 				5C11E54DB459166D920AF304 /* XCRemoteSwiftPackageReference "supabase-swift" */,
+				F667088FD68D1427274AF33D /* XCRemoteSwiftPackageReference "Superwall-iOS" */,
 			);
 			productRefGroup = 4210CA2A6F193F7E12C583FE /* Products */;
 			projectDirPath = "";
@@ -2215,6 +2219,14 @@
 				minimumVersion = 5.2.7;
 			};
 		};
+		F667088FD68D1427274AF33D /* XCRemoteSwiftPackageReference "Superwall-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/superwall/Superwall-iOS";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.0.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -2237,6 +2249,10 @@
 		73A4451A26D46F43055C8E84 /* OneSignalFramework */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = OneSignalFramework;
+		};
+		F9976F589F12A217D8BA637F /* SuperwallKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SuperwallKit;
 		};
 		FD65ADA46B5F55F57D1A3B52 /* Mixpanel */ = {
 			isa = XCSwiftPackageProductDependency;

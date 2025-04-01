@@ -46,6 +46,17 @@ func tuistProject() -> Project {
     addCrashlyticsKit()
     addAnalyticsKit()
 
+    // Add Superwall package
+    projectPackages.append(
+        .remote(
+            url: "https://github.com/superwall/Superwall-iOS",
+            requirement: .upToNextMajor(from: "4.0.0")
+        )
+    )
+
+    // Add Superwall dependency to app
+    appDependencies.append(.package(product: "SuperwallKit", type: .runtime))
+
 	addApp()
 
 	return Project(
@@ -85,7 +96,6 @@ func tuistProject() -> Project {
 			settings: .settings(base: [
 				"OTHER_LDFLAGS": "-ObjC",
 				"ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME": "AccentColor",
-
 			])
 		)
 

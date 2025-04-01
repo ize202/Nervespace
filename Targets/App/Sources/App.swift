@@ -17,6 +17,7 @@ import SwiftUI
 import UIKit
 import AnalyticsKit
 import CrashlyticsKit
+import SuperwallKit
 
 @main
 struct MainApp: App {
@@ -93,6 +94,9 @@ class AppDelegate: NSObject, UIApplicationDelegate, OSNotificationLifecycleListe
 
 		// Initialize Sentry for crash reporting
 		Crashlytics.shared.configure()
+
+		// Initialize Superwall
+		Superwall.configure(apiKey: "pk_9a8863050fddddfe94135b0d907e2e593af2c3dbbd78c6be")
 
 		// If OneSignal initialized successfully, we set up the push notification observers and clear all notifications when the app is opened
 		PushNotifications.initOneSignal(launchOptions)
