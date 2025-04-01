@@ -490,6 +490,26 @@ struct ReminderScreen: View {
 
 struct MoodCheckScreen: View {
     @ObservedObject var viewModel: OnboardingViewModel
+    @State private var selectedMood: Int = 1 // Default to neutral
+    
+    let moods = [
+        (title: "Stressed", icon: "😰", color: Color.red.opacity(0.7)),
+        (title: "Neutral", icon: "😐", color: Color.yellow.opacity(0.7)),
+        (title: "Relaxed", icon: "😌", color: Color.green.opacity(0.7))
+    ]
+    
+    var feedbackMessage: String {
+        switch selectedMood {
+        case 0:
+            return "It's okay to feel stressed. We'll help you find your calm."
+        case 1:
+            return "A neutral state is a great starting point for your journey."
+        case 2:
+            return "Wonderful! Let's maintain and build on this relaxed state."
+        default:
+            return ""
+        }
+    }
     
     var body: some View {
         OnboardingScreenContainer(
@@ -499,26 +519,77 @@ struct MoodCheckScreen: View {
             isNextButtonEnabled: true,
             nextButtonTitle: "Continue",
             onNext: {
+                // Convert selection to 0-1 range for compatibility
+                viewModel.selections.initialMood = Double(selectedMood) / Double(moods.count - 1)
                 viewModel.moveToNextScreen()
             },
             onBack: {
                 viewModel.moveToPreviousScreen()
             }
         ) {
-            VStack(spacing: 24) {
-                HStack {
-                    Text("Overwhelmed")
-                        .foregroundColor(.secondary)
-                    Spacer()
-                    Text("Grounded")
-                        .foregroundColor(.secondary)
+            VStack(spacing: 32) {
+                // Mood Selection Cards
+                ForEach(0..<moods.count, id: \.self) { index in
+                    Button(action: {
+                        withAnimation(.spring()) {
+                            selectedMood = index
+                            hapticFeedback(.light)
+                        }
+                    }) {
+                        HStack(spacing: 16) {
+                            Text(moods[index].icon)
+                                .font(.system(size: 32))
+                            
+                            Text(moods[index].title)
+                                .font(.system(size: 17, weight: .semibold))
+                                .foregroundColor(.baseWhite)
+                            
+                            Spacer()
+                            
+                            if selectedMood == index {
+                                Image(systemName: "checkmark.circle.fill")
+                                    .foregroundColor(.brandPrimary)
+                                    .font(.system(size: 20))
+                            }
+                        }
+                        .padding(.vertical, 20)
+                        .padding(.horizontal, 24)
+                        .background(
+                            RoundedRectangle(cornerRadius: 16)
+                                .fill(Color.baseWhite.opacity(0.05))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 16)
+                                        .stroke(selectedMood == index ? Color.brandPrimary : Color.baseWhite.opacity(0.1), lineWidth: 1)
+                                )
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 16)
+                                        .fill(moods[index].color.opacity(selectedMood == index ? 0.1 : 0))
+                                )
+                        )
+                    }
+                    .buttonStyle(ScaleButtonStyle())
                 }
                 
-                Slider(value: $viewModel.selections.initialMood, in: 0...1)
-                    .tint(.brandPrimary)
+                // Contextual Feedback Message
+                Text(feedbackMessage)
+                    .font(.system(size: 15))
+                    .foregroundColor(.baseWhite.opacity(0.8))
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 20)
+                    .padding(.top, 8)
+                    .transition(.opacity)
+                    .animation(.easeInOut, value: selectedMood)
             }
-            .padding(.vertical, 40)
+            .padding(.vertical, 20)
         }
+    }
+}
+
+struct ScaleButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? 0.98 : 1)
+            .animation(.easeInOut(duration: 0.2), value: configuration.isPressed)
     }
 }
 
