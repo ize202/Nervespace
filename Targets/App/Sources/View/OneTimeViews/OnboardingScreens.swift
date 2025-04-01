@@ -535,65 +535,148 @@ struct PlanDayView: View {
 
 struct BreathingExerciseScreen: View {
     @ObservedObject var viewModel: OnboardingViewModel
-    @State private var scale: CGFloat = 1.0
     @State private var isInhaling = false
     @State private var cyclesCompleted = 0
-    let totalCycles = 5
+    @State private var fillAmount: CGFloat = 0
+    @State private var showExhalePrompt = false
+    @State private var isExhaling = false
+    let totalCycles = 3
+    
+    var instructionText: String {
+        if isExhaling {
+            return "Release and exhale through your mouth"
+        }
+        if !isInhaling {
+            return "Hold the button and inhale through your nose"
+        }
+        return showExhalePrompt ? "Release and exhale through your mouth" : "Hold the button and inhale through your nose"
+    }
     
     var body: some View {
-        OnboardingScreenContainer(
-            title: OnboardingScreen.breathingExercise.title,
-            subtitle: OnboardingScreen.breathingExercise.subtitle,
-            progress: 0.8,
-            isNextButtonEnabled: false,
-            nextButtonTitle: "Continue",
-            onNext: {
-                viewModel.moveToNextScreen()
-            },
-            onBack: {
-                viewModel.moveToPreviousScreen()
-            }
-        ) {
-            VStack(spacing: 40) {
-                ZStack {
-                    Circle()
-                        .stroke(Color.brandPrimary.opacity(0.3), lineWidth: 2)
-                        .frame(width: 200, height: 200)
-                    
-                    Circle()
-                        .fill(Color.brandPrimary.opacity(0.15))
-                        .frame(width: 200, height: 200)
-                        .scaleEffect(scale)
-                        .animation(.easeInOut(duration: 4), value: scale)
-                    
-                    Text(isInhaling ? "Hold to Inhale" : "Release to Exhale")
-                        .font(.system(size: 17, weight: .medium))
-                        .foregroundColor(.baseWhite)
-                }
-                .gesture(
-                    DragGesture(minimumDistance: 0)
-                        .onChanged { _ in
-                            isInhaling = true
-                            scale = 1.5
+        GeometryReader { geometry in
+            ZStack {
+                Color.baseBlack.ignoresSafeArea()
+                
+                // Purple fill overlay
+                Color.brandPrimary
+                    .opacity(0.3)
+                    .frame(height: geometry.size.height * fillAmount)
+                    .frame(maxHeight: .infinity, alignment: .bottom)
+                    .animation(.easeInOut(duration: 7), value: fillAmount)
+                
+                VStack(alignment: .leading, spacing: 0) {
+                    // Top Navigation Bar
+                    HStack(spacing: 16) {
+                        Button(action: { viewModel.moveToPreviousScreen() }) {
+                            Image(systemName: "arrow.left")
+                                .font(.system(size: 24, weight: .medium))
+                                .foregroundColor(.baseWhite)
                         }
-                        .onEnded { _ in
-                            isInhaling = false
-                            scale = 1.0
-                            cyclesCompleted += 1
-                            
-                            if cyclesCompleted >= totalCycles {
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                                    viewModel.moveToNextScreen()
-                                }
+                        
+                        GeometryReader { barGeometry in
+                            ZStack(alignment: .leading) {
+                                Rectangle()
+                                    .fill(Color.baseWhite.opacity(0.1))
+                                    .frame(height: 4)
+                                    .cornerRadius(2)
+                                
+                                Rectangle()
+                                    .fill(Color.baseWhite)
+                                    .frame(width: barGeometry.size.width * 0.8, height: 4)
+                                    .cornerRadius(2)
                             }
                         }
-                )
-                
-                Text("\(cyclesCompleted)/\(totalCycles) breaths completed")
-                    .font(.system(size: 15, weight: .regular))
-                    .foregroundColor(.baseWhite.opacity(0.7))
+                        .frame(height: 4)
+                    }
+                    .padding(.horizontal, 24)
+                    .padding(.top, 8)
+                    
+                    // Title and Subtitle
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text(OnboardingScreen.breathingExercise.title)
+                            .font(.system(size: 34, weight: .bold))
+                            .foregroundColor(.baseWhite)
+                            .fixedSize(horizontal: false, vertical: true)
+                        
+                        Text(OnboardingScreen.breathingExercise.subtitle)
+                            .font(.system(size: 17, weight: .regular))
+                            .foregroundColor(.baseWhite.opacity(0.7))
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    .padding(.top, 32)
+                    .padding(.horizontal, 24)
+                    
+                    Spacer()
+                    
+                    // Breathing Instructions
+                    Text(instructionText)
+                        .font(.system(size: 20, weight: .medium))
+                        .foregroundColor(.baseWhite)
+                        .frame(maxWidth: .infinity)
+                        .padding(.bottom, 32)
+                        .animation(.easeInOut, value: instructionText)
+                    
+                    // Progress Text
+                    Text("\(cyclesCompleted)/\(totalCycles) breaths completed")
+                        .font(.system(size: 15, weight: .regular))
+                        .foregroundColor(.baseWhite.opacity(0.7))
+                        .frame(maxWidth: .infinity)
+                        .padding(.bottom, 24)
+                    
+                    // Touch Circle
+                    ZStack {
+                        Circle()
+                            .stroke(Color.brandPrimary.opacity(0.3), lineWidth: 2)
+                            .frame(width: 80, height: 80)
+                        
+                        Circle()
+                            .fill(Color.brandPrimary.opacity(isInhaling ? 0.3 : 0.15))
+                            .frame(width: 80, height: 80)
+                        
+                        Text("Hold")
+                            .font(.system(size: 15, weight: .medium))
+                            .foregroundColor(.baseWhite)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.bottom, 50)
+                    .gesture(
+                        DragGesture(minimumDistance: 0)
+                            .onChanged { _ in
+                                if !isInhaling {
+                                    isInhaling = true
+                                    isExhaling = false
+                                    showExhalePrompt = false
+                                    withAnimation {
+                                        fillAmount = 0.85
+                                    }
+                                    // Schedule the exhale prompt to appear when fill reaches top
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 7) {
+                                        showExhalePrompt = true
+                                    }
+                                }
+                            }
+                            .onEnded { _ in
+                                isInhaling = false
+                                isExhaling = true
+                                withAnimation {
+                                    fillAmount = 0
+                                }
+                                
+                                // Wait for exhale animation to complete before resetting prompt and counting the breath
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 7) {
+                                    isExhaling = false
+                                    showExhalePrompt = false
+                                    cyclesCompleted += 1
+                                    if cyclesCompleted >= totalCycles {
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                                            viewModel.moveToNextScreen()
+                                        }
+                                    }
+                                }
+                            }
+                    )
+                }
             }
-            .padding(.vertical, 40)
         }
     }
 }
