@@ -53,6 +53,7 @@ struct OnboardingScreenContainer<Content: View>: View {
     let onNext: () -> Void
     let onBack: () -> Void
     let progress: CGFloat
+    let showBackButton: Bool
     
     init(
         title: String,
@@ -60,6 +61,7 @@ struct OnboardingScreenContainer<Content: View>: View {
         progress: CGFloat,
         isNextButtonEnabled: Bool = true,
         nextButtonTitle: String = "Continue",
+        showBackButton: Bool = true,
         onNext: @escaping () -> Void = {},
         onBack: @escaping () -> Void = {},
         @ViewBuilder content: () -> Content
@@ -71,6 +73,7 @@ struct OnboardingScreenContainer<Content: View>: View {
         self.onNext = onNext
         self.onBack = onBack
         self.progress = progress
+        self.showBackButton = showBackButton
         self.content = content()
     }
     
@@ -82,13 +85,15 @@ struct OnboardingScreenContainer<Content: View>: View {
                 VStack(alignment: .leading, spacing: 0) {
                     // Top Navigation Bar
                     HStack(spacing: 16) {
-                        Button(action: {
-                            hapticFeedback(.light)
-                            onBack()
-                        }) {
-                            Image(systemName: "arrow.left")
-                                .font(.system(size: 24, weight: .medium))
-                                .foregroundColor(.baseWhite)
+                        if showBackButton {
+                            Button(action: {
+                                hapticFeedback(.light)
+                                onBack()
+                            }) {
+                                Image(systemName: "arrow.left")
+                                    .font(.system(size: 24, weight: .medium))
+                                    .foregroundColor(.baseWhite)
+                            }
                         }
                         
                         GeometryReader { barGeometry in
@@ -202,6 +207,7 @@ struct WelcomeScreen: View {
             progress: 0.1,
             isNextButtonEnabled: true,
             nextButtonTitle: "Let's begin",
+            showBackButton: false,
             onNext: {
                 viewModel.moveToNextScreen()
             },
