@@ -1,6 +1,8 @@
 import SwiftUI
 import SharedKit
 import NotifKit
+import UserNotifications
+import StoreKit
 
 // MARK: - Common Components
 
@@ -260,14 +262,21 @@ struct TimeCommitmentScreen: View {
 struct ReminderScreen: View {
     @ObservedObject var viewModel: OnboardingViewModel
     
+    func requestNotificationPermission() {
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
+            DispatchQueue.main.async {
+                viewModel.moveToNextScreen()
+            }
+        }
+    }
+    
     var body: some View {
         OnboardingScreenContainer(
             title: OnboardingScreen.reminder.title,
             subtitle: OnboardingScreen.reminder.subtitle,
             nextButtonTitle: "Set Reminder"
         ) {
-            PushNotifications.showNotificationsPermissionsSheet()
-            viewModel.moveToNextScreen()
+            requestNotificationPermission()
         } content: {
             VStack(spacing: 24) {
                 DatePicker("Select Time", selection: $viewModel.selections.reminderTime, displayedComponents: .hourAndMinute)
@@ -314,6 +323,14 @@ struct ResetPlanScreen: View {
     @ObservedObject var viewModel: OnboardingViewModel
     @State private var hasRequestedReview = false
     
+    func requestReview() {
+        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+            SKStoreReviewController.requestReview(in: windowScene)
+        }
+        // Set flag and continue regardless of whether review was shown
+        hasRequestedReview = true
+    }
+    
     var body: some View {
         OnboardingScreenContainer(
             title: OnboardingScreen.resetPlan.title,
@@ -321,10 +338,7 @@ struct ResetPlanScreen: View {
             nextButtonTitle: "Start Day 1 Now"
         ) {
             if !hasRequestedReview {
-                askUserFor(.appRating) {
-                    // On successful rating or dismissal, set the flag and continue
-                    hasRequestedReview = true
-                }
+                requestReview()
             } else {
                 viewModel.moveToNextScreen()
             }
