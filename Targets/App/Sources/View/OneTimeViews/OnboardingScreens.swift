@@ -210,6 +210,7 @@ struct MotivationScreen: View {
             title: OnboardingScreen.motivation.title,
             subtitle: OnboardingScreen.motivation.subtitle,
             progress: 0.2,
+            showNextButton: !viewModel.selections.motivation.isEmpty,
             onNext: {
                 viewModel.moveToNextScreen()
             },
@@ -221,7 +222,6 @@ struct MotivationScreen: View {
                 ForEach(motivations, id: \.self) { text in
                     Button(action: {
                         viewModel.selections.motivation = text
-                        viewModel.moveToNextScreen()
                     }) {
                         HStack(alignment: .center, spacing: 16) {                            
                             Text(text)
@@ -337,6 +337,7 @@ struct TimeCommitmentScreen: View {
             title: OnboardingScreen.timeCommitment.title,
             subtitle: OnboardingScreen.timeCommitment.subtitle,
             progress: 0.4,
+            showNextButton: !viewModel.selections.timeCommitment.isEmpty,
             onNext: {
                 viewModel.moveToNextScreen()
             },
@@ -348,7 +349,6 @@ struct TimeCommitmentScreen: View {
                 ForEach(timeOptions, id: \.self) { text in
                     Button(action: {
                         viewModel.selections.timeCommitment = text
-                        viewModel.moveToNextScreen()
                     }) {
                         HStack(alignment: .center, spacing: 16) {
                             Text(text)
