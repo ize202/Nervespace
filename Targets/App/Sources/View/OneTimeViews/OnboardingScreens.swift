@@ -689,8 +689,8 @@ struct BreathingCompletionScreen: View {
     
     var body: some View {
         OnboardingScreenContainer(
-            title: OnboardingScreen.breathingCompletion.title,
-            subtitle: OnboardingScreen.breathingCompletion.subtitle,
+            title: "",
+            subtitle: "",
             progress: 0.8,
             isNextButtonEnabled: true,
             nextButtonTitle: "Continue",
