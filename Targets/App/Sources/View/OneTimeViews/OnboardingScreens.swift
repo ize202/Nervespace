@@ -480,7 +480,6 @@ struct ReminderScreen: View {
                     .colorScheme(.dark)
                     .accentColor(.brandPrimary)
                     .background(Color.baseBlack)
-                
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }

@@ -141,6 +141,14 @@ class OnboardingViewModel: ObservableObject {
 	init() {
 		// Pre-initialize haptic manager
 		_ = HapticManager.shared
+		
+		// Track start of onboarding
+		Analytics.capture(
+			.info,
+			id: "onboarding_view",
+			longDescription: "Started onboarding: welcome screen",
+			source: .general
+		)
 	}
 	
 	func moveToNextScreen() {
@@ -148,7 +156,16 @@ class OnboardingViewModel: ObservableObject {
 			  currentIndex < OnboardingScreen.allCases.count - 1 else {
 			return
 		}
+		
 		currentScreen = OnboardingScreen.allCases[currentIndex + 1]
+		
+		// Track progression to next screen
+		Analytics.capture(
+			.info,
+			id: "onboarding_view",
+			longDescription: "Progressed to: \(currentScreen)",
+			source: .general
+		)
 	}
 	
 	func moveToPreviousScreen() {
@@ -156,11 +173,11 @@ class OnboardingViewModel: ObservableObject {
 			  currentIndex > 0 else {
 			return
 		}
+		
 		currentScreen = OnboardingScreen.allCases[currentIndex - 1]
 	}
 	
 	func completeOnboarding() {
-		// This will be called from the Progress screen's final button
 		currentScreen = .progress // Ensure we're on the progress screen
 		// Any final cleanup or data saving can go here
 	}
