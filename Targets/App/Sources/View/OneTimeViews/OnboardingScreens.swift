@@ -539,6 +539,32 @@ struct PlanDayView: View {
     }
 }
 
+struct ProgressDayView: View {
+    let day: Int
+    let title: String
+    let isLocked: Bool
+    
+    var body: some View {
+        HStack(spacing: 16) {
+            Text("Day \(day)")
+                .font(.system(size: 15, weight: .semibold))
+                .foregroundColor(.brandPrimary)
+            
+            Text(title)
+                .font(.system(size: 17, weight: .regular))
+                .foregroundColor(.baseWhite)
+            
+            Spacer()
+            
+            Image(systemName: isLocked ? "lock.fill" : "checkmark.circle.fill")
+                .foregroundColor(isLocked ? .baseWhite.opacity(0.3) : .brandPrimary)
+        }
+        .padding(.vertical, 16)
+        .padding(.horizontal, 20)
+        .glassmorphism()
+    }
+}
+
 // MARK: - Breathing Exercise Screen
 
 struct BreathingExerciseScreen: View {
@@ -779,10 +805,10 @@ struct ProgressScreen: View {
                     .frame(height: 8)
                 
                 VStack(spacing: 16) {
-                    PlanDayView(day: 1, title: "Grounding Breath", isLocked: false)
-                    PlanDayView(day: 2, title: "Somatic Ease", isLocked: true)
-                    PlanDayView(day: 3, title: "Evening Calm", isLocked: true)
-                    PlanDayView(day: 4, title: "Posture Reset", isLocked: true)
+                    ProgressDayView(day: 1, title: "Grounding Breath", isLocked: false)
+                    ProgressDayView(day: 2, title: "Somatic Ease", isLocked: true)
+                    ProgressDayView(day: 3, title: "Evening Calm", isLocked: true)
+                    ProgressDayView(day: 4, title: "Posture Reset", isLocked: true)
                 }
             }
             .padding(.vertical, 20)
