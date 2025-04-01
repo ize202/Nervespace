@@ -31,44 +31,56 @@ struct OnboardingScreenContainer<Content: View>: View {
     }
     
     var body: some View {
-        ZStack {
-            // Background
-            Color.baseBlack
-                .ignoresSafeArea()
-            
-            VStack(alignment: .leading, spacing: 32) {
-                VStack(alignment: .leading, spacing: 12) {
-                    Text(title)
-                        .font(.system(size: 34, weight: .bold))
-                        .foregroundColor(.baseWhite)
-                        .multilineTextAlignment(.leading)
+        GeometryReader { geometry in
+            ZStack {
+                Color.baseBlack.ignoresSafeArea()
+                
+                ScrollView(showsIndicators: false) {
+                    VStack(alignment: .leading, spacing: 32) {
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text(title)
+                                .font(.system(size: 34, weight: .bold))
+                                .foregroundColor(.baseWhite)
+                                .multilineTextAlignment(.leading)
+                                .fixedSize(horizontal: false, vertical: true)
+                            
+                            Text(subtitle)
+                                .font(.system(size: 17, weight: .regular))
+                                .foregroundColor(.baseWhite.opacity(0.7))
+                                .multilineTextAlignment(.leading)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                        .padding(.top, 48)
                         .padding(.horizontal, 24)
-                    
-                    Text(subtitle)
-                        .font(.system(size: 17, weight: .regular))
-                        .foregroundColor(.baseWhite.opacity(0.7))
-                        .multilineTextAlignment(.leading)
-                        .padding(.horizontal, 24)
+                        
+                        content
+                            .padding(.horizontal, 24)
+                        
+                        Spacer(minLength: 100)
+                    }
+                    .frame(minHeight: geometry.size.height)
                 }
-                .padding(.top, 48)
-                
-                content
-                    .padding(.horizontal, 24)
-                
-                Spacer()
                 
                 if showNextButton {
-                    Button(action: onNext) {
-                        Text(nextButtonTitle)
-                            .font(.system(size: 17, weight: .semibold))
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 56)
-                            .background(Color.brandPrimary)
-                            .foregroundColor(.baseBlack)
-                            .cornerRadius(16)
+                    VStack {
+                        Spacer()
+                        Button(action: onNext) {
+                            Text(nextButtonTitle)
+                                .font(.system(size: 17, weight: .semibold))
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 56)
+                                .background(Color.brandPrimary)
+                                .foregroundColor(.baseBlack)
+                                .cornerRadius(16)
+                        }
+                        .padding(.horizontal, 24)
+                        .padding(.bottom, 32)
+                        .background(
+                            Color.baseBlack
+                                .edgesIgnoringSafeArea(.bottom)
+                                .shadow(color: .black.opacity(0.25), radius: 16, x: 0, y: -8)
+                        )
                     }
-                    .padding(.horizontal, 24)
-                    .padding(.bottom, 32)
                 }
             }
         }
@@ -313,27 +325,58 @@ struct TimeCommitmentScreen: View {
 
 struct ReminderScreen: View {
     @ObservedObject var viewModel: OnboardingViewModel
+    @State private var hasRequestedPermission = false
     
     func requestNotificationPermission() {
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
             DispatchQueue.main.async {
+                hasRequestedPermission = true
+                if granted {
+                    // Schedule the notification for the selected time
+                    scheduleNotification()
+                }
                 viewModel.moveToNextScreen()
             }
         }
+    }
+    
+    func scheduleNotification() {
+        let content = UNMutableNotificationContent()
+        content.title = "Time for Your Reset"
+        content.body = "Take a moment to ground yourself and reset your nervous system."
+        content.sound = .default
+        
+        // Create date components from the selected time
+        let calendar = Calendar.current
+        let components = calendar.dateComponents([.hour, .minute], from: viewModel.selections.reminderTime)
+        
+        // Create the trigger
+        let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: true)
+        
+        // Create the request
+        let request = UNNotificationRequest(identifier: "dailyReset", content: content, trigger: trigger)
+        
+        // Add the request
+        UNUserNotificationCenter.current().add(request)
     }
     
     var body: some View {
         OnboardingScreenContainer(
             title: OnboardingScreen.reminder.title,
             subtitle: OnboardingScreen.reminder.subtitle,
-            nextButtonTitle: "Set Reminder"
+            nextButtonTitle: hasRequestedPermission ? "Skip" : "Set Reminder"
         ) {
-            requestNotificationPermission()
+            if !hasRequestedPermission {
+                requestNotificationPermission()
+            } else {
+                viewModel.moveToNextScreen()
+            }
         } content: {
             VStack(spacing: 24) {
                 DatePicker("Select Time", selection: $viewModel.selections.reminderTime, displayedComponents: .hourAndMinute)
                     .datePickerStyle(.wheel)
                     .labelsHidden()
+                    .colorScheme(.dark)
             }
             .padding(.vertical, 20)
         }

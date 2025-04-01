@@ -90,7 +90,7 @@ struct OnboardingView: View {
 	
 	var body: some View {
 		ZStack {
-			Color.brandPrimary.opacity(0.1).ignoresSafeArea()
+			Color.baseBlack.ignoresSafeArea()
 			
 			TabView(selection: $viewModel.currentScreen) {
 				WelcomeScreen(viewModel: viewModel)
@@ -122,6 +122,13 @@ struct OnboardingView: View {
 			}
 			.tabViewStyle(.page(indexDisplayMode: .never))
 			.animation(.easeInOut, value: viewModel.currentScreen)
+			.interactiveDismissDisabled()  // Prevent dismissal by swipe
+			.gesture(DragGesture())  // Disable swipe between pages
+		}
+		.onChange(of: viewModel.currentScreen) { newScreen in
+			if newScreen == .progress {
+				onCompletion()
+			}
 		}
 	}
 }
