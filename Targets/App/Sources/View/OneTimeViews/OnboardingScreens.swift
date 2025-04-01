@@ -81,6 +81,13 @@ struct OnboardingScreenContainer<Content: View>: View {
 struct WelcomeScreen: View {
     @ObservedObject var viewModel: OnboardingViewModel
     
+    let exercises = [
+        ("figure.mind.and.body", "Somatic"),
+        ("lungs", "Breathwork"),
+        ("heart.circle", "Nervous System"),
+        ("sparkles", "Recovery")
+    ]
+    
     var body: some View {
         OnboardingScreenContainer(
             title: OnboardingScreen.welcome.title,
@@ -89,12 +96,32 @@ struct WelcomeScreen: View {
         ) {
             viewModel.moveToNextScreen()
         } content: {
-            Image("AppIcon")
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .frame(width: 120, height: 120)
-                .clipShape(RoundedRectangle(cornerRadius: 24))
-                .padding(.vertical, 40)
+            LazyVGrid(columns: [
+                GridItem(.flexible()),
+                GridItem(.flexible())
+            ], spacing: 20) {
+                ForEach(exercises, id: \.0) { systemName, title in
+                    VStack(spacing: 12) {
+                        Image(systemName: systemName)
+                            .font(.system(size: 32, weight: .light))
+                            .foregroundColor(.brandPrimary)
+                            .frame(width: 64, height: 64)
+                            .background(
+                                RoundedRectangle(cornerRadius: 16)
+                                    .fill(Color.baseBlack)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 16)
+                                            .stroke(Color.brandPrimary.opacity(0.3), lineWidth: 1)
+                                    )
+                            )
+                        
+                        Text(title)
+                            .font(.system(size: 13, weight: .medium))
+                            .foregroundColor(.baseWhite.opacity(0.7))
+                    }
+                }
+            }
+            .padding(.vertical, 40)
         }
     }
 }
@@ -516,6 +543,48 @@ struct ProgressBar: View {
                     .cornerRadius(8)
             }
         }
+    }
+}
+
+// MARK: - Previews
+struct OnboardingScreen_Previews: PreviewProvider {
+    static var previews: some View {
+        Group {
+            // Full Onboarding Flow
+            OnboardingView { }
+                .previewDisplayName("Full Onboarding Flow")
+            
+            // Individual Screens
+            Group {
+                WelcomeScreen(viewModel: OnboardingViewModel())
+                    .previewDisplayName("Welcome")
+                
+                MotivationScreen(viewModel: OnboardingViewModel())
+                    .previewDisplayName("Motivation")
+                
+                TensionAreasScreen(viewModel: OnboardingViewModel())
+                    .previewDisplayName("Tension Areas")
+                
+                TimeCommitmentScreen(viewModel: OnboardingViewModel())
+                    .previewDisplayName("Time Commitment")
+                
+                ReminderScreen(viewModel: OnboardingViewModel())
+                    .previewDisplayName("Reminder")
+                
+                MoodCheckScreen(viewModel: OnboardingViewModel())
+                    .previewDisplayName("Mood Check")
+                
+                ResetPlanScreen(viewModel: OnboardingViewModel())
+                    .previewDisplayName("Reset Plan")
+                
+                BreathingExerciseScreen(viewModel: OnboardingViewModel())
+                    .previewDisplayName("Breathing Exercise")
+                
+                ProgressScreen(viewModel: OnboardingViewModel())
+                    .previewDisplayName("Progress")
+            }
+        }
+        .preferredColorScheme(.dark)
     }
 }
 
