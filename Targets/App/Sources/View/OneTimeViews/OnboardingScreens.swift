@@ -414,23 +414,19 @@ struct ReminderScreen: View {
                 viewModel.moveToPreviousScreen()
             }
         ) {
-            GeometryReader { geometry in
-                VStack {
-                    Spacer()
-                    
-                    DatePicker("Select Time", selection: $viewModel.selections.reminderTime, displayedComponents: .hourAndMinute)
-                        .datePickerStyle(.wheel)
-                        .labelsHidden()
-                        .colorScheme(.dark)
-                        .accentColor(.brandPrimary)
-                        .background(Color.baseBlack)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: geometry.size.height * 35)
-                    
-                    Spacer()
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            VStack {
+                Spacer(minLength: 60)
+                
+                DatePicker("Select Time", selection: $viewModel.selections.reminderTime, displayedComponents: .hourAndMinute)
+                    .datePickerStyle(.wheel)
+                    .labelsHidden()
+                    .colorScheme(.dark)
+                    .accentColor(.brandPrimary)
+                    .background(Color.baseBlack)
+                
+                Spacer(minLength: 60)
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
     }
 }
