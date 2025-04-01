@@ -163,31 +163,32 @@ struct WelcomeScreen: View {
             }
         ) {
             LazyVGrid(columns: [
-                GridItem(.flexible()),
-                GridItem(.flexible())
-            ], spacing: 24) {
+                GridItem(.flexible(), spacing: 16),
+                GridItem(.flexible(), spacing: 16)
+            ], spacing: 16) {
                 ForEach(exercises, id: \.0) { systemName, title in
-                    VStack(spacing: 16) {
+                    VStack(spacing: 12) {
                         Image(systemName: systemName)
-                            .font(.system(size: 44, weight: .light))
+                            .font(.system(size: 52, weight: .light))
                             .foregroundColor(.brandPrimary)
-                            .frame(width: 96, height: 96)
+                            .frame(width: 140, height: 140)
                             .background(
-                                RoundedRectangle(cornerRadius: 24)
+                                RoundedRectangle(cornerRadius: 32)
                                     .fill(Color.baseBlack)
                                     .overlay(
-                                        RoundedRectangle(cornerRadius: 24)
+                                        RoundedRectangle(cornerRadius: 32)
                                             .stroke(Color.brandPrimary.opacity(0.3), lineWidth: 1)
                                     )
                             )
                         
                         Text(title)
-                            .font(.system(size: 15, weight: .medium))
+                            .font(.system(size: 17, weight: .medium))
                             .foregroundColor(.baseWhite.opacity(0.7))
                     }
                 }
             }
             .padding(.vertical, 40)
+            .padding(.horizontal, 8)
         }
     }
 }
