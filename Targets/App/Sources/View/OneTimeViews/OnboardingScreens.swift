@@ -31,36 +31,48 @@ struct OnboardingScreenContainer<Content: View>: View {
     }
     
     var body: some View {
-        VStack(spacing: 24) {
-            VStack(spacing: 8) {
-                Text(title)
-                    .font(.title)
-                    .fontWeight(.bold)
-                    .multilineTextAlignment(.center)
-                
-                Text(subtitle)
-                    .font(.body)
-                    .foregroundColor(.secondary)
-                    .multilineTextAlignment(.center)
-            }
-            .padding(.top, 40)
-            .padding(.horizontal, 24)
+        ZStack {
+            // Background
+            Color.baseBlack
+                .ignoresSafeArea()
             
-            content
-                .padding(.horizontal, 24)
-            
-            if showNextButton {
-                Button(action: onNext) {
-                    Text(nextButtonTitle)
-                        .frame(maxWidth: .infinity)
+            VStack(alignment: .leading, spacing: 32) {
+                VStack(alignment: .leading, spacing: 12) {
+                    Text(title)
+                        .font(.system(size: 34, weight: .bold))
+                        .foregroundColor(.baseWhite)
+                        .multilineTextAlignment(.leading)
+                        .padding(.horizontal, 24)
+                    
+                    Text(subtitle)
+                        .font(.system(size: 17, weight: .regular))
+                        .foregroundColor(.baseWhite.opacity(0.7))
+                        .multilineTextAlignment(.leading)
+                        .padding(.horizontal, 24)
                 }
-                .buttonStyle(.cta())
-                .padding(.horizontal, 24)
-                .padding(.bottom, 32)
+                .padding(.top, 48)
+                
+                content
+                    .padding(.horizontal, 24)
+                
+                Spacer()
+                
+                if showNextButton {
+                    Button(action: onNext) {
+                        Text(nextButtonTitle)
+                            .font(.system(size: 17, weight: .semibold))
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 56)
+                            .background(Color.brandPrimary)
+                            .foregroundColor(.baseBlack)
+                            .cornerRadius(16)
+                    }
+                    .padding(.horizontal, 24)
+                    .padding(.bottom, 32)
+                }
             }
-            
-            Spacer()
         }
+        .preferredColorScheme(.dark)
     }
 }
 
@@ -77,11 +89,11 @@ struct WelcomeScreen: View {
         ) {
             viewModel.moveToNextScreen()
         } content: {
-            Image(systemName: "heart.circle.fill")
+            Image("AppIcon")
                 .resizable()
                 .aspectRatio(contentMode: .fit)
                 .frame(width: 120, height: 120)
-                .foregroundColor(.brandPrimary)
+                .clipShape(RoundedRectangle(cornerRadius: 24))
                 .padding(.vertical, 40)
         }
     }
@@ -107,18 +119,21 @@ struct MotivationScreen: View {
         ) {
             viewModel.moveToNextScreen()
         } content: {
-            VStack(spacing: 12) {
+            VStack(alignment: .leading, spacing: 12) {
                 ForEach(motivations, id: \.1) { emoji, text in
                     Button(action: {
                         viewModel.selections.motivation = text
                         viewModel.moveToNextScreen()
                     }) {
-                        HStack(spacing: 16) {
+                        HStack(alignment: .center, spacing: 16) {
                             Text(emoji)
-                                .font(.title)
+                                .font(.system(size: 32))
+                                .frame(width: 44, alignment: .center)
                             
                             Text(text)
-                                .font(.body)
+                                .font(.system(size: 17, weight: .regular))
+                                .foregroundColor(.baseWhite)
+                                .multilineTextAlignment(.leading)
                             
                             Spacer()
                             
@@ -127,11 +142,15 @@ struct MotivationScreen: View {
                                     .foregroundColor(.brandPrimary)
                             }
                         }
-                        .padding()
+                        .padding(.vertical, 16)
+                        .padding(.horizontal, 20)
                         .background(
-                            RoundedRectangle(cornerRadius: 12)
-                                .fill(Color.white)
-                                .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 4)
+                            RoundedRectangle(cornerRadius: 16)
+                                .fill(Color.baseBlack)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 16)
+                                        .stroke(Color.baseWhite.opacity(0.1), lineWidth: 1)
+                                )
                         )
                     }
                     .buttonStyle(.plain)
@@ -165,7 +184,7 @@ struct TensionAreasScreen: View {
         ) {
             viewModel.moveToNextScreen()
         } content: {
-            VStack(spacing: 12) {
+            VStack(alignment: .leading, spacing: 12) {
                 ForEach(tensionAreas, id: \.self) { area in
                     Button(action: {
                         if viewModel.selections.tensionAreas.contains(area) {
@@ -176,7 +195,9 @@ struct TensionAreasScreen: View {
                     }) {
                         HStack {
                             Text(area)
-                                .font(.body)
+                                .font(.system(size: 17, weight: .regular))
+                                .foregroundColor(.baseWhite)
+                                .multilineTextAlignment(.leading)
                             
                             Spacer()
                             
@@ -185,14 +206,18 @@ struct TensionAreasScreen: View {
                                     .foregroundColor(.brandPrimary)
                             } else {
                                 Image(systemName: "circle")
-                                    .foregroundColor(.secondary)
+                                    .foregroundColor(.baseWhite.opacity(0.3))
                             }
                         }
-                        .padding()
+                        .padding(.vertical, 16)
+                        .padding(.horizontal, 20)
                         .background(
-                            RoundedRectangle(cornerRadius: 12)
-                                .fill(Color.white)
-                                .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 4)
+                            RoundedRectangle(cornerRadius: 16)
+                                .fill(Color.baseBlack)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 16)
+                                        .stroke(Color.baseWhite.opacity(0.1), lineWidth: 1)
+                                )
                         )
                     }
                     .buttonStyle(.plain)
@@ -361,22 +386,27 @@ struct PlanDayView: View {
     var body: some View {
         HStack(spacing: 16) {
             Text("Day \(day)")
-                .font(.headline)
+                .font(.system(size: 15, weight: .semibold))
                 .foregroundColor(.brandPrimary)
             
             Text(title)
-                .font(.body)
+                .font(.system(size: 17, weight: .regular))
+                .foregroundColor(.baseWhite)
             
             Spacer()
             
             Image(systemName: isLocked ? "lock.fill" : "checkmark.circle.fill")
-                .foregroundColor(isLocked ? .secondary : .brandPrimary)
+                .foregroundColor(isLocked ? .baseWhite.opacity(0.3) : .brandPrimary)
         }
-        .padding()
+        .padding(.vertical, 16)
+        .padding(.horizontal, 20)
         .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Color.white)
-                .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 4)
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color.baseBlack)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16)
+                        .stroke(Color.baseWhite.opacity(0.1), lineWidth: 1)
+                )
         )
     }
 }
@@ -401,18 +431,18 @@ struct BreathingExerciseScreen: View {
             VStack(spacing: 40) {
                 ZStack {
                     Circle()
-                        .stroke(Color.brandPrimary.opacity(0.2), lineWidth: 2)
+                        .stroke(Color.brandPrimary.opacity(0.3), lineWidth: 2)
                         .frame(width: 200, height: 200)
                     
                     Circle()
-                        .fill(Color.brandPrimary.opacity(0.1))
+                        .fill(Color.brandPrimary.opacity(0.15))
                         .frame(width: 200, height: 200)
                         .scaleEffect(scale)
                         .animation(.easeInOut(duration: 4), value: scale)
                     
                     Text(isInhaling ? "Hold to Inhale" : "Release to Exhale")
-                        .font(.headline)
-                        .foregroundColor(.brandPrimary)
+                        .font(.system(size: 17, weight: .medium))
+                        .foregroundColor(.baseWhite)
                 }
                 .gesture(
                     DragGesture(minimumDistance: 0)
@@ -434,8 +464,8 @@ struct BreathingExerciseScreen: View {
                 )
                 
                 Text("\(cyclesCompleted)/\(totalCycles) breaths completed")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
+                    .font(.system(size: 15, weight: .regular))
+                    .foregroundColor(.baseWhite.opacity(0.7))
             }
             .padding(.vertical, 40)
         }
@@ -478,12 +508,12 @@ struct ProgressBar: View {
             ZStack(alignment: .leading) {
                 Rectangle()
                     .fill(Color.brandPrimary.opacity(0.2))
-                    .cornerRadius(4)
+                    .cornerRadius(8)
                 
                 Rectangle()
                     .fill(Color.brandPrimary)
                     .frame(width: geometry.size.width * progress)
-                    .cornerRadius(4)
+                    .cornerRadius(8)
             }
         }
     }
