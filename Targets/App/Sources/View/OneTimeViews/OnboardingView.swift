@@ -138,6 +138,11 @@ class OnboardingViewModel: ObservableObject {
 	@Published var currentScreen: OnboardingScreen = .welcome
 	@Published var selections = OnboardingSelections()
 	
+	init() {
+		// Pre-initialize haptic manager
+		_ = HapticManager.shared
+	}
+	
 	func moveToNextScreen() {
 		guard let currentIndex = OnboardingScreen.allCases.firstIndex(of: currentScreen),
 			  currentIndex < OnboardingScreen.allCases.count - 1 else {

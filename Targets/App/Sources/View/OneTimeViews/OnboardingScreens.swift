@@ -4,11 +4,42 @@ import NotifKit
 import UserNotifications
 import StoreKit
 
-// MARK: - Haptic Feedback Helper
+// MARK: - Haptic Feedback Manager
+
+final class HapticManager {
+    static let shared = HapticManager()
+    
+    private var lightGenerator: UIImpactFeedbackGenerator
+    private var mediumGenerator: UIImpactFeedbackGenerator
+    private var softGenerator: UIImpactFeedbackGenerator
+    
+    private init() {
+        lightGenerator = UIImpactFeedbackGenerator(style: .light)
+        mediumGenerator = UIImpactFeedbackGenerator(style: .medium)
+        softGenerator = UIImpactFeedbackGenerator(style: .soft)
+        
+        // Prepare generators
+        lightGenerator.prepare()
+        mediumGenerator.prepare()
+        softGenerator.prepare()
+    }
+    
+    func impact(_ style: UIImpactFeedbackGenerator.FeedbackStyle) {
+        switch style {
+        case .light:
+            lightGenerator.impactOccurred()
+        case .medium:
+            mediumGenerator.impactOccurred()
+        case .soft:
+            softGenerator.impactOccurred()
+        default:
+            mediumGenerator.impactOccurred()
+        }
+    }
+}
 
 private func hapticFeedback(_ style: UIImpactFeedbackGenerator.FeedbackStyle = .medium) {
-    let generator = UIImpactFeedbackGenerator(style: style)
-    generator.impactOccurred()
+    HapticManager.shared.impact(style)
 }
 
 // MARK: - Common Components
