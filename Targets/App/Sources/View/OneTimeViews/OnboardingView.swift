@@ -92,38 +92,34 @@ struct OnboardingView: View {
 		ZStack {
 			Color.baseBlack.ignoresSafeArea()
 			
-			TabView(selection: $viewModel.currentScreen) {
-				WelcomeScreen(viewModel: viewModel)
-					.tag(OnboardingScreen.welcome)
-				
-				MotivationScreen(viewModel: viewModel)
-					.tag(OnboardingScreen.motivation)
-				
-				TensionAreasScreen(viewModel: viewModel)
-					.tag(OnboardingScreen.tensionAreas)
-				
-				TimeCommitmentScreen(viewModel: viewModel)
-					.tag(OnboardingScreen.timeCommitment)
-				
-				ReminderScreen(viewModel: viewModel)
-					.tag(OnboardingScreen.reminder)
-				
-				MoodCheckScreen(viewModel: viewModel)
-					.tag(OnboardingScreen.moodCheck)
-				
-				ResetPlanScreen(viewModel: viewModel)
-					.tag(OnboardingScreen.resetPlan)
-				
-				BreathingExerciseScreen(viewModel: viewModel)
-					.tag(OnboardingScreen.breathingExercise)
-				
-				ProgressScreen(viewModel: viewModel)
-					.tag(OnboardingScreen.progress)
+			// Replace TabView with ZStack and switch between screens
+			ZStack {
+				switch viewModel.currentScreen {
+				case .welcome:
+					WelcomeScreen(viewModel: viewModel)
+				case .motivation:
+					MotivationScreen(viewModel: viewModel)
+				case .tensionAreas:
+					TensionAreasScreen(viewModel: viewModel)
+				case .timeCommitment:
+					TimeCommitmentScreen(viewModel: viewModel)
+				case .reminder:
+					ReminderScreen(viewModel: viewModel)
+				case .moodCheck:
+					MoodCheckScreen(viewModel: viewModel)
+				case .resetPlan:
+					ResetPlanScreen(viewModel: viewModel)
+				case .breathingExercise:
+					BreathingExerciseScreen(viewModel: viewModel)
+				case .progress:
+					ProgressScreen(viewModel: viewModel)
+				}
 			}
-			.tabViewStyle(.page(indexDisplayMode: .never))
+			.transition(.asymmetric(
+				insertion: .move(edge: .trailing),
+				removal: .move(edge: .leading)
+			))
 			.animation(.easeInOut, value: viewModel.currentScreen)
-			.interactiveDismissDisabled()  // Prevent dismissal by swipe
-			.gesture(DragGesture())  // Disable swipe between pages
 		}
 		.onChange(of: viewModel.currentScreen) { newScreen in
 			if newScreen == .progress {
