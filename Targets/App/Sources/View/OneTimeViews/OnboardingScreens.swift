@@ -68,30 +68,33 @@ struct OnboardingScreenContainer<Content: View>: View {
                     .padding(.horizontal, 24)
                     .padding(.top, 8)
                     
+                    // Fixed Header
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text(title)
+                            .font(.system(size: 34, weight: .bold))
+                            .foregroundColor(.baseWhite)
+                            .fixedSize(horizontal: false, vertical: true)
+                        
+                        if !subtitle.isEmpty {
+                            Text(subtitle)
+                                .font(.system(size: 17, weight: .regular))
+                                .foregroundColor(.baseWhite.opacity(0.7))
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                    }
+                    .padding(.top, 24)
+                    .padding(.horizontal, 24)
+                    
+                    // Scrollable Content
                     ScrollView(showsIndicators: false) {
-                        VStack(alignment: .leading, spacing: 24) {
-                            // Title and Subtitle
-                            VStack(alignment: .leading, spacing: 12) {
-                                Text(title)
-                                    .font(.system(size: 34, weight: .bold))
-                                    .foregroundColor(.baseWhite)
-                                    .fixedSize(horizontal: false, vertical: true)
-                                
-                                if !subtitle.isEmpty {
-                                    Text(subtitle)
-                                        .font(.system(size: 17, weight: .regular))
-                                        .foregroundColor(.baseWhite.opacity(0.7))
-                                        .fixedSize(horizontal: false, vertical: true)
-                                }
-                            }
-                            .padding(.top, 32)
-                            
+                        VStack(spacing: 12) {
                             content
-                                .padding(.top, 24)
+                                .padding(.top, 20)
                         }
                         .padding(.horizontal, 24)
                     }
                     
+                    // Bottom Button
                     Button(action: onNext) {
                         Text(nextButtonTitle)
                             .font(.system(size: 17, weight: .semibold))
@@ -416,7 +419,7 @@ struct ReminderScreen: View {
             }
         ) {
             VStack {
-                Spacer(minLength: 60)
+                Spacer(minLength: 120)
                 
                 DatePicker("Select Time", selection: $viewModel.selections.reminderTime, displayedComponents: .hourAndMinute)
                     .datePickerStyle(.wheel)
@@ -425,7 +428,6 @@ struct ReminderScreen: View {
                     .accentColor(.brandPrimary)
                     .background(Color.baseBlack)
                 
-                Spacer(minLength: 60)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
