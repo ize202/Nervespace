@@ -64,7 +64,7 @@ enum OnboardingScreen: Int, CaseIterable {
 		case .reminder:
 			return "A gentle nudge can make all the difference."
 		case .moodCheck:
-			return "We'll come back to this after your first reset."
+			return "Let’s take note of how you're feeling right now."
 		case .resetPlan:
 			return "Built from your answers to fit your energy and needs."
 		case .breathingExercise:

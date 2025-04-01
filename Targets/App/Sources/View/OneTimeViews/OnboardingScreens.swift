@@ -490,7 +490,7 @@ struct ReminderScreen: View {
 
 struct MoodCheckScreen: View {
     @ObservedObject var viewModel: OnboardingViewModel
-    @State private var selectedMood: Int = 1 // Default to neutral
+    @State private var selectedMood: Int? = nil // No default selection
     
     let moods = [
         (title: "Stressed", icon: "😰", color: Color.red.opacity(0.7)),
@@ -499,6 +499,10 @@ struct MoodCheckScreen: View {
     ]
     
     var feedbackMessage: String {
+        guard let selectedMood = selectedMood else {
+            return "How are you feeling right now?"
+        }
+        
         switch selectedMood {
         case 0:
             return "It's okay to feel stressed. We'll help you find your calm."
@@ -516,12 +520,14 @@ struct MoodCheckScreen: View {
             title: OnboardingScreen.moodCheck.title,
             subtitle: OnboardingScreen.moodCheck.subtitle,
             progress: 0.6,
-            isNextButtonEnabled: true,
+            isNextButtonEnabled: selectedMood != nil, // Only enable continue when mood is selected
             nextButtonTitle: "Continue",
             onNext: {
                 // Convert selection to 0-1 range for compatibility
-                viewModel.selections.initialMood = Double(selectedMood) / Double(moods.count - 1)
-                viewModel.moveToNextScreen()
+                if let mood = selectedMood {
+                    viewModel.selections.initialMood = Double(mood) / Double(moods.count - 1)
+                    viewModel.moveToNextScreen()
+                }
             },
             onBack: {
                 viewModel.moveToPreviousScreen()
