@@ -530,7 +530,7 @@ struct PlanDayView: View {
             
             Spacer()
             
-            Image(systemName: isLocked ? "lock.fill" : "checkmark.circle.fill")
+            Image(systemName: isLocked ? "lock.fill" : "lock.open.fill")
                 .foregroundColor(isLocked ? .baseWhite.opacity(0.3) : .brandPrimary)
         }
         .padding(.vertical, 16)
