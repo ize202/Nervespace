@@ -10,7 +10,7 @@ struct OnboardingScreenContainer<Content: View>: View {
     let title: String
     let subtitle: String
     let content: Content
-    let showNextButton: Bool
+    let isNextButtonEnabled: Bool
     let nextButtonTitle: String
     let onNext: () -> Void
     let onBack: () -> Void
@@ -20,7 +20,7 @@ struct OnboardingScreenContainer<Content: View>: View {
         title: String,
         subtitle: String,
         progress: CGFloat,
-        showNextButton: Bool = true,
+        isNextButtonEnabled: Bool = true,
         nextButtonTitle: String = "Continue",
         onNext: @escaping () -> Void = {},
         onBack: @escaping () -> Void = {},
@@ -28,7 +28,7 @@ struct OnboardingScreenContainer<Content: View>: View {
     ) {
         self.title = title
         self.subtitle = subtitle
-        self.showNextButton = showNextButton
+        self.isNextButtonEnabled = isNextButtonEnabled
         self.nextButtonTitle = nextButtonTitle
         self.onNext = onNext
         self.onBack = onBack
@@ -92,23 +92,22 @@ struct OnboardingScreenContainer<Content: View>: View {
                         .padding(.horizontal, 24)
                     }
                     
-                    if showNextButton {
-                        Button(action: onNext) {
-                            Text(nextButtonTitle)
-                                .font(.system(size: 17, weight: .semibold))
-                                .frame(maxWidth: .infinity)
-                                .frame(height: 56)
-                                .background(Color.brandPrimary)
-                                .foregroundColor(.baseBlack)
-                                .cornerRadius(16)
-                        }
-                        .padding(.horizontal, 24)
-                        .padding(.vertical, 16)
-                        .background(
-                            Color.baseBlack
-                                .shadow(color: .black.opacity(0.25), radius: 16, x: 0, y: -8)
-                        )
+                    Button(action: onNext) {
+                        Text(nextButtonTitle)
+                            .font(.system(size: 17, weight: .semibold))
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 56)
+                            .background(Color.brandPrimary.opacity(isNextButtonEnabled ? 1 : 0.5))
+                            .foregroundColor(.baseBlack)
+                            .cornerRadius(16)
                     }
+                    .disabled(!isNextButtonEnabled)
+                    .padding(.horizontal, 24)
+                    .padding(.vertical, 16)
+                    .background(
+                        Color.baseBlack
+                            .shadow(color: .black.opacity(0.25), radius: 16, x: 0, y: -8)
+                    )
                 }
             }
         }
@@ -154,6 +153,7 @@ struct WelcomeScreen: View {
             title: OnboardingScreen.welcome.title,
             subtitle: OnboardingScreen.welcome.subtitle,
             progress: 0.1,
+            isNextButtonEnabled: true,
             nextButtonTitle: "Let's begin",
             onNext: {
                 viewModel.moveToNextScreen()
@@ -210,7 +210,7 @@ struct MotivationScreen: View {
             title: OnboardingScreen.motivation.title,
             subtitle: OnboardingScreen.motivation.subtitle,
             progress: 0.2,
-            showNextButton: !viewModel.selections.motivation.isEmpty,
+            isNextButtonEnabled: !viewModel.selections.motivation.isEmpty,
             onNext: {
                 viewModel.moveToNextScreen()
             },
@@ -273,7 +273,7 @@ struct TensionAreasScreen: View {
             title: OnboardingScreen.tensionAreas.title,
             subtitle: OnboardingScreen.tensionAreas.subtitle,
             progress: 0.3,
-            showNextButton: true,
+            isNextButtonEnabled: !viewModel.selections.tensionAreas.isEmpty,
             nextButtonTitle: "Continue",
             onNext: {
                 viewModel.moveToNextScreen()
@@ -337,7 +337,7 @@ struct TimeCommitmentScreen: View {
             title: OnboardingScreen.timeCommitment.title,
             subtitle: OnboardingScreen.timeCommitment.subtitle,
             progress: 0.4,
-            showNextButton: !viewModel.selections.timeCommitment.isEmpty,
+            isNextButtonEnabled: !viewModel.selections.timeCommitment.isEmpty,
             onNext: {
                 viewModel.moveToNextScreen()
             },
@@ -390,25 +390,10 @@ struct ReminderScreen: View {
             DispatchQueue.main.async {
                 hasRequestedPermission = true
                 if granted {
-                    scheduleNotification()
+                    viewModel.moveToNextScreen()
                 }
-                viewModel.moveToNextScreen()
             }
         }
-    }
-    
-    func scheduleNotification() {
-        let content = UNMutableNotificationContent()
-        content.title = "Time for Your Reset"
-        content.body = "Take a moment to ground yourself and reset your nervous system."
-        content.sound = .default
-        
-        let calendar = Calendar.current
-        let components = calendar.dateComponents([.hour, .minute], from: viewModel.selections.reminderTime)
-        let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: true)
-        let request = UNNotificationRequest(identifier: "dailyReset", content: content, trigger: trigger)
-        
-        UNUserNotificationCenter.current().add(request)
     }
     
     var body: some View {
@@ -416,6 +401,7 @@ struct ReminderScreen: View {
             title: OnboardingScreen.reminder.title,
             subtitle: OnboardingScreen.reminder.subtitle,
             progress: 0.5,
+            isNextButtonEnabled: true,
             nextButtonTitle: hasRequestedPermission ? "Skip" : "Set Reminder",
             onNext: {
                 if !hasRequestedPermission {
@@ -451,6 +437,8 @@ struct MoodCheckScreen: View {
             title: OnboardingScreen.moodCheck.title,
             subtitle: OnboardingScreen.moodCheck.subtitle,
             progress: 0.6,
+            isNextButtonEnabled: true,
+            nextButtonTitle: "Continue",
             onNext: {
                 viewModel.moveToNextScreen()
             },
@@ -494,6 +482,7 @@ struct ResetPlanScreen: View {
             title: OnboardingScreen.resetPlan.title,
             subtitle: OnboardingScreen.resetPlan.subtitle,
             progress: 0.7,
+            isNextButtonEnabled: true,
             nextButtonTitle: "Start Day 1 Now",
             onNext: {
                 if !hasRequestedReview {
@@ -556,7 +545,8 @@ struct BreathingExerciseScreen: View {
             title: OnboardingScreen.breathingExercise.title,
             subtitle: OnboardingScreen.breathingExercise.subtitle,
             progress: 0.8,
-            showNextButton: false,
+            isNextButtonEnabled: false,
+            nextButtonTitle: "Continue",
             onNext: {
                 viewModel.moveToNextScreen()
             },
@@ -619,6 +609,7 @@ struct ProgressScreen: View {
             title: OnboardingScreen.progress.title,
             subtitle: OnboardingScreen.progress.subtitle,
             progress: 0.9,
+            isNextButtonEnabled: true,
             nextButtonTitle: "Unlock Full Plan",
             onNext: {
                 onCompletion()
