@@ -681,6 +681,71 @@ struct BreathingExerciseScreen: View {
     }
 }
 
+// MARK: - Breathing Completion Screen
+
+struct BreathingCompletionScreen: View {
+    @ObservedObject var viewModel: OnboardingViewModel
+    @State private var isBreathing = false
+    
+    var body: some View {
+        OnboardingScreenContainer(
+            title: OnboardingScreen.breathingCompletion.title,
+            subtitle: OnboardingScreen.breathingCompletion.subtitle,
+            progress: 0.8,
+            isNextButtonEnabled: true,
+            nextButtonTitle: "Continue",
+            onNext: {
+                viewModel.moveToNextScreen()
+            },
+            onBack: {
+                viewModel.moveToPreviousScreen()
+            }
+        ) {
+            // Center content with circle background
+            ZStack {
+                // Soft breathing circle
+                Circle()
+                    .fill(Color.brandPrimary.opacity(0.15))
+                    .scaleEffect(isBreathing ? 1.1 : 1.0)
+                    .animation(
+                        Animation
+                            .easeInOut(duration: 4)
+                            .repeatForever(autoreverses: true),
+                        value: isBreathing
+                    )
+                
+                // Text content
+                VStack(spacing: 24) {
+                    Text("Reset complete.")
+                        .font(.system(size: 34, weight: .bold))
+                        .foregroundColor(.baseWhite)
+                        .multilineTextAlignment(.center)
+                    
+                    Text("Your body felt that. Just 3 breaths made a difference.")
+                        .font(.system(size: 20, weight: .regular))
+                        .foregroundColor(.baseWhite.opacity(0.7))
+                        .multilineTextAlignment(.center)
+                    
+                    Text("You're 1 step into your reset plan. Let's keep your momentum going.")
+                        .font(.system(size: 17, weight: .regular))
+                        .foregroundColor(.baseWhite.opacity(0.7))
+                        .multilineTextAlignment(.center)
+                }
+                .padding(.horizontal, 24)
+                .frame(maxWidth: .infinity)
+                .opacity(isBreathing ? 1 : 0)
+                .animation(.easeIn.delay(0.3), value: isBreathing)
+            }
+            .frame(maxHeight: .infinity)
+        }
+        .onAppear {
+            withAnimation {
+                isBreathing = true
+            }
+        }
+    }
+}
+
 // MARK: - Progress Screen
 
 struct ProgressScreen: View {
@@ -768,6 +833,9 @@ struct OnboardingScreen_Previews: PreviewProvider {
                 
                 BreathingExerciseScreen(viewModel: OnboardingViewModel())
                     .previewDisplayName("Breathing Exercise")
+                
+                BreathingCompletionScreen(viewModel: OnboardingViewModel())
+                    .previewDisplayName("Breathing Completion")
                 
                 ProgressScreen(viewModel: OnboardingViewModel()) {
                     // Placeholder for onCompletion

@@ -23,6 +23,7 @@ enum OnboardingScreen: Int, CaseIterable {
 	case moodCheck
 	case resetPlan
 	case breathingExercise
+	case breathingCompletion
 	case progress
 	
 	var title: String {
@@ -43,6 +44,8 @@ enum OnboardingScreen: Int, CaseIterable {
 			return "Here's your personalized 3-day reset path"
 		case .breathingExercise:
 			return "Let's take your first reset breath"
+		case .breathingCompletion:
+			return "Reset complete."
 		case .progress:
 			return "You've started something powerful"
 		}
@@ -66,6 +69,8 @@ enum OnboardingScreen: Int, CaseIterable {
 			return "Built from your answers to fit your energy and needs."
 		case .breathingExercise:
 			return "No movement needed — just follow the rhythm."
+		case .breathingCompletion:
+			return "Your body felt that. Just 3 breaths made a difference."
 		case .progress:
 			return "You're 1 day in. Your reset plan continues tomorrow."
 		}
@@ -112,6 +117,8 @@ struct OnboardingView: View {
 					ResetPlanScreen(viewModel: viewModel)
 				case .breathingExercise:
 					BreathingExerciseScreen(viewModel: viewModel)
+				case .breathingCompletion:
+					BreathingCompletionScreen(viewModel: viewModel)
 				case .progress:
 					ProgressScreen(viewModel: viewModel, onCompletion: onCompletion)
 				}
