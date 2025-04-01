@@ -4,6 +4,13 @@ import NotifKit
 import UserNotifications
 import StoreKit
 
+// MARK: - Haptic Feedback Helper
+
+private func hapticFeedback(_ style: UIImpactFeedbackGenerator.FeedbackStyle = .medium) {
+    let generator = UIImpactFeedbackGenerator(style: style)
+    generator.impactOccurred()
+}
+
 // MARK: - Common Components
 
 struct OnboardingScreenContainer<Content: View>: View {
@@ -44,7 +51,10 @@ struct OnboardingScreenContainer<Content: View>: View {
                 VStack(alignment: .leading, spacing: 0) {
                     // Top Navigation Bar
                     HStack(spacing: 16) {
-                        Button(action: onBack) {
+                        Button(action: {
+                            hapticFeedback(.light)
+                            onBack()
+                        }) {
                             Image(systemName: "arrow.left")
                                 .font(.system(size: 24, weight: .medium))
                                 .foregroundColor(.baseWhite)
@@ -95,7 +105,10 @@ struct OnboardingScreenContainer<Content: View>: View {
                     }
                     
                     // Bottom Button
-                    Button(action: onNext) {
+                    Button(action: {
+                        hapticFeedback()
+                        onNext()
+                    }) {
                         Text(nextButtonTitle)
                             .font(.system(size: 17, weight: .semibold))
                             .frame(maxWidth: .infinity)
@@ -225,6 +238,7 @@ struct MotivationScreen: View {
             VStack(spacing: 12) {
                 ForEach(motivations, id: \.self) { text in
                     Button(action: {
+                        hapticFeedback(.light)
                         viewModel.selections.motivation = text
                     }) {
                         HStack(alignment: .center, spacing: 16) {                            
@@ -289,6 +303,7 @@ struct TensionAreasScreen: View {
             VStack(spacing: 12) {
                 ForEach(tensionAreas, id: \.self) { area in
                     Button(action: {
+                        hapticFeedback(.light)
                         if viewModel.selections.tensionAreas.contains(area) {
                             viewModel.selections.tensionAreas.remove(area)
                         } else {
@@ -352,6 +367,7 @@ struct TimeCommitmentScreen: View {
             VStack(spacing: 12) {
                 ForEach(timeOptions, id: \.self) { text in
                     Button(action: {
+                        hapticFeedback(.light)
                         viewModel.selections.timeCommitment = text
                     }) {
                         HStack(alignment: .center, spacing: 16) {
@@ -601,7 +617,10 @@ struct BreathingExerciseScreen: View {
                 VStack(alignment: .leading, spacing: 0) {
                     // Top Navigation Bar
                     HStack(spacing: 16) {
-                        Button(action: { viewModel.moveToPreviousScreen() }) {
+                        Button(action: {
+                            hapticFeedback(.light)
+                            viewModel.moveToPreviousScreen()
+                        }) {
                             Image(systemName: "arrow.left")
                                 .font(.system(size: 24, weight: .medium))
                                 .foregroundColor(.baseWhite)
@@ -677,6 +696,7 @@ struct BreathingExerciseScreen: View {
                         DragGesture(minimumDistance: 0)
                             .onChanged { _ in
                                 if !isInhaling {
+                                    hapticFeedback(.soft)
                                     isInhaling = true
                                     isExhaling = false
                                     showExhalePrompt = false
@@ -690,6 +710,7 @@ struct BreathingExerciseScreen: View {
                                 }
                             }
                             .onEnded { _ in
+                                hapticFeedback(.soft)
                                 isInhaling = false
                                 isExhaling = true
                                 withAnimation {
@@ -702,6 +723,7 @@ struct BreathingExerciseScreen: View {
                                     showExhalePrompt = false
                                     cyclesCompleted += 1
                                     if cyclesCompleted >= totalCycles {
+                                        hapticFeedback(.medium)
                                         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                                             viewModel.moveToNextScreen()
                                         }
