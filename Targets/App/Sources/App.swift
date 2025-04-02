@@ -185,6 +185,9 @@ final class SceneDelegate: NSObject, ObservableObject, UIWindowSceneDelegate {
 	) {
 		if let windowScene = scene as? UIWindowScene {
 			setupSecondaryOverlayWindow(in: windowScene)
+			
+			// Show app launch paywall if needed
+			PaywallManager.shared.handleAppLaunch()
 		}
 		// Change the AccentColor in App/Resources/Assets to style the app
 		UIView.appearance(whenContainedInInstancesOf: [UIAlertController.self]).tintColor = UIColor.init(
