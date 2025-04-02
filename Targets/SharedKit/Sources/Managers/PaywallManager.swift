@@ -16,12 +16,4 @@ public class PaywallManager {
             completion()
         }
     }
-    
-    /// Track app open event
-    public func trackAppOpen() {
-        // Only track app open for non-first launches
-        if defaults.bool(forKey: hasCompletedOnboardingKey) {
-            Superwall.shared.register(placement: "app_opened")
-        }
-    }
 } 
