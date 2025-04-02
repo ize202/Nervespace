@@ -59,6 +59,19 @@ func tuistProject() -> Project {
 
 	addApp()
 
+	// Create staging scheme with StoreKit configuration
+	let stagingScheme = Scheme.scheme(
+		name: "\(appName)-Staging",
+		shared: true,
+		hidden: false,
+		buildAction: .buildAction(targets: ["\(appName)"], findImplicitDependencies: true),
+		testAction: nil,
+        runAction: .runAction(configuration: "Debug", arguments: nil, options: .options(storeKitConfigurationPath: "Products.storekit")),
+		archiveAction: .archiveAction(configuration: "Release"),
+		profileAction: nil,
+		analyzeAction: nil
+	)
+
 	return Project(
 		name: appName,
 		options: .options(
@@ -77,7 +90,8 @@ func tuistProject() -> Project {
 			"MARKETING_VERSION": "1.0.0",
 			"CURRENT_PROJECT_VERSION": "1",
 		]),
-		targets: projectTargets
+		targets: projectTargets,
+		schemes: [stagingScheme]
 	)
 
 	func addApp() {

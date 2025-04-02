@@ -1,0 +1,239 @@
+{
+  "appPolicies" : {
+    "eula" : "",
+    "policies" : [
+      {
+        "locale" : "en_US",
+        "policyText" : "",
+        "policyURL" : ""
+      }
+    ]
+  },
+  "identifier" : "E04DB413",
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
+
+  ],
+  "settings" : {
+    "_applicationInternalID" : "6743818354",
+    "_developerTeamID" : "NMXU2ZADVX",
+    "_failTransactionsEnabled" : false,
+    "_lastSynchronizedDate" : 765313710.44366801,
+    "_locale" : "en_US",
+    "_storefront" : "USA",
+    "_storeKitErrors" : [
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Load Products"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Purchase"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Verification"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "App Store Sync"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Subscription Status"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "App Transaction"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Manage Subscriptions Sheet"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Refund Request Sheet"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Offer Code Redeem Sheet"
+      }
+    ]
+  },
+  "subscriptionGroups" : [
+    {
+      "id" : "21660155",
+      "localizations" : [
+
+      ],
+      "name" : "Form Premium",
+      "subscriptions" : [
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "12.99",
+          "familyShareable" : false,
+          "groupNumber" : 5,
+          "internalID" : "6744074831",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "All premium features, billed monthly",
+              "displayName" : "Form Premium Monthly",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "monthly_12.99_0d_trial",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "Unlimited (Monthly)",
+          "subscriptionGroupID" : "21660155",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "39.99",
+          "familyShareable" : false,
+          "groupNumber" : 2,
+          "internalID" : "6744104436",
+          "introductoryOffer" : {
+            "internalID" : "1166BBF6",
+            "numberOfPeriods" : 1,
+            "paymentMode" : "free",
+            "subscriptionPeriod" : "P3D"
+          },
+          "localizations" : [
+            {
+              "description" : "All premium features at our best value",
+              "displayName" : "Form Premium Yearly",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "yearly_39.99_3d_trial",
+          "recurringSubscriptionPeriod" : "P1Y",
+          "referenceName" : "Unlimited (Yearly + 50% off)",
+          "subscriptionGroupID" : "21660155",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "23.99",
+          "familyShareable" : false,
+          "groupNumber" : 3,
+          "internalID" : "6744104729",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "Access to all premium plans and exercises ",
+              "displayName" : "Form Premium Yearly",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "yearly_23.99_0d_trial",
+          "recurringSubscriptionPeriod" : "P1Y",
+          "referenceName" : "Unlimited (Yearly + 70% off)",
+          "subscriptionGroupID" : "21660155",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "19.99",
+          "familyShareable" : false,
+          "groupNumber" : 4,
+          "internalID" : "6744105233",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "Access to all premium content, best value",
+              "displayName" : "Form Premium Yearly",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "yearly_19.99_0d_trial",
+          "recurringSubscriptionPeriod" : "P1Y",
+          "referenceName" : "Unlimited (Yearly + 75% off)",
+          "subscriptionGroupID" : "21660155",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "79.99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "6744074959",
+          "introductoryOffer" : {
+            "internalID" : "5D4DFF19",
+            "numberOfPeriods" : 1,
+            "paymentMode" : "free",
+            "subscriptionPeriod" : "P3D"
+          },
+          "localizations" : [
+            {
+              "description" : "All premium features at our best value",
+              "displayName" : "Form Premium Yearly",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "yearly_79.99_3d_trial",
+          "recurringSubscriptionPeriod" : "P1Y",
+          "referenceName" : "Unlimited (Yearly)",
+          "subscriptionGroupID" : "21660155",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
+        }
+      ]
+    }
+  ],
+  "version" : {
+    "major" : 4,
+    "minor" : 0
+  }
+}

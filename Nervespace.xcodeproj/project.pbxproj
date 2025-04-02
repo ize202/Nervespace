@@ -310,6 +310,7 @@
 		4C2ECC22973D7C1A97317E4D /* BookmarkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkManager.swift; sourceTree = "<group>"; };
 		4F95AB075CFCC69E3E00BE35 /* isPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = isPreview.swift; sourceTree = "<group>"; };
 		5279F25E04166E8C66540B70 /* OnboardingScreens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingScreens.swift; sourceTree = "<group>"; };
+		53C1ECFF6CE4DAF4D82ED904 /* Products.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = Products.storekit; sourceTree = "<group>"; };
 		5507FF85704924F325225747 /* captureTaps.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = captureTaps.swift; sourceTree = "<group>"; };
 		553CD736FB8477C349AC0D06 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		5659C5D7AD221C5697002B98 /* requireLogin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = requireLogin.swift; sourceTree = "<group>"; };
@@ -751,6 +752,7 @@
 			children = (
 				9E71ADD4E01AAC892F727405 /* Derived */,
 				1DCBD6B0C47AD73D8FF20314 /* Targets */,
+				53C1ECFF6CE4DAF4D82ED904 /* Products.storekit */,
 			);
 			name = Project;
 			sourceTree = "<group>";
