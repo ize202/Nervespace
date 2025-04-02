@@ -211,10 +211,8 @@ final class SceneDelegate: NSObject, ObservableObject, UIWindowSceneDelegate {
 	}
     
     func sceneDidBecomeActive(_ scene: UIScene) {
-        // Check if we should show first paywall
-        if PaywallManager.shared.shouldShowFirstPaywall() {
-            PaywallManager.shared.showFirstPaywall()
-        }
+        // Track app open event - Superwall will handle paywall presentation based on rules
+        PaywallManager.shared.trackAppOpen()
     }
 }
 

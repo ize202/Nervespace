@@ -3,6 +3,7 @@ import SharedKit
 import NotifKit
 import UserNotifications
 import StoreKit
+import SuperwallKit
 
 // MARK: - Haptic Feedback Manager
 
@@ -929,9 +930,10 @@ struct ProgressScreen: View {
             isNextButtonEnabled: true,
             nextButtonTitle: "Unlock Full Plan",
             onNext: {
-                // Show first paywall with second paywall on decline during onboarding
-                PaywallManager.shared.showFirstPaywall(showSecondPaywallOnDecline: true)
-                onCompletion()
+                // Mark onboarding as completed and handle paywall presentation
+                PaywallManager.shared.markOnboardingCompleted {
+                    onCompletion()
+                }
             },
             onBack: {
                 viewModel.moveToPreviousScreen()
