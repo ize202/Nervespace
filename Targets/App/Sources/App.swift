@@ -171,7 +171,6 @@ class AppDelegate: NSObject, UIApplicationDelegate, OSNotificationLifecycleListe
 
 	}
 }
-
 // https://swiftylaun.ch/blog/swiftui-overlay-over-every-view
 // https://docs.swiftylaun.ch/module/sharedkit/in-app-notifications
 final class SceneDelegate: NSObject, ObservableObject, UIWindowSceneDelegate {
@@ -210,6 +209,13 @@ final class SceneDelegate: NSObject, ObservableObject, UIWindowSceneDelegate {
 		secondaryWindow.isHidden = false
 		self.secondaryWindow = secondaryWindow
 	}
+    
+    func sceneDidBecomeActive(_ scene: UIScene) {
+        // Check if we should show first paywall
+        if PaywallManager.shared.shouldShowFirstPaywall() {
+            PaywallManager.shared.showFirstPaywall()
+        }
+    }
 }
 
 class PassThroughWindow: UIWindow {
@@ -220,3 +226,4 @@ class PassThroughWindow: UIWindow {
 		return rootViewController?.view == hitView ? nil : hitView
 	}
 }
+

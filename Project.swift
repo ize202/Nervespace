@@ -113,7 +113,9 @@ func tuistProject() -> Project {
 			deploymentTargets: .iOS(osVersion),
 			sources: ["Targets/\(targetName)/Sources/**"],
 			resources: ["Targets/\(targetName)/Resources/**"],
-			dependencies: []
+			dependencies: [
+				.package(product: "SuperwallKit", type: .runtime)
+			]
 		)
 
 		appDependencies.append(sharedKit)

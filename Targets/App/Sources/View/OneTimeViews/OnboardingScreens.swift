@@ -929,6 +929,8 @@ struct ProgressScreen: View {
             isNextButtonEnabled: true,
             nextButtonTitle: "Unlock Full Plan",
             onNext: {
+                // Show first paywall with second paywall on decline during onboarding
+                PaywallManager.shared.showFirstPaywall(showSecondPaywallOnDecline: true)
                 onCompletion()
             },
             onBack: {
