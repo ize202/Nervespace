@@ -9,13 +9,10 @@ public class PaywallManager {
     
     private init() {}
     
-    /// Called when onboarding is completed
+    /// Called when onboarding is completed to show hard paywall
     public func markOnboardingCompleted(completion: @escaping () -> Void = {}) {
-        defaults.set(true, forKey: hasCompletedOnboardingKey)
-        
-        // Present paywall using Superwall placement with handler
-        let handler = PaywallPresentationHandler()
-        Superwall.shared.register(placement: "onboarding_completed", handler: handler) {
+        // Present hard paywall using Superwall
+        Superwall.shared.register(placement: "onboarding_completed") {
             completion()
         }
     }

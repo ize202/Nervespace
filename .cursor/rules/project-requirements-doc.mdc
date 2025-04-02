@@ -114,7 +114,7 @@ public extension Color {
 	1. Welcome screens with a brief app overview and tutorial.
 	2. No sign-up/login needed
 2. First Paywall w/ 50% annual discount
-3. Second Paywall w/  70% annual discount
+3. Second Paywall w/  75% annual discount
 4. Home Screen: Quick access to daily resets, guided sessions, and progress tracking.
 5. Session Selection: Browse free or premium sessions with clear categorization.
 6. Session Experience: Audio guidance with optional visuals (e.g., breathing animations).
@@ -153,8 +153,8 @@ Mobile: iOS (MVP)
 ### Pricing
 - Monthly: $12.99 (No discounts)
 - Annual: $79.99 (discounts included)
-	- $39.99 (50% off)
-	- $23.99 (70% off)
+	- $39.99 (50% off + 3d trial)
+	- $19.99 (75% off + no trial)
 
 ## Success Metrics
 

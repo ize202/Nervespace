@@ -930,7 +930,7 @@ struct ProgressScreen: View {
             isNextButtonEnabled: true,
             nextButtonTitle: "Unlock Full Plan",
             onNext: {
-                // Mark onboarding as completed and handle paywall presentation
+                // Show hard paywall at end of onboarding
                 PaywallManager.shared.markOnboardingCompleted {
                     onCompletion()
                 }

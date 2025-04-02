@@ -1268,7 +1268,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastUpgradeCheck = 1620;
+				LastUpgradeCheck = 1630;
 			};
 			buildConfigurationList = C0D2750EF28CF4F78BE110D2 /* Build configuration list for PBXProject "Nervespace" */;
 			compatibilityVersion = "Xcode 14.0";

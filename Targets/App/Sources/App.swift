@@ -209,11 +209,6 @@ final class SceneDelegate: NSObject, ObservableObject, UIWindowSceneDelegate {
 		secondaryWindow.isHidden = false
 		self.secondaryWindow = secondaryWindow
 	}
-    
-    func sceneDidBecomeActive(_ scene: UIScene) {
-        // Track app open event - Superwall will handle paywall presentation based on rules
-        PaywallManager.shared.trackAppOpen()
-    }
 }
 
 class PassThroughWindow: UIWindow {
