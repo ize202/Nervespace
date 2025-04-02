@@ -97,7 +97,6 @@ class AppDelegate: NSObject, UIApplicationDelegate, OSNotificationLifecycleListe
 
 		// Initialize Superwall
 		Superwall.configure(apiKey: "pk_9a8863050fddddfe94135b0d907e2e593af2c3dbbd78c6be")
-		Superwall.shared.delegate = SuperwallAnalytics.shared
 
 		// If OneSignal initialized successfully, we set up the push notification observers and clear all notifications when the app is opened
 		PushNotifications.initOneSignal(launchOptions)
