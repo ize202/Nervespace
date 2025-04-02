@@ -7,21 +7,16 @@
 		<key>AnalyticsKit.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>isShown</key>
-			<false/>
+			<true/>
 			<key>orderHint</key>
 			<integer>0</integer>
 		</dict>
 		<key>CrashlyticsKit.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>isShown</key>
-			<false/>
+			<true/>
 			<key>orderHint</key>
 			<integer>1</integer>
-		</dict>
-		<key>Nervespace-Staging.xcscheme_^#shared#^_</key>
-		<dict>
-			<key>orderHint</key>
-			<integer>3</integer>
 		</dict>
 		<key>Nervespace.xcscheme_^#shared#^_</key>
 		<dict>
@@ -33,68 +28,30 @@
 		<key>NotifKit.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>isShown</key>
-			<false/>
+			<true/>
 			<key>orderHint</key>
-			<integer>5</integer>
+			<integer>4</integer>
 		</dict>
 		<key>OneSignalNotificationServiceExtension.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>isShown</key>
-			<false/>
+			<true/>
 			<key>orderHint</key>
-			<integer>6</integer>
+			<integer>5</integer>
 		</dict>
 		<key>SharedKit.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>isShown</key>
-			<false/>
+			<true/>
 			<key>orderHint</key>
-			<integer>7</integer>
+			<integer>6</integer>
 		</dict>
 		<key>SupabaseKit.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>isShown</key>
-			<false/>
+			<true/>
 			<key>orderHint</key>
-			<integer>8</integer>
-		</dict>
-	</dict>
-	<key>SuppressBuildableAutocreation</key>
-	<dict>
-		<key>08590A2D507658161A15BCDF</key>
-		<dict>
-			<key>primary</key>
-			<true/>
-		</dict>
-		<key>224D8CDC1815EBB35C0D6AC4</key>
-		<dict>
-			<key>primary</key>
-			<true/>
-		</dict>
-		<key>3F6205C1A134BE02DABCB2A0</key>
-		<dict>
-			<key>primary</key>
-			<true/>
-		</dict>
-		<key>981F618F0E37669F07EE951D</key>
-		<dict>
-			<key>primary</key>
-			<true/>
-		</dict>
-		<key>D9AB99BC4EB5C67C2E177D44</key>
-		<dict>
-			<key>primary</key>
-			<true/>
-		</dict>
-		<key>DE21648189B7215D165E7802</key>
-		<dict>
-			<key>primary</key>
-			<true/>
-		</dict>
-		<key>FEC853F5402718FFEB00846C</key>
-		<dict>
-			<key>primary</key>
-			<true/>
+			<integer>7</integer>
 		</dict>
 	</dict>
 </dict>

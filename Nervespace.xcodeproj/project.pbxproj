@@ -35,6 +35,7 @@
 		378EFA1D4B6C986FDC481125 /* SharedKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 39E86B5FF5E957E5D088F40B /* SharedKit.framework */; };
 		3797008718C84B73B92DA49A /* RoutineCompletionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4065C60AB9E5466ACC434A9E /* RoutineCompletionView.swift */; };
 		39323B12200564DF86A723E3 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 2A95F18B032436B71DBB4D08 /* Supabase */; };
+		39DF690A2F4788EAC1770E1F /* SuperwallAnalytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8A696B1E16C7AB6C99B0282 /* SuperwallAnalytics.swift */; };
 		3C25A9005BCDA83403899218 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5C09F336EAC3018DF777EA4A /* Assets.xcassets */; };
 		3F285921495C600CA69CD5CA /* Supabase-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0A6F5D777272D1E306BA4BB9 /* Supabase-Info.plist */; };
 		3FDBB637086310BAA31C24A1 /* Color+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6FC25820BDEE7785E361350 /* Color+Extensions.swift */; };
@@ -379,6 +380,7 @@
 		E5DFA5E09A8701AD67D4ECAB /* RequestType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestType.swift; sourceTree = "<group>"; };
 		E707125AB574BCCB8270439E /* Stack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stack.swift; sourceTree = "<group>"; };
 		E792EB44A5FA4D059ECCAD19 /* openAppInSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = openAppInSettings.swift; sourceTree = "<group>"; };
+		E8A696B1E16C7AB6C99B0282 /* SuperwallAnalytics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuperwallAnalytics.swift; sourceTree = "<group>"; };
 		E8A6EE964B30D294427E8570 /* Nervespace.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Nervespace.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		EDA25E2E3D1A1DE59AAFCCBE /* CrashlyticsKit-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "CrashlyticsKit-Info.plist"; sourceTree = "<group>"; };
 		F1B45027C04793D1C7C5909B /* currentPlatform.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = currentPlatform.swift; sourceTree = "<group>"; };
@@ -815,6 +817,7 @@
 			isa = PBXGroup;
 			children = (
 				A3AFEF9E228126C5D9312328 /* Analytics.swift */,
+				E8A696B1E16C7AB6C99B0282 /* SuperwallAnalytics.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -1495,6 +1498,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DB5B3FB057515CC4DB4172B7 /* Analytics.swift in Sources */,
+				39DF690A2F4788EAC1770E1F /* SuperwallAnalytics.swift in Sources */,
 				50910C0AFAFF3F345E6257E4 /* captureTaps.swift in Sources */,
 				4859F837A31A39F32F733FF0 /* captureViewActivity.swift in Sources */,
 			);
@@ -1788,8 +1792,6 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Derived/Entitlements/Nervespace.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = NMXU2ZADVX;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = "Derived/InfoPlists/Nervespace-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -1797,7 +1799,6 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.57;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.slips.nervespace;
 				PRODUCT_NAME = Nervespace;
@@ -1819,8 +1820,6 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Derived/Entitlements/Nervespace.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = NMXU2ZADVX;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = "Derived/InfoPlists/Nervespace-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -1828,7 +1827,6 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.57;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = com.slips.nervespace;
 				PRODUCT_NAME = Nervespace;
