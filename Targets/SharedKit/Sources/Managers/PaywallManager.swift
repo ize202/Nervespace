@@ -16,8 +16,24 @@ public class PaywallManager {
     /// Called when onboarding is completed to show hard paywall
     public func markOnboardingCompleted(completion: @escaping () -> Void = {}) {
         defaults.set(true, forKey: hasCompletedOnboardingKey)
-        // Present hard paywall using Superwall
-        Superwall.shared.register(placement: "onboarding_completed") {
+        
+        // For onboarding, we'll use a handler to show the decline paywall
+        let handler = PaywallPresentationHandler()
+        handler.onDismiss { _, result in
+            switch result {
+            case .declined:
+                // Show decline paywall only during onboarding
+                Superwall.shared.register(placement: "paywall_closed") {
+                    completion()
+                }
+            default:
+                completion()
+            }
+        }
+        
+        // Present initial onboarding paywall
+        Superwall.shared.register(placement: "onboarding_completed", handler: handler) {
+            // This completion only runs if paywall is skipped
             completion()
         }
     }
@@ -27,7 +43,12 @@ public class PaywallManager {
         // Only show if onboarding is completed
         guard hasCompletedOnboarding else { return }
         
-        // Show paywall on fresh app launch for non-subscribers
-        Superwall.shared.register(placement: "new_session") {}
+        // Show new session paywall without decline flow
+        let handler = PaywallPresentationHandler()
+        handler.onDismiss { _, _ in
+            // No additional action on decline for new sessions
+        }
+        
+        Superwall.shared.register(placement: "new_session", handler: handler) {}
     }
 } 
