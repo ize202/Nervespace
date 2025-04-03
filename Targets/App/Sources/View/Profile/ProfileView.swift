@@ -26,10 +26,10 @@ struct ProfileView: View {
                 // Settings Section
                 Section("SETTINGS") {
                     NavigationLink {
-                        Text("Notifications Settings")
+                        Text("Reminder")
                     } label: {
                         HStack {
-                            Text("Notifications")
+                            Text("Reminder")
                             Spacer()
                         }
                     }
@@ -45,80 +45,11 @@ struct ProfileView: View {
                         }
                     }
                     
-                    NavigationLink {
-                        Text("Sound Settings")
-                    } label: {
-                        HStack {
-                            Text("Sound")
-                            Spacer()
-                            Text("Built-In Speaker")
-                                .foregroundColor(.secondary)
-                        }
-                    }
-                    
-                    NavigationLink {
-                        Text("Appearance Settings")
-                    } label: {
-                        HStack {
-                            Text("Appearance")
-                            Spacer()
-                            Text("Automatic")
-                                .foregroundColor(.secondary)
-                        }
-                    }
-                    
-                    NavigationLink {
-                        Text("Voiceover Settings")
-                    } label: {
-                        Text("Voiceover")
-                    }
-                    
-                    NavigationLink {
-                        Text("Apple Health Settings")
-                    } label: {
-                        HStack {
-                            Text("Apple Health")
-                            Spacer()
-                            Text("On")
-                                .foregroundColor(.secondary)
-                        }
-                    }
                 }
                 
-                // Preferences Section
-                Section("PREFERENCES") {
-                    NavigationLink {
-                        Text("Experience Level Settings")
-                    } label: {
-                        Text("Experience Level")
-                    }
-                    
-                    NavigationLink {
-                        Text("Focus Areas Settings")
-                    } label: {
-                        Text("Focus Areas")
-                    }
-                    
-                    NavigationLink {
-                        Text("Health Conditions Settings")
-                    } label: {
-                        Text("Health Conditions")
-                    }
-                    
-                    NavigationLink {
-                        Text("Caution Areas Settings")
-                    } label: {
-                        Text("Caution Areas")
-                    }
-                }
                 
                 // Support Section
                 Section("SUPPORT") {
-                    NavigationLink {
-                        Text("FAQ")
-                    } label: {
-                        Text("Frequently Asked Questions")
-                    }
                     
                     NavigationLink {
                         Text("Contact Support View")
@@ -126,11 +57,6 @@ struct ProfileView: View {
                         Text("Contact Support")
                     }
                     
-                    NavigationLink {
-                        Text("Referral Code View")
-                    } label: {
-                        Text("Referral Code")
-                    }
                     
                     NavigationLink {
                         Text("Membership View")
@@ -150,11 +76,6 @@ struct ProfileView: View {
                         Text("Privacy Policy")
                     }
                     
-                    NavigationLink {
-                        Text("Health & Safety")
-                    } label: {
-                        Text("Health & Safety")
-                    }
                 }
                 
                 // App Info Section
@@ -163,9 +84,9 @@ struct ProfileView: View {
                         Text(appVersion)
                             .font(.footnote)
                             .foregroundColor(.secondary)
-//                        Text("Made with ♥️ in NYC")
-//                            .font(.footnote)
-//                            .foregroundColor(.secondary)
+                        Text("Made with ♥️")
+                            .font(.footnote)
+                            .foregroundColor(.secondary)
                         Text("© 2024 Slips LLC")
                             .font(.footnote)
                             .foregroundColor(.secondary)
@@ -174,7 +95,7 @@ struct ProfileView: View {
                     .listRowBackground(Color.clear)
                 }
             }
-            .navigationTitle("Profile")
+            .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
