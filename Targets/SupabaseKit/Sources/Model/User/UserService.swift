@@ -22,13 +22,6 @@ public protocol UserService {
         days: Int
     ) async throws -> [Model.RoutineCompletion]
     
-    // Premium status
-    func updatePremiumStatus(
-        userId: UUID,
-        isPremium: Bool,
-        premiumUntil: Date?
-    ) async throws -> Model.UserProfile
-    
     // Utility methods
     func findProfileByAppleId(_ appleId: String) async throws -> Model.UserProfile?
 }

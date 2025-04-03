@@ -28,16 +28,6 @@ private struct ProgressUpdate: Encodable {
     }
 }
 
-private struct PremiumStatusUpdate: Encodable {
-    let isPremium: Bool
-    let premiumUntil: Date?
-    
-    enum CodingKeys: String, CodingKey {
-        case isPremium = "is_premium"
-        case premiumUntil = "premium_until"
-    }
-}
-
 private struct RecordRoutineCompletionParams: Encodable {
     let p_routine_id: String
     let p_duration_minutes: Int
@@ -181,28 +171,6 @@ public class SupabaseUserService: UserService {
     ) async throws -> [Model.RoutineCompletion] {
         let response: [Model.RoutineCompletion] = try await client
             .rpc("get_recent_completions", params: ["p_days": days])
-            .execute()
-            .value
-        return response
-    }
-    
-    // MARK: - Premium Status
-    
-    public func updatePremiumStatus(
-        userId: UUID,
-        isPremium: Bool,
-        premiumUntil: Date?
-    ) async throws -> Model.UserProfile {
-        let update = PremiumStatusUpdate(
-            isPremium: isPremium,
-            premiumUntil: premiumUntil
-        )
-        
-        let response: Model.UserProfile = try await client
-            .from("user_profiles")
-            .update(update)
-            .eq("id", value: userId)
-            .single()
             .execute()
             .value
         return response

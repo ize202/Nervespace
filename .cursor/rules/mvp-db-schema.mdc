@@ -15,7 +15,6 @@ CREATE TABLE public.user_profiles (
     email TEXT,
     name TEXT,
     avatar_url TEXT,
-    is_premium BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );

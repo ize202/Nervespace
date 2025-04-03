@@ -7,8 +7,6 @@ public enum Model {
         public let email: String?
         public let name: String?
         public let avatarUrl: String?
-        public let isPremium: Bool
-        public let premiumUntil: Date?
         public let createdAt: Date
         public let updatedAt: Date
         
@@ -18,8 +16,6 @@ public enum Model {
             email: String? = nil,
             name: String? = nil,
             avatarUrl: String? = nil,
-            isPremium: Bool = false,
-            premiumUntil: Date? = nil,
             createdAt: Date = Date(),
             updatedAt: Date = Date()
         ) {
@@ -28,8 +24,6 @@ public enum Model {
             self.email = email
             self.name = name
             self.avatarUrl = avatarUrl
-            self.isPremium = isPremium
-            self.premiumUntil = premiumUntil
             self.createdAt = createdAt
             self.updatedAt = updatedAt
         }
@@ -40,8 +34,6 @@ public enum Model {
             case email
             case name
             case avatarUrl = "avatar_url"
-            case isPremium = "is_premium"
-            case premiumUntil = "premium_until"
             case createdAt = "created_at"
             case updatedAt = "updated_at"
         }
