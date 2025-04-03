@@ -27,6 +27,7 @@ struct DeveloperSettingsView: View {
 
 	@State var showOnboarding = false
 	@State var showFeatureSheet = false
+	@State var showSignIn = false
 
 	@State var showViewWithNoAccess = false
 	@State var showViewWithAccessIfSignedIn = false
@@ -159,6 +160,10 @@ struct DeveloperSettingsView: View {
 							.badge("\(db.currentUser?.id.uuidString ?? "Not Logged In")")
 							.textSelection(.enabled)  // allows the user to hold to copy
 
+						Button("Show Sign In") {
+							showSignIn = true
+						}
+
 						Button("You probably can't see what this opens") {
 							showViewWithNoAccess = true
 						}
@@ -178,6 +183,11 @@ struct DeveloperSettingsView: View {
 				.sheet(isPresented: $showOnboarding) {
 					OnboardingView {
 						showOnboarding = false
+					}
+				}
+				.sheet(isPresented: $showSignIn) {
+					SignInView(db: db) {
+						showSignIn = false
 					}
 				}
 
