@@ -4,6 +4,7 @@ import NotifKit
 import UserNotifications
 import StoreKit
 import SuperwallKit
+import SupabaseKit
 
 // MARK: - Haptic Feedback Manager
 
@@ -920,38 +921,50 @@ struct BreathingCompletionScreen: View {
 
 struct ProgressScreen: View {
     @ObservedObject var viewModel: OnboardingViewModel
+    @State private var showSignIn = false
     let onCompletion: () -> Void
     
     var body: some View {
-        OnboardingScreenContainer(
-            title: OnboardingScreen.progress.title,
-            subtitle: OnboardingScreen.progress.subtitle,
-            progress: 0.9,
-            isNextButtonEnabled: true,
-            nextButtonTitle: "Unlock Full Plan",
-            onNext: {
-                // Show hard paywall at end of onboarding
-                PaywallManager.shared.markOnboardingCompleted {
+        ZStack {
+            OnboardingScreenContainer(
+                title: OnboardingScreen.progress.title,
+                subtitle: OnboardingScreen.progress.subtitle,
+                progress: 0.9,
+                isNextButtonEnabled: true,
+                nextButtonTitle: "Unlock Full Plan",
+                onNext: {
+                    // Show hard paywall at end of onboarding
+                    PaywallManager.shared.markOnboardingCompleted {
+                        showSignIn = true
+                    }
+                },
+                onBack: {
+                    viewModel.moveToPreviousScreen()
+                }
+            ) {
+                VStack(spacing: 24) {
+                    ProgressBar(progress: 0.33)
+                        .frame(height: 8)
+                    
+                    VStack(spacing: 16) {
+                        ProgressDayView(day: 1, title: "Grounding Breath", isLocked: false)
+                        ProgressDayView(day: 2, title: "Somatic Ease", isLocked: true)
+                        ProgressDayView(day: 3, title: "Evening Calm", isLocked: true)
+                        ProgressDayView(day: 4, title: "Posture Reset", isLocked: true)
+                    }
+                }
+                .padding(.vertical, 20)
+            }
+            
+            if showSignIn {
+                SignInView(db: DB()) {
                     onCompletion()
                 }
-            },
-            onBack: {
-                viewModel.moveToPreviousScreen()
+                .transition(.opacity)
+                .zIndex(1)
             }
-        ) {
-            VStack(spacing: 24) {
-                ProgressBar(progress: 0.33)
-                    .frame(height: 8)
-                
-                VStack(spacing: 16) {
-                    ProgressDayView(day: 1, title: "Grounding Breath", isLocked: false)
-                    ProgressDayView(day: 2, title: "Somatic Ease", isLocked: true)
-                    ProgressDayView(day: 3, title: "Evening Calm", isLocked: true)
-                    ProgressDayView(day: 4, title: "Posture Reset", isLocked: true)
-                }
-            }
-            .padding(.vertical, 20)
         }
+        .animation(.easeInOut, value: showSignIn)
     }
 }
 
