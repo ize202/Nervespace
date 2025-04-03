@@ -97,7 +97,7 @@ public struct Constants {
 		public static let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as! String
 
 		/// Your app's display name
-		public static let appName = Bundle.main.object(forInfoDictionaryKey: kCFBundleNameKey as String) as! String
+		public static let appName = "Form"
 
 		/// Custom description of your app.
 		/// Will be shown under the SignInView if AuthKit was selected during project generation
