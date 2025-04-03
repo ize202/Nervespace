@@ -957,11 +957,15 @@ struct ProgressScreen: View {
             }
             
             if showSignIn {
-                SignInView(db: DB()) {
-                    onCompletion()
-                }
-                .transition(.opacity)
-                .zIndex(1)
+                Color.baseBlack
+                    .ignoresSafeArea()
+                    .overlay {
+                        SignInView(db: DB()) {
+                            onCompletion()
+                        }
+                    }
+                    .transition(.opacity)
+                    .zIndex(1)
             }
         }
         .animation(.easeInOut, value: showSignIn)
