@@ -1,8 +1,10 @@
 import SwiftUI
 import SharedKit
+import SupabaseKit
 
 struct ProfileView: View {
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject private var db: DB
     
     var body: some View {
         NavigationView {
@@ -10,7 +12,7 @@ struct ProfileView: View {
                 // Account Section
                 Section("ACCOUNT") {
                     NavigationLink {
-                        AccountSettingsView()
+                        AccountSettingsView(db: db)
                     } label: {
                         HStack {
                             Image(systemName: "person.circle.fill")
@@ -18,9 +20,9 @@ struct ProfileView: View {
                                 .foregroundColor(Color.brandPrimary)
                             
                             VStack(alignment: .leading, spacing: 4) {
-                                Text("Aize Igbinakenzua")
+                                Text(db.currentUser?.email ?? "No Email")
                                     .font(.headline)
-                                Text("aizeakenzua@gmail.com")
+                                Text("Sign in with Apple")
                                     .font(.subheadline)
                                     .foregroundColor(.secondary)
                             }
@@ -88,4 +90,5 @@ struct ProfileView: View {
 
 #Preview {
     ProfileView()
+        .environmentObject(DB())
 } 

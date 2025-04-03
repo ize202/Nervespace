@@ -1,167 +1,126 @@
 import SwiftUI
 import SharedKit
-
+import SupabaseKit
 
 struct AccountSettingsView: View {
-    @State private var name = "Aize Igbinakenzua"
-    @State private var email = "aizeakenzua@gmail.com"
-    @State private var showingImagePicker = false
-    @State private var profileImage: UIImage?
+    @EnvironmentObject private var db: DB
+    @StateObject private var viewModel: AccountSettingsViewModel
+    @State private var showingNameEmailSheet = false
+    @State private var showingDeleteConfirmation = false
+    @Environment(\.dismiss) private var dismiss
+    
+    init(db: DB) {
+        _viewModel = StateObject(wrappedValue: AccountSettingsViewModel(db: db))
+    }
     
     var body: some View {
         List {
-            // Profile Section
-            Section {
-                VStack(spacing: 16) {
-                    // Profile Image
-                    Button {
-                        showingImagePicker = true
-                    } label: {
-                        if let profileImage = profileImage {
-                            Image(uiImage: profileImage)
-                                .resizable()
-                                .scaledToFill()
-                                .frame(width: 100, height: 100)
-                                .clipShape(Circle())
-                                .background(
-                                    Circle()
-                                        .fill(Color.gray.opacity(0.2))
-                                        .frame(width: 102, height: 102)
-                                )
-                        } else {
-                            ZStack {
-                                Circle()
-                                    .fill(Color.brandPrimary)
-                                    .frame(width: 100, height: 100)
-                                
-                                Image(systemName: "person.fill")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 50, height: 50)
-                                    .foregroundColor(.white)
-                            }
-                        }
-                    }
-                    
-                    // Name and Email
-                    VStack(spacing: 4) {
-                        Text(name)
-                            .font(.title2)
-                            .fontWeight(.semibold)
-                        
-                        Text(email)
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                    }
-                }
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 8)
-                .listRowBackground(Color.clear)
-            }
-            .listRowInsets(EdgeInsets())
-            
             // Account Management Section
             Section {
-                NavigationLink {
-                    Text("Change Password View")
+                Button {
+                    showingNameEmailSheet = true
                 } label: {
-                    SettingsRowItem(label: "Change Password")
-                }
-                
-                NavigationLink {
-                    Text("Privacy Settings View")
-                } label: {
-                    SettingsRowItem(label: "Privacy Settings")
-                }
-                
-                NavigationLink {
-                    Text("Data & Storage View")
-                } label: {
-                    SettingsRowItem(label: "Data & Storage")
-                }
-            } header: {
-                Text("ACCOUNT MANAGEMENT")
-            }
-            
-            // Subscription Section
-            Section {
-                NavigationLink {
-                    Text("Subscription Details View")
-                } label: {
-                    SettingsRowItem(label: "Current Plan")
-                }
-                
-                NavigationLink {
-                    Text("Billing History View")
-                } label: {
-                    SettingsRowItem(label: "Billing History")
-                }
-            } header: {
-                Text("SUBSCRIPTION")
-            }
-            
-            // Danger Zone Section
-            Section {
-                Button(role: .destructive) {
-                    // Handle logout
-                } label: {
-                    SettingsRowItem(label: "Log Out", isDestructive: true)
+                    Text("Change Name & Email")
+                        .foregroundColor(.primary)
                 }
                 
                 Button(role: .destructive) {
-                    // Handle account deletion
+                    showingDeleteConfirmation = true
                 } label: {
-                    SettingsRowItem(label: "Delete Account", isDestructive: true)
+                    Text("Delete Account")
+                }
+                
+                Button(role: .destructive) {
+                    Task {
+                        if await viewModel.signOut() {
+                            // Handle successful sign out (e.g., navigate to login screen)
+                        }
+                    }
+                } label: {
+                    Text("Log Out")
+                }
+            }
+            
+            // Email Display Section
+            Section {
+                if viewModel.isLoading {
+                    ProgressView()
+                        .frame(maxWidth: .infinity)
+                } else {
+                    Text("Logged in as \(viewModel.userEmail)")
+                        .foregroundColor(.secondary)
+                        .font(.footnote)
                 }
             }
         }
         .navigationTitle("Account")
         .navigationBarTitleDisplayMode(.inline)
-        .sheet(isPresented: $showingImagePicker) {
-            ImagePicker(image: $profileImage)
+        .alert("Delete Account", isPresented: $showingDeleteConfirmation) {
+            Button("Cancel", role: .cancel) { }
+            Button("Delete", role: .destructive) {
+                Task {
+                    if await viewModel.deleteAccount() {
+                        // Handle successful deletion (e.g., navigate to login screen)
+                    }
+                }
+            }
+        } message: {
+            Text("Are you sure you want to delete your account? This action cannot be undone.")
+        }
+        .sheet(isPresented: $showingNameEmailSheet) {
+            NavigationView {
+                ChangeNameEmailView(viewModel: viewModel)
+            }
         }
     }
 }
 
-// Image Picker struct to handle profile photo selection
-struct ImagePicker: UIViewControllerRepresentable {
-    @Binding var image: UIImage?
+struct ChangeNameEmailView: View {
     @Environment(\.dismiss) private var dismiss
+    @ObservedObject var viewModel: AccountSettingsViewModel
+    @State private var name: String = ""
+    @State private var email: String = ""
     
-    func makeUIViewController(context: Context) -> UIImagePickerController {
-        let picker = UIImagePickerController()
-        picker.delegate = context.coordinator
-        return picker
-    }
-    
-    func updateUIViewController(_ uiViewController: UIImagePickerController, context: Context) {}
-    
-    func makeCoordinator() -> Coordinator {
-        Coordinator(self)
-    }
-    
-    class Coordinator: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
-        let parent: ImagePicker
-        
-        init(_ parent: ImagePicker) {
-            self.parent = parent
-        }
-        
-        func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-            if let image = info[.originalImage] as? UIImage {
-                parent.image = image
+    var body: some View {
+        Form {
+            Section {
+                TextField("Name", text: $name)
+                TextField("Email", text: $email)
+                    .textContentType(.emailAddress)
+                    .keyboardType(.emailAddress)
+                    .autocapitalization(.none)
             }
-            parent.dismiss()
         }
-        
-        func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-            parent.dismiss()
+        .navigationTitle("Change Name & Email")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button("Cancel") {
+                    dismiss()
+                }
+            }
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button("Save") {
+                    Task {
+                        if await viewModel.updateProfile(name: name, email: email) {
+                            dismiss()
+                        }
+                    }
+                }
+                .disabled(viewModel.isLoading)
+            }
+        }
+        .onAppear {
+            name = viewModel.userName
+            email = viewModel.userEmail
         }
     }
 }
 
 #Preview {
-    NavigationView {
-        AccountSettingsView()
+    let db = DB()
+    return NavigationView {
+        AccountSettingsView(db: db)
+            .environmentObject(db)
     }
 } 
