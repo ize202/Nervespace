@@ -727,7 +727,7 @@ struct BreathingExerciseScreen: View {
                     .opacity(0.3)
                     .frame(height: geometry.size.height * fillAmount)
                     .frame(maxHeight: .infinity, alignment: .bottom)
-                    .animation(.easeInOut(duration: 7), value: fillAmount)
+                    .animation(.easeInOut(duration: 6), value: fillAmount)
                 
                 VStack(alignment: .leading, spacing: 0) {
                     // Top Navigation Bar
@@ -819,7 +819,7 @@ struct BreathingExerciseScreen: View {
                                         fillAmount = 0.85
                                     }
                                     // Schedule the exhale prompt to appear when fill reaches top
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 7) {
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 6) {
                                         showExhalePrompt = true
                                     }
                                 }
@@ -833,7 +833,7 @@ struct BreathingExerciseScreen: View {
                                 }
                                 
                                 // Wait for exhale animation to complete before resetting prompt and counting the breath
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 7) {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 6) {
                                     isExhaling = false
                                     showExhalePrompt = false
                                     cyclesCompleted += 1

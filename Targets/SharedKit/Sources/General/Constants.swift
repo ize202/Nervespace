@@ -46,7 +46,7 @@ public struct Constants {
 		public static let maxShownAtOnce: Int = 3
 
 		/// The duration that the in-app notification appears on screen (in seconds)
-		public static let showingDuration: Int = 6
+		public static let showingDuration: Int = 3
 	}
 
 	/// Notification Names & UserInfo Keys for NotificationCenter (!= push notifications)
