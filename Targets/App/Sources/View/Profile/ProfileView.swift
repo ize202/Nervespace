@@ -6,6 +6,11 @@ struct ProfileView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var db: DB
     
+    private var appVersion: String {
+        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0"
+        return "Version \(version)"
+    }
+    
     var body: some View {
         NavigationView {
             List {
@@ -155,7 +160,7 @@ struct ProfileView: View {
                 // App Info Section
                 Section {
                     VStack(spacing: 4) {
-                        Text("Version 1.0.0")
+                        Text(appVersion)
                             .font(.footnote)
                             .foregroundColor(.secondary)
 //                        Text("Made with ♥️ in NYC")
