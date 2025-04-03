@@ -4,10 +4,12 @@ import Supabase
 // Update types for encoding
 private struct ProfileUpdate: Encodable {
     let name: String?
+    let email: String?
     let avatarURL: String?
     
     enum CodingKeys: String, CodingKey {
         case name
+        case email
         case avatarURL = "avatar_url"
     }
 }
@@ -71,9 +73,10 @@ public class SupabaseUserService: UserService {
         return response
     }
     
-    public func updateProfile(userId: UUID, name: String?, avatarURL: URL?) async throws -> Model.UserProfile {
+    public func updateProfile(userId: UUID, name: String?, email: String?, avatarURL: URL?) async throws -> Model.UserProfile {
         let update = ProfileUpdate(
             name: name,
+            email: email,
             avatarURL: avatarURL?.absoluteString
         )
         

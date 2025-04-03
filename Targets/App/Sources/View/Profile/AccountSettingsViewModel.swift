@@ -53,6 +53,7 @@ class AccountSettingsViewModel: ObservableObject {
             let profile = try await db.userService.updateProfile(
                 userId: userId,
                 name: name,
+                email: email,
                 avatarURL: nil
             )
             

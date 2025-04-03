@@ -4,7 +4,7 @@ public protocol UserService {
     // Profile management
     func fetchProfile(userId: UUID) async throws -> Model.UserProfile
     func createProfile(appleId: String, email: String?, name: String?) async throws -> Model.UserProfile
-    func updateProfile(userId: UUID, name: String?, avatarURL: URL?) async throws -> Model.UserProfile
+    func updateProfile(userId: UUID, name: String?, email: String?, avatarURL: URL?) async throws -> Model.UserProfile
     func deleteProfile(userId: UUID) async throws
     
     // Progress tracking
