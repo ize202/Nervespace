@@ -164,6 +164,12 @@ struct DeveloperSettingsView: View {
 							showSignIn = true
 						}
 
+						Button("Sign Out", role: .destructive) {
+							Task {
+								try? await db.signOut()
+							}
+						}
+
 						Button("You probably can't see what this opens") {
 							showViewWithNoAccess = true
 						}
