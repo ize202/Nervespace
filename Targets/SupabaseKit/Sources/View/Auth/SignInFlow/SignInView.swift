@@ -72,7 +72,7 @@ public struct SignInView: View {
 struct SignInHeroSection: View {
 	var body: some View {
 		VStack {
-			Image("AppIcon")
+			Image("launchscreen-icon", bundle: .main)
 				.resizable()
 				.squircle(width: 125)
 
