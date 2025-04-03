@@ -33,7 +33,7 @@ struct AccountSettingsView: View {
                 Button(role: .destructive) {
                     Task {
                         if await viewModel.signOut() {
-                            // Handle successful sign out (e.g., navigate to login screen)
+                            dismiss()
                         }
                     }
                 } label: {
@@ -60,7 +60,7 @@ struct AccountSettingsView: View {
             Button("Delete", role: .destructive) {
                 Task {
                     if await viewModel.deleteAccount() {
-                        // Handle successful deletion (e.g., navigate to login screen)
+                        dismiss()
                     }
                 }
             }
@@ -70,6 +70,19 @@ struct AccountSettingsView: View {
         .sheet(isPresented: $showingNameEmailSheet) {
             NavigationView {
                 ChangeNameEmailView(viewModel: viewModel)
+            }
+        }
+        .overlay {
+            if let error = viewModel.errorMessage {
+                VStack {
+                    Spacer()
+                    Text(error)
+                        .foregroundColor(.white)
+                        .padding()
+                        .background(Color.red.opacity(0.8))
+                        .cornerRadius(8)
+                        .padding()
+                }
             }
         }
     }
@@ -113,6 +126,13 @@ struct ChangeNameEmailView: View {
         .onAppear {
             name = viewModel.userName
             email = viewModel.userEmail
+        }
+        .overlay {
+            if viewModel.isLoading {
+                ProgressView()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(Color.black.opacity(0.2))
+            }
         }
     }
 }

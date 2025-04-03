@@ -9,6 +9,7 @@ class AccountSettingsViewModel: ObservableObject {
     @Published var userEmail: String = ""
     @Published var userName: String = ""
     @Published var isLoading = false
+    @Published var errorMessage: String?
     
     private let db: DB
     
@@ -24,13 +25,18 @@ class AccountSettingsViewModel: ObservableObject {
         defer { isLoading = false }
         
         do {
-            guard let userId = db.currentUser?.id else { return }
-            let profile = try await db.userService.fetchProfile(userId: userId)
+            guard let userId = db.currentUser?.id else {
+                errorMessage = "No user logged in"
+                return
+            }
             
+            let profile = try await db.userService.fetchProfile(userId: userId)
             userName = profile.name ?? ""
             userEmail = profile.email ?? ""
+            errorMessage = nil
         } catch {
             print("Error loading user profile: \(error)")
+            errorMessage = "Failed to load profile"
         }
     }
     
@@ -39,15 +45,25 @@ class AccountSettingsViewModel: ObservableObject {
         defer { isLoading = false }
         
         do {
-            guard let userId = db.currentUser?.id else { return false }
-            let profile = try await db.userService.updateProfile(userId: userId, name: name, avatarURL: nil)
+            guard let userId = db.currentUser?.id else {
+                errorMessage = "No user logged in"
+                return false
+            }
+            
+            let profile = try await db.userService.updateProfile(
+                userId: userId,
+                name: name,
+                avatarURL: nil
+            )
             
             // Update local state
             userName = profile.name ?? ""
             userEmail = profile.email ?? ""
+            errorMessage = nil
             return true
         } catch {
             print("Error updating profile: \(error)")
+            errorMessage = "Failed to update profile"
             return false
         }
     }
@@ -57,12 +73,18 @@ class AccountSettingsViewModel: ObservableObject {
         defer { isLoading = false }
         
         do {
-            guard let userId = db.currentUser?.id else { return false }
+            guard let userId = db.currentUser?.id else {
+                errorMessage = "No user logged in"
+                return false
+            }
+            
             try await db.userService.deleteProfile(userId: userId)
             try await db.signOut()
+            errorMessage = nil
             return true
         } catch {
             print("Error deleting account: \(error)")
+            errorMessage = "Failed to delete account"
             return false
         }
     }
@@ -73,9 +95,11 @@ class AccountSettingsViewModel: ObservableObject {
         
         do {
             try await db.signOut()
+            errorMessage = nil
             return true
         } catch {
             print("Error signing out: \(error)")
+            errorMessage = "Failed to sign out"
             return false
         }
     }

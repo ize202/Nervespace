@@ -56,6 +56,7 @@ public class SupabaseUserService: UserService {
     
     public func createProfile(appleId: String, email: String?, name: String?) async throws -> Model.UserProfile {
         let profile = Model.UserProfile(
+            id: client.auth.currentUser?.id ?? UUID(),
             appleId: appleId,
             email: email,
             name: name
