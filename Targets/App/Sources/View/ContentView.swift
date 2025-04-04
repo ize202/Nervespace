@@ -10,6 +10,8 @@ import SupabaseKit
 import SwiftUI
 
 struct ContentView: View {
+	@EnvironmentObject private var db: DB
+	
 	var body: some View {
 		TabView {
 			HomeView()
@@ -22,7 +24,7 @@ struct ContentView: View {
 					Label("Explore", systemImage: "square.grid.2x2.fill")
 				}
 			
-			ProgressView()
+			ProgressView(db: db)
 				.tabItem {
 					Label("Progress", systemImage: "chart.bar.fill")
 				}
@@ -45,5 +47,6 @@ struct ContentView: View {
 
 #Preview {
 	ContentView()
+		.environmentObject(DB())
 		.preferredColorScheme(.dark)
 }

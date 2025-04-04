@@ -3,7 +3,7 @@ import SharedKit
 import SupabaseKit
 
 struct ProgressView: View {
-    @EnvironmentObject private var db: DB
+    @StateObject private var viewModel: ProgressViewModel
     private let currentDate = Date()
     @State private var streakDays: Set<Date> = []
     
@@ -13,9 +13,13 @@ struct ProgressView: View {
     private let calendar = Calendar.current
     private let daysOfWeek = ["S", "M", "T", "W", "T", "F", "S"]
     
+    init(db: DB) {
+        _viewModel = StateObject(wrappedValue: ProgressViewModel(db: db))
+    }
+    
     private var currentMinutes: Int {
-        guard let lastActivity = db.lastActivity else { return 0 }
-        return calendar.isDateInToday(lastActivity) ? db.dailyMinutes : 0
+        guard let lastActivity = viewModel.lastActivity else { return 0 }
+        return calendar.isDateInToday(lastActivity) ? viewModel.dailyMinutes : 0
     }
     
     var body: some View {
@@ -24,7 +28,7 @@ struct ProgressView: View {
                 Color.baseBlack.ignoresSafeArea()
                 
                 ScrollView {
-                    VStack(alignment: .leading, spacing: 40) {
+                    VStack(spacing: 24) {
                         // Header
                         HStack {
                             Text("Progress")
@@ -41,7 +45,7 @@ struct ProgressView: View {
                             // Calendar Card
                             VStack(alignment: .leading, spacing: 16) {
                                 HStack {
-                                    Label("\(db.currentStreak)-Day Streak", systemImage: "flame.fill")
+                                    Label("\(viewModel.streak)-Day Streak", systemImage: "flame.fill")
                                         .font(.headline)
                                         .foregroundColor(.brandPrimary)
                                     
@@ -126,10 +130,15 @@ struct ProgressView: View {
                     }
                     .padding(.vertical)
                 }
+                
+                if viewModel.isLoading {
+                    LoadingOverlay()
+                }
             }
             .navigationBarHidden(true)
             .task {
                 await loadStreakDays()
+                await viewModel.refreshFromSupabase()
             }
         }
         .preferredColorScheme(.dark)
@@ -163,7 +172,7 @@ struct ProgressView: View {
         var days: Set<Date> = []
         
         // Add today if we have activity
-        if let lastActivity = db.lastActivity,
+        if let lastActivity = viewModel.lastActivity,
            calendar.isDateInToday(lastActivity) {
             // Normalize to start of day to ensure proper comparison
             if let startOfDay = calendar.date(bySettingHour: 0, minute: 0, second: 0, of: lastActivity) {
@@ -172,11 +181,11 @@ struct ProgressView: View {
         }
         
         // Add previous streak days
-        if db.currentStreak > 1 {
+        if viewModel.streak > 1 {
             let today = Date()
             // Get start of today for consistent date comparisons
             if let startOfToday = calendar.date(bySettingHour: 0, minute: 0, second: 0, of: today) {
-                for dayOffset in 1..<db.currentStreak {
+                for dayOffset in 1..<viewModel.streak {
                     if let date = calendar.date(byAdding: .day, value: -dayOffset, to: startOfToday) {
                         days.insert(date)
                     }
@@ -216,7 +225,6 @@ struct DayCell: View {
 }
 
 #Preview {
-    ProgressView()
-        .environmentObject(DB())
+    ProgressView(db: DB())
         .preferredColorScheme(.dark)
 }

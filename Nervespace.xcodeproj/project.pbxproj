@@ -28,6 +28,7 @@
 		2C09B4EF821A2C217A82A6BA /* SignInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4634A94D674EB513386D2C52 /* SignInView.swift */; };
 		2CC928AEBAD65DD2F42F40CA /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A6C05EE090C2810E6906508 /* App.swift */; };
 		2EFC35727BB9C6EC3BF201F5 /* SharedKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 39E86B5FF5E957E5D088F40B /* SharedKit.framework */; };
+		2F67C83F303C36FEFF75175A /* ProgressViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E02216AA4E7BC3EFE3DDC5C /* ProgressViewModel.swift */; };
 		31699A9567B1D5A13CA4645A /* OneSignalExtension in Frameworks */ = {isa = PBXBuildFile; productRef = 53E06AEFBCFEE5D596DDD235 /* OneSignalExtension */; };
 		32AE0B76A515FD7214260461 /* OneSignalFramework in Frameworks */ = {isa = PBXBuildFile; productRef = 188C0B847C7B0939BB7DBF05 /* OneSignalFramework */; };
 		34A6D5554C6E86F341EC61B2 /* RequestType.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5DFA5E09A8701AD67D4ECAB /* RequestType.swift */; };
@@ -309,6 +310,7 @@
 		4634A94D674EB513386D2C52 /* SignInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInView.swift; sourceTree = "<group>"; };
 		4C0FB06C6665D672F2E3F45C /* BiometricAuth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BiometricAuth.swift; sourceTree = "<group>"; };
 		4C2ECC22973D7C1A97317E4D /* BookmarkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkManager.swift; sourceTree = "<group>"; };
+		4E02216AA4E7BC3EFE3DDC5C /* ProgressViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressViewModel.swift; sourceTree = "<group>"; };
 		4F95AB075CFCC69E3E00BE35 /* isPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = isPreview.swift; sourceTree = "<group>"; };
 		5279F25E04166E8C66540B70 /* OnboardingScreens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingScreens.swift; sourceTree = "<group>"; };
 		53C1ECFF6CE4DAF4D82ED904 /* Products.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = Products.storekit; sourceTree = "<group>"; };
@@ -927,6 +929,7 @@
 			children = (
 				C81FB8187D2C75C5F20311CD /* HistoryView.swift */,
 				5680309FE39BC8223920FFD0 /* ProgressView.swift */,
+				4E02216AA4E7BC3EFE3DDC5C /* ProgressViewModel.swift */,
 			);
 			path = Progress;
 			sourceTree = "<group>";
@@ -1496,6 +1499,7 @@
 				887A7A89BAFE84FA99F4B50A /* ProfileView.swift in Sources */,
 				B0CB05DD9BF6B551BBECAC31 /* HistoryView.swift in Sources */,
 				71BA8BA640E472796457CDDB /* ProgressView.swift in Sources */,
+				2F67C83F303C36FEFF75175A /* ProgressViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

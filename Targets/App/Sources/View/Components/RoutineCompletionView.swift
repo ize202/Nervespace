@@ -211,8 +211,7 @@ struct RoutineCompletionView: View {
             
             // Loading State
             if viewModel.isLoading {
-                ProgressView()
-                    .tint(.white)
+                LoadingOverlay()
             }
             
             // Confetti Layer

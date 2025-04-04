@@ -9,6 +9,14 @@ public protocol UserService {
     
     // Progress tracking
     func fetchProgress(userId: UUID) async throws -> Model.UserProgress
+    func initializeProgress(userId: UUID) async throws -> Model.UserProgress
+    func updateProgress(
+        userId: UUID,
+        streak: Int?,
+        dailyMinutes: Int?,
+        totalMinutes: Int?,
+        lastActivity: Date?
+    ) async throws -> Model.UserProgress
     
     // Routine completions
     func recordRoutineCompletion(
