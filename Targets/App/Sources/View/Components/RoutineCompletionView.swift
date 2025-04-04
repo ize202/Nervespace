@@ -11,6 +11,7 @@ struct RoutineCompletionView: View {
     @State private var showError = false
     @State private var errorMessage = ""
     @State private var showConfetti = false
+    @State private var completion: Model.RoutineCompletion?
     
     private let weekDays = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"]
     private let calendar = Calendar.current
@@ -87,73 +88,72 @@ struct RoutineCompletionView: View {
                     .cornerRadius(16)
                     .padding(.horizontal)
                     
-                    // Completed Routine Card with Checkmark
-                    HStack(spacing: 16) {
-                        // Routine Info
+                    // Completed Routine Card with Stats
+                    if let completion = completion {
                         HStack(spacing: 16) {
-                            // Thumbnail
-                            Image(routine.thumbnailName)
-                                .resizable()
-                                .aspectRatio(contentMode: .fill)
-                                .frame(width: 56, height: 56)
-                                .clipShape(RoundedRectangle(cornerRadius: 8))
-                            
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text(routine.name)
-                                    .font(.headline)
-                                    .foregroundColor(.white)
+                            // Routine Info
+                            HStack(spacing: 16) {
+                                // Thumbnail
+                                Image(routine.thumbnailName)
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fill)
+                                    .frame(width: 56, height: 56)
+                                    .clipShape(RoundedRectangle(cornerRadius: 8))
                                 
-                                Text("\(routine.exercises.count) exercises • \(routine.totalDuration / 60) min")
-                                    .font(.subheadline)
-                                    .foregroundColor(.white.opacity(0.6))
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(routine.name)
+                                        .font(.headline)
+                                        .foregroundColor(.white)
+                                    
+                                    Text("\(routine.exercises.count) exercises • \(completion.durationMinutes) min")
+                                        .font(.subheadline)
+                                        .foregroundColor(.white.opacity(0.6))
+                                }
                             }
+                            
+                            Spacer()
+                            
+                            // Checkmark Icon
+                            Circle()
+                                .fill(.ultraThinMaterial)
+                                .frame(width: 44, height: 44)
+                                .overlay {
+                                    Image(systemName: "checkmark")
+                                        .font(.system(size: 20, weight: .medium))
+                                        .foregroundColor(.white)
+                                }
                         }
-                        
-                        Spacer()
-                        
-                        // Checkmark Icon
-                        Circle()
-                            .fill(.ultraThinMaterial)
-                            .frame(width: 44, height: 44)
-                            .overlay {
-                                Image(systemName: "checkmark")
-                                    .font(.system(size: 20, weight: .medium))
-                                    .foregroundColor(.white)
-                            }
+                        .padding()
+                        .background(.ultraThinMaterial)
+                        .cornerRadius(16)
+                        .padding(.horizontal)
                     }
-                    .padding()
-                    .background(.ultraThinMaterial)
-                    .cornerRadius(16)
-                    .padding(.horizontal)
                     
                     Spacer(minLength: 32)
                     
                     // Continue Button
                     Button(action: {
-                        Task {
-                            await addToStreak()
-                        }
+                        dismiss()
                     }) {
                         HStack {
                             Text(buttonText)
                                 .font(.headline)
                                 .foregroundColor(.white)
-                            
-                            if isUpdating {
-                                ProgressView()
-                                    .tint(.white)
-                                    .padding(.leading, 8)
-                            }
                         }
                         .frame(maxWidth: .infinity)
                         .padding()
                         .background(Color.brandPrimary)
                         .cornerRadius(12)
                     }
-                    .disabled(isUpdating)
                     .padding(.horizontal)
                     .padding(.bottom, 32)
                 }
+            }
+            
+            // Loading State
+            if isUpdating {
+                ProgressView()
+                    .tint(.white)
             }
             
             // Confetti Layer
@@ -171,7 +171,10 @@ struct RoutineCompletionView: View {
         } message: {
             Text(errorMessage)
         }
-        .onAppear {
+        .task {
+            isUpdating = true
+            await loadCompletion()
+            isUpdating = false
             showConfetti = true
         }
     }
@@ -185,11 +188,19 @@ struct RoutineCompletionView: View {
         return dayIndex == adjustedToday
     }
     
-    private func addToStreak() async {
-        isUpdating = true
-        // No need to update streak manually anymore as it's handled by the database function
-        dismiss()
-        isUpdating = false
+    private func loadCompletion() async {
+        do {
+            // Use the DB class to fetch completion details
+            let completions = try await db.getRecentCompletions()
+            if let completion = completions.first(where: { $0.id == completionId }) {
+                self.completion = completion
+                // Also update the streak and progress
+                try await db.loadProgress()
+            }
+        } catch {
+            showError = true
+            errorMessage = error.localizedDescription
+        }
     }
 }
 

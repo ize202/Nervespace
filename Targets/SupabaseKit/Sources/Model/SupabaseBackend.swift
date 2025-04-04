@@ -137,6 +137,17 @@ public class DB: ObservableObject {
 		)
 	}
 	
+	public func getRecentCompletions() async throws -> [Model.RoutineCompletion] {
+		guard authState == .signedIn, let userId = currentUser?.id else {
+			throw NSError(domain: "SupabaseKit", code: 401, userInfo: [NSLocalizedDescriptionKey: "User must be authenticated"])
+		}
+		
+		return try await userService.getRecentCompletions(
+			userId: userId,
+			days: 30
+		)
+	}
+	
 	public func loadRecentCompletions() async {
 		guard authState == .signedIn, let userId = currentUser?.id else { return }
 		
@@ -152,6 +163,5 @@ public class DB: ObservableObject {
 			print("[DB] Failed to load recent completions: \(error.localizedDescription)")
 		}
 	}
-	
 }
 
