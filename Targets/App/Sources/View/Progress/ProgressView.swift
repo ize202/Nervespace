@@ -139,10 +139,6 @@ struct ProgressView: View {
                     }
                     .padding(.vertical)
                 }
-                
-                if viewModel.isLoading {
-                    LoadingOverlay()
-                }
             }
             .navigationBarHidden(true)
             .task {

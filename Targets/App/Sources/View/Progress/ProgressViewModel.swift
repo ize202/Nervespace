@@ -25,17 +25,18 @@ final class ProgressViewModel: ObservableObject {
     init(progressStore: LocalProgressStore, syncManager: SupabaseSyncManager) {
         self.progressStore = progressStore
         self.syncManager = syncManager
+        
+        // Start background sync
+        Task {
+            await syncInBackground()
+        }
     }
     
     // MARK: - Public Methods
     
-    /// Refreshes data from local store and optionally syncs with Supabase
-    func refresh(syncWithSupabase: Bool = true) async {
-        if syncWithSupabase {
-            isLoading = true
-            await syncManager.syncSupabaseToLocal()
-            isLoading = false
-        }
+    /// Refreshes data from local store and syncs with Supabase in background
+    func refresh() async {
+        await syncInBackground()
     }
     
     public func updateProgress(minutes: Int) async {
@@ -82,4 +83,16 @@ final class ProgressViewModel: ObservableObject {
         await updateProgress(minutes: 5)
     }
     #endif
+    
+    // MARK: - Private Methods
+    
+    private func syncInBackground() async {
+        do {
+            await syncManager.syncSupabaseToLocal()
+        } catch {
+            // Just log the error, don't show loading or error states to user
+            // since we're operating in local-first mode
+            print("[Progress] Background sync failed: \(error)")
+        }
+    }
 } 

@@ -176,8 +176,7 @@ public class SupabaseUserService: UserService {
     ) async throws -> [Model.RoutineCompletion] {
         let response: [Model.RoutineCompletion] = try await client.database
             .rpc("get_recent_completions", params: [
-                "user_id": userId.uuidString,
-                "days_ago": String(days)
+                "p_days": String(days)
             ])
             .execute()
             .value

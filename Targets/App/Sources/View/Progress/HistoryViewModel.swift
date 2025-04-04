@@ -14,17 +14,32 @@ final class HistoryViewModel: ObservableObject {
     init(completionStore: RoutineCompletionStore, syncManager: SupabaseSyncManager) {
         self.completionStore = completionStore
         self.syncManager = syncManager
-        loadFromLocalStore()
+        loadFromLocalStore() // Load local data immediately
+        
+        // Start background sync
+        Task {
+            await syncInBackground()
+        }
     }
     
-    func refresh(syncWithSupabase: Bool = true) async {
-        if syncWithSupabase {
-            isLoading = true
-            await syncManager.syncSupabaseToLocal()
-            isLoading = false
-        }
-        
+    func refresh() async {
+        // Load local data immediately
         loadFromLocalStore()
+        
+        // Then sync in background
+        await syncInBackground()
+    }
+    
+    private func syncInBackground() async {
+        do {
+            await syncManager.syncSupabaseToLocal()
+            // Only reload from local store if sync succeeded
+            loadFromLocalStore()
+        } catch {
+            // Just log the error, don't show loading or error states to user
+            // since we're operating in local-first mode
+            print("[History] Background sync failed: \(error)")
+        }
     }
     
     /// Deletes a completion both locally and in Supabase
