@@ -30,12 +30,6 @@ private struct ProgressUpdate: Encodable {
     }
 }
 
-private struct RecordRoutineCompletionParams: Encodable {
-    let p_routine_id: String
-    let p_duration_minutes: Int
-    let p_user_id: String
-}
-
 public class SupabaseUserService: UserService {
     private let client: SupabaseClient
     
@@ -150,6 +144,11 @@ public class SupabaseUserService: UserService {
     
     // MARK: - Routine Completions
     
+    private struct RecordRoutineCompletionParams: Encodable {
+        let p_routine_id: String
+        let p_duration_minutes: Int
+    }
+    
     public func recordRoutineCompletion(
         routineId: String,
         durationMinutes: Int,
@@ -157,8 +156,7 @@ public class SupabaseUserService: UserService {
     ) async throws -> UUID {
         let params = RecordRoutineCompletionParams(
             p_routine_id: routineId,
-            p_duration_minutes: durationMinutes,
-            p_user_id: userId.uuidString
+            p_duration_minutes: durationMinutes
         )
         
         let response: UUID = try await client
@@ -169,12 +167,18 @@ public class SupabaseUserService: UserService {
         return response
     }
     
+    private struct GetRecentCompletionsParams: Encodable {
+        let p_days: Int
+    }
+    
     public func getRecentCompletions(
         userId: UUID,
         days: Int
     ) async throws -> [Model.RoutineCompletion] {
+        let params = GetRecentCompletionsParams(p_days: days)
+        
         let response: [Model.RoutineCompletion] = try await client
-            .rpc("get_recent_completions", params: ["p_days": days])
+            .rpc("get_recent_completions", params: params)
             .execute()
             .value
         return response

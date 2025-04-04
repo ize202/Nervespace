@@ -188,7 +188,7 @@ public struct ActiveSessionView: View {
         }
         .sheet(isPresented: $showingCompletion) {
             if let completionId = completionId {
-                RoutineCompletionView(routine: routine, completionId: completionId)
+                RoutineCompletionView(routine: routine, completionId: completionId, db: db)
             }
         }
         .alert("Error", isPresented: $showError) {

@@ -2,26 +2,85 @@ import SwiftUI
 import SharedKit
 import SupabaseKit
 
+@MainActor
+final class RoutineCompletionViewModel: ObservableObject {
+    @Published private(set) var completion: Model.RoutineCompletion?
+    @Published private(set) var isLoading = false
+    @Published var showError = false
+    @Published var errorMessage = ""
+    @Published var showConfetti = false
+    
+    private let db: DB
+    private let completionId: UUID
+    private let routine: Routine
+    
+    init(db: DB, completionId: UUID, routine: Routine) {
+        self.db = db
+        self.completionId = completionId
+        self.routine = routine
+    }
+    
+    var currentStreak: Int {
+        db.currentStreak
+    }
+    
+    func loadData() {
+        isLoading = true
+        
+        Task {
+            do {
+                // Load completion details in background
+                let completions = try await db.getRecentCompletions()
+                if let completion = completions.first(where: { $0.id == completionId }) {
+                    await MainActor.run {
+                        self.completion = completion
+                    }
+                }
+                
+                // Update progress data
+                try await db.loadProgress()
+                
+                await MainActor.run {
+                    self.showConfetti = true
+                    self.isLoading = false
+                }
+            } catch {
+                await MainActor.run {
+                    self.showError = true
+                    self.errorMessage = error.localizedDescription
+                    self.isLoading = false
+                }
+            }
+        }
+    }
+}
+
 struct RoutineCompletionView: View {
     let routine: Routine
     let completionId: UUID
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var db: DB
-    @State private var isUpdating = false
-    @State private var showError = false
-    @State private var errorMessage = ""
-    @State private var showConfetti = false
-    @State private var completion: Model.RoutineCompletion?
+    @StateObject private var viewModel: RoutineCompletionViewModel
     
     private let weekDays = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"]
     private let calendar = Calendar.current
+    
+    init(routine: Routine, completionId: UUID, db: DB) {
+        self.routine = routine
+        self.completionId = completionId
+        self._viewModel = StateObject(wrappedValue: RoutineCompletionViewModel(
+            db: db,
+            completionId: completionId,
+            routine: routine
+        ))
+    }
     
     private var buttonText: String {
         "CONTINUE"
     }
     
     private var isStreakMilestone: Bool {
-        db.currentStreak <= 1 || db.currentStreak.isMultiple(of: 7)
+        viewModel.currentStreak <= 1 || viewModel.currentStreak.isMultiple(of: 7)
     }
     
     var body: some View {
@@ -48,7 +107,7 @@ struct RoutineCompletionView: View {
                     // Streak Card
                     VStack(spacing: 16) {
                         // Streak count
-                        Text("\(db.currentStreak) day")
+                        Text("\(viewModel.currentStreak) day")
                             .font(.system(size: 44, weight: .bold))
                             .foregroundColor(.white)
                         
@@ -89,7 +148,7 @@ struct RoutineCompletionView: View {
                     .padding(.horizontal)
                     
                     // Completed Routine Card with Stats
-                    if let completion = completion {
+                    if let completion = viewModel.completion {
                         HStack(spacing: 16) {
                             // Routine Info
                             HStack(spacing: 16) {
@@ -151,13 +210,13 @@ struct RoutineCompletionView: View {
             }
             
             // Loading State
-            if isUpdating {
+            if viewModel.isLoading {
                 ProgressView()
                     .tint(.white)
             }
             
             // Confetti Layer
-            if showConfetti {
+            if viewModel.showConfetti {
                 ConfettiView(intensity: isStreakMilestone ? .high : .low)
                     .allowsHitTesting(false)
                     .ignoresSafeArea()
@@ -166,16 +225,13 @@ struct RoutineCompletionView: View {
         .presentationBackground(.clear)
         .presentationDragIndicator(.visible)
         .presentationDetents([.large])
-        .alert("Error", isPresented: $showError) {
+        .alert("Error", isPresented: $viewModel.showError) {
             Button("OK", role: .cancel) {}
         } message: {
-            Text(errorMessage)
+            Text(viewModel.errorMessage)
         }
         .task {
-            isUpdating = true
-            await loadCompletion()
-            isUpdating = false
-            showConfetti = true
+            viewModel.loadData()
         }
     }
     
@@ -186,21 +242,6 @@ struct RoutineCompletionView: View {
         // Convert Sunday from 1 to 7
         let adjustedToday = today == 1 ? 7 : today - 1
         return dayIndex == adjustedToday
-    }
-    
-    private func loadCompletion() async {
-        do {
-            // Use the DB class to fetch completion details
-            let completions = try await db.getRecentCompletions()
-            if let completion = completions.first(where: { $0.id == completionId }) {
-                self.completion = completion
-                // Also update the streak and progress
-                try await db.loadProgress()
-            }
-        } catch {
-            showError = true
-            errorMessage = error.localizedDescription
-        }
     }
 }
 
@@ -217,17 +258,17 @@ struct ConfettiView: View {
             }
         }
         
-        var duration: ClosedRange<Double> {
+        var duration: Double {
             switch self {
-            case .low: return 1.5...2.5
-            case .high: return 2...4
+            case .low: return 2.0
+            case .high: return 3.0
             }
         }
         
-        var delayRange: ClosedRange<Double> {
+        var delayRange: Double {
             switch self {
-            case .low: return 0...1
-            case .high: return 0...2
+            case .low: return 0.5
+            case .high: return 1.0
             }
         }
     }
@@ -245,9 +286,9 @@ struct ConfettiView: View {
                             y: isAnimating ? geometry.size.height + 100 : -100
                         )
                         .animation(
-                            Animation.linear(duration: .random(in: intensity.duration))
+                            Animation.linear(duration: intensity.duration)
                             .repeatForever(autoreverses: false)
-                            .delay(.random(in: intensity.delayRange)),
+                            .delay(.random(in: 0...intensity.delayRange)),
                             value: isAnimating
                         )
                 }
@@ -282,7 +323,8 @@ struct ConfettiPiece: View {
 #Preview {
     RoutineCompletionView(
         routine: RoutineLibrary.routines.first!,
-        completionId: UUID()
+        completionId: UUID(),
+        db: DB()
     )
     .environmentObject(DB())
 } 
