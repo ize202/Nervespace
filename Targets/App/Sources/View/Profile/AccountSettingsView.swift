@@ -43,13 +43,15 @@ struct AccountSettingsView: View {
             
             // Email Display Section
             Section {
-                if viewModel.isLoading {
-                    ProgressView()
-                        .frame(maxWidth: .infinity)
-                } else {
+                HStack {
                     Text("Logged in as \(viewModel.userEmail)")
                         .foregroundColor(.secondary)
                         .font(.footnote)
+                    
+                    if viewModel.isLoading {
+                        Spacer()
+                        LoadingView()
+                    }
                 }
             }
         }
@@ -129,9 +131,7 @@ struct ChangeNameEmailView: View {
         }
         .overlay {
             if viewModel.isLoading {
-                ProgressView()
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(Color.black.opacity(0.2))
+                LoadingOverlay()
             }
         }
     }
