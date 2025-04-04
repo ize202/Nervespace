@@ -15,10 +15,10 @@ final class ProgressViewModel: ObservableObject {
     
     // MARK: - Public Properties
     
-    var streak: Int { progressStore.streak }
-    var dailyMinutes: Int { progressStore.dailyMinutes }
-    var totalMinutes: Int { progressStore.totalMinutes }
-    var lastActivity: Date? { progressStore.lastActivity }
+    public var streak: Int { progressStore.streak }
+    public var dailyMinutes: Int { progressStore.dailyMinutes }
+    public var totalMinutes: Int { progressStore.totalMinutes }
+    public var lastActivity: Date? { progressStore.lastActivity }
     
     // MARK: - Initialization
     
@@ -38,7 +38,7 @@ final class ProgressViewModel: ObservableObject {
         }
     }
     
-    func updateProgress(minutes: Int) async {
+    public func updateProgress(minutes: Int) async {
         guard minutes > 0 else { return }
         
         let now = Date()

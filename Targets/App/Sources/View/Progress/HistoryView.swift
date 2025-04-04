@@ -20,18 +20,6 @@ struct HistoryView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var viewModel: HistoryViewModel
     
-    private let dateFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "d MMMM"
-        return formatter
-    }()
-    
-    private let timeFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "h:mm a"
-        return formatter
-    }()
-    
     init(completionStore: RoutineCompletionStore, syncManager: SupabaseSyncManager) {
         _viewModel = StateObject(wrappedValue: HistoryViewModel(
             completionStore: completionStore,
@@ -44,81 +32,9 @@ struct HistoryView: View {
             Color.baseBlack.ignoresSafeArea()
             
             if viewModel.completedRoutines.isEmpty {
-                VStack(spacing: 16) {
-                    Text("No History Yet")
-                        .font(.title2)
-                        .bold()
-                        .foregroundColor(.white)
-                    
-                    Text("Complete your first routine to start tracking your progress!")
-                        .font(.body)
-                        .foregroundColor(.white.opacity(0.7))
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal)
-                }
+                EmptyHistoryView()
             } else {
-                ScrollView {
-                    VStack(spacing: 24) {
-                        ForEach(viewModel.groupedRoutines(), id: \.0) { date, routines in
-                            // Date Header
-                            Text(date)
-                                .font(.title2)
-                                .bold()
-                                .foregroundColor(.white)
-                                .padding(.horizontal)
-                            
-                            // Routines for this date
-                            VStack(spacing: 12) {
-                                ForEach(routines) { completed in
-                                    HStack(spacing: 16) {
-                                        // Thumbnail
-                                        Image(completed.routine.thumbnailName)
-                                            .resizable()
-                                            .aspectRatio(contentMode: .fill)
-                                            .frame(width: 56, height: 56)
-                                            .clipShape(RoundedRectangle(cornerRadius: 8))
-                                        
-                                        VStack(alignment: .leading, spacing: 4) {
-                                            Text(completed.routine.name)
-                                                .font(.headline)
-                                                .foregroundColor(.white)
-                                            
-                                            Text("\(completed.routine.exercises.count) exercises • \(completed.durationMinutes) min")
-                                                .font(.subheadline)
-                                                .foregroundColor(.white.opacity(0.6))
-                                        }
-                                        
-                                        Spacer()
-                                        
-                                        Text(timeFormatter.string(from: completed.date))
-                                            .font(.subheadline)
-                                            .foregroundColor(.white.opacity(0.6))
-                                    }
-                                    .padding()
-                                    .background {
-                                        RoundedRectangle(cornerRadius: 12)
-                                            .fill(.ultraThinMaterial)
-                                    }
-                                    .swipeActions(edge: .trailing) {
-                                        Button(role: .destructive) {
-                                            Task {
-                                                await viewModel.deleteCompletion(id: completed.id)
-                                            }
-                                        } label: {
-                                            Label("Delete", systemImage: "trash")
-                                        }
-                                        .tint(.red)
-                                    }
-                                }
-                            }
-                            .padding(.horizontal)
-                        }
-                    }
-                    .padding(.vertical)
-                }
-                .refreshable {
-                    await viewModel.refresh()
-                }
+                HistoryListView(viewModel: viewModel)
             }
             
             if viewModel.isLoading {
@@ -130,13 +46,140 @@ struct HistoryView: View {
         .task {
             await viewModel.refresh()
         }
+        .refreshable {
+            await viewModel.refresh()
+        }
+    }
+}
+
+// MARK: - Empty State View
+private struct EmptyHistoryView: View {
+    var body: some View {
+        VStack(spacing: 16) {
+            Text("No History Yet")
+                .font(.title2)
+                .bold()
+                .foregroundColor(.white)
+            
+            Text("Complete your first routine to start tracking your progress!")
+                .font(.body)
+                .foregroundColor(.white.opacity(0.7))
+                .multilineTextAlignment(.center)
+                .padding(.horizontal)
+        }
+    }
+}
+
+// MARK: - History List View
+private struct HistoryListView: View {
+    @ObservedObject var viewModel: HistoryViewModel
+    
+    private let dateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "d MMMM"
+        return formatter
+    }()
+    
+    private let timeFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "h:mm a"
+        return formatter
+    }()
+    
+    var body: some View {
+        ScrollView {
+            LazyVStack(spacing: 24) {
+                ForEach(viewModel.groupedRoutines(), id: \.0) { date, routines in
+                    HistoryDaySection(
+                        date: date,
+                        routines: routines,
+                        timeFormatter: timeFormatter,
+                        onDelete: { id in
+                            Task {
+                                await viewModel.deleteCompletion(id: id)
+                            }
+                        }
+                    )
+                }
+            }
+            .padding(.vertical)
+        }
+    }
+}
+
+// MARK: - History Day Section
+private struct HistoryDaySection: View {
+    let date: String
+    let routines: [CompletedRoutine]
+    let timeFormatter: DateFormatter
+    let onDelete: (UUID) -> Void
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text(date)
+                .font(.headline)
+                .foregroundColor(.white)
+                .padding(.horizontal)
+            
+            ForEach(routines) { routine in
+                HistoryRoutineRow(
+                    routine: routine,
+                    timeFormatter: timeFormatter,
+                    onDelete: { onDelete(routine.id) }
+                )
+            }
+        }
+    }
+}
+
+// MARK: - History Routine Row
+private struct HistoryRoutineRow: View {
+    let routine: CompletedRoutine
+    let timeFormatter: DateFormatter
+    let onDelete: () -> Void
+    
+    var body: some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(routine.routine.name)
+                    .font(.body)
+                    .foregroundColor(.white)
+                
+                Text(timeFormatter.string(from: routine.date))
+                    .font(.subheadline)
+                    .foregroundColor(.white.opacity(0.7))
+            }
+            
+            Spacer()
+            
+            Text("\(routine.durationMinutes)m")
+                .font(.body)
+                .foregroundColor(.brandPrimary)
+        }
+        .padding()
+        .background(Color.white.opacity(0.1))
+        .cornerRadius(12)
+        .padding(.horizontal)
+        .swipeActions {
+            Button(role: .destructive) {
+                onDelete()
+            } label: {
+                Label("Delete", systemImage: "trash")
+            }
+        }
     }
 }
 
 #Preview {
     NavigationStack {
-        HistoryView(completionStore: RoutineCompletionStore(), syncManager: SupabaseSyncManager())
+        HistoryView(
+            completionStore: RoutineCompletionStore(),
+            syncManager: SupabaseSyncManager(
+                db: DB(),
+                progressStore: LocalProgressStore(),
+                completionStore: RoutineCompletionStore(),
+                pendingStore: PendingCompletionStore()
+            )
+        )
     }
-    .preferredColorScheme(.dark)
-} 
 } 

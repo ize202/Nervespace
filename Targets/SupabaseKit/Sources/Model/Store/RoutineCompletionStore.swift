@@ -3,7 +3,7 @@ import SharedKit
 
 @MainActor
 public class RoutineCompletionStore: ObservableObject {
-    @Published private(set) var completions: [Model.RoutineCompletion] = []
+    @Published public private(set) var completions: [Model.RoutineCompletion] = []
     
     private let fileManager: FileManager
     private let storeURL: URL
@@ -21,24 +21,23 @@ public class RoutineCompletionStore: ObservableObject {
     
     // MARK: - Public Methods
     
-    func addCompletion(_ completion: Model.RoutineCompletion) {
+    public func addCompletion(_ completion: Model.RoutineCompletion) {
         completions.append(completion)
         saveToDisk()
     }
     
-    func getRecentCompletions(days: Int = 30) -> [Model.RoutineCompletion] {
+    public func removeCompletion(id: UUID) {
+        completions.removeAll { $0.id == id }
+        saveToDisk()
+    }
+    
+    public func getRecentCompletions(days: Int = 30) -> [Model.RoutineCompletion] {
         let cutoffDate = Calendar.current.date(byAdding: .day, value: -days, to: Date()) ?? Date()
         return completions.filter { $0.completedAt >= cutoffDate }
     }
     
-    func updateCompletions(_ newCompletions: [Model.RoutineCompletion]) {
+    public func updateCompletions(_ newCompletions: [Model.RoutineCompletion]) {
         completions = newCompletions
-        saveToDisk()
-    }
-    
-    // Remove a completion from the store
-    public func removeCompletion(id: UUID) {
-        completions.removeAll { $0.id == id }
         saveToDisk()
     }
     

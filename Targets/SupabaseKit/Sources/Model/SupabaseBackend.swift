@@ -143,7 +143,7 @@ public class DB: ObservableObject {
 		
 		// Load completions
 		print("[DB] Loading recent completions...")
-		await loadRecentCompletions()
+		try await loadRecentCompletions()
 	}
 	
 	public func recordCompletion(
@@ -175,16 +175,16 @@ public class DB: ObservableObject {
 	public func loadRecentCompletions() async throws -> [Model.RoutineCompletion] {
 		os_log(.debug, "Loading recent completions...")
 		
-		guard let userId = self.userId else {
+		guard let userId = currentUser?.id else {
 			os_log(.error, "Cannot load recent completions - no user ID available")
 			throw SupabaseError.notAuthenticated
 		}
 		
-		let response = try await client.database
-			.rpc(fn: "get_recent_completions", params: ["user_id": userId.uuidString])
+		let response = try await _db.database
+			.rpc("get_recent_completions", params: ["user_id": userId.uuidString])
 			.execute()
 		
-		guard let data = response.data else {
+		guard let data = response.data as? Data else {
 			os_log(.error, "No data returned from get_recent_completions")
 			throw SupabaseError.noData
 		}

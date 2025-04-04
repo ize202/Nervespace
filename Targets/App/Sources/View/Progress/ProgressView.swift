@@ -4,6 +4,9 @@ import SupabaseKit
 
 struct ProgressView: View {
     @StateObject private var viewModel: ProgressViewModel
+    @EnvironmentObject private var completionStore: RoutineCompletionStore
+    @EnvironmentObject private var syncManager: SupabaseSyncManager
+    
     private let currentDate = Date()
     @State private var streakDays: Set<Date> = []
     
@@ -235,6 +238,22 @@ struct DayCell: View {
 }
 
 #Preview {
-    ProgressView(progressStore: LocalProgressStore(), syncManager: SupabaseSyncManager())
-        .preferredColorScheme(.dark)
+    let progressStore = LocalProgressStore()
+    let completionStore = RoutineCompletionStore()
+    let pendingStore = PendingCompletionStore()
+    let db = DB()
+    let syncManager = SupabaseSyncManager(
+        db: db,
+        progressStore: progressStore,
+        completionStore: completionStore,
+        pendingStore: pendingStore
+    )
+    
+    ProgressView(
+        progressStore: progressStore,
+        syncManager: syncManager
+    )
+    .environmentObject(completionStore)
+    .environmentObject(syncManager)
+    .preferredColorScheme(.dark)
 }

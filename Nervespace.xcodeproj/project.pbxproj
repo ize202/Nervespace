@@ -87,6 +87,7 @@
 		978270648561AA9A6516EF73 /* SupabaseBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68127D761F8CF5F33120898D /* SupabaseBackend.swift */; };
 		99347E5C50ECDC12DC4CF52C /* TuistBundle+Nervespace.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83A9214733C3AC2CFF832873 /* TuistBundle+Nervespace.swift */; };
 		9C9D2BFE9AB3340B61C46261 /* AccountSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C72FB855CB10B1BA0E8FE23 /* AccountSettingsView.swift */; };
+		9D10EF380F532A63EE33A5C2 /* SupabaseError.swift in Sources */ = {isa = PBXBuildFile; fileRef = F28AE6968C7EDBE620765978 /* SupabaseError.swift */; };
 		9D2E3E5F2E1E9F13DB3F01AD /* Button.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACFDE9512C613A2E8A568D6D /* Button.swift */; };
 		9EFC0B9D77821CC5A7E1460C /* showInAppNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D1A73B0736C403765CF552B /* showInAppNotification.swift */; };
 		A26EBEA5D3CDE46589B50078 /* PushNotifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1277B682814579C39C505B9B /* PushNotifications.swift */; };
@@ -400,6 +401,7 @@
 		E8A6EE964B30D294427E8570 /* Nervespace.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Nervespace.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		EDA25E2E3D1A1DE59AAFCCBE /* CrashlyticsKit-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "CrashlyticsKit-Info.plist"; sourceTree = "<group>"; };
 		F1B45027C04793D1C7C5909B /* currentPlatform.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = currentPlatform.swift; sourceTree = "<group>"; };
+		F28AE6968C7EDBE620765978 /* SupabaseError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseError.swift; sourceTree = "<group>"; };
 		F40C70744D86B5E96EA614AE /* PendingCompletionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PendingCompletionStore.swift; sourceTree = "<group>"; };
 		FA326228F13EFB0EB155C980 /* NotifKit-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "NotifKit-Info.plist"; sourceTree = "<group>"; };
 		FA592D584CE1DAC849EA9F2D /* PlanDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanDetailView.swift; sourceTree = "<group>"; };
@@ -551,6 +553,7 @@
 				2BFF175CD4B3100C47F217EA /* Store */,
 				6A2A33AADC3104D50BD04E7D /* User */,
 				68127D761F8CF5F33120898D /* SupabaseBackend.swift */,
+				F28AE6968C7EDBE620765978 /* SupabaseError.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -1467,6 +1470,7 @@
 				2469D456693A9CE88A2508D9 /* SupabaseSyncManager.swift in Sources */,
 				965FD08E870FEF7DC9ACD1E5 /* SyncCoordinator.swift in Sources */,
 				978270648561AA9A6516EF73 /* SupabaseBackend.swift in Sources */,
+				9D10EF380F532A63EE33A5C2 /* SupabaseError.swift in Sources */,
 				735F57ECF2158D6B9578A52C /* Models.swift in Sources */,
 				1590D6A919B6E1F3A2B3A8A4 /* SupabaseUserService.swift in Sources */,
 				A5DD577F098553E951EC427E /* UserService.swift in Sources */,

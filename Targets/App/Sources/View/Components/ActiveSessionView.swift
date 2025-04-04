@@ -241,9 +241,15 @@ public struct ActiveSessionView: View {
             // Calculate actual duration in minutes, rounded up
             let durationMinutes = Int(ceil(actualSessionDuration / 60.0))
             
+            // Get current user ID
+            guard let userId = syncManager.db.currentUser?.id else {
+                throw NSError(domain: "ActiveSessionView", code: 401, userInfo: [NSLocalizedDescriptionKey: "User not authenticated"])
+            }
+            
             // Create completion record
             let completion = Model.RoutineCompletion(
                 id: UUID(), // New local ID
+                userId: userId,
                 routineId: routine.id,
                 completedAt: Date(),
                 durationMinutes: durationMinutes
@@ -344,15 +350,22 @@ public struct ActiveSessionView: View {
 }
 
 #Preview {
+    let progressStore = LocalProgressStore()
+    let completionStore = RoutineCompletionStore()
+    let pendingStore = PendingCompletionStore()
+    let db = DB()
+    let syncManager = SupabaseSyncManager(
+        db: db,
+        progressStore: progressStore,
+        completionStore: completionStore,
+        pendingStore: pendingStore
+    )
+    
     ActiveSessionView(
         routine: RoutineLibrary.routines.first!,
         customDurations: [:],
-        progressStore: LocalProgressStore(),
-        completionStore: RoutineCompletionStore(),
-        syncManager: SupabaseSyncManager(
-            db: DB(),
-            progressStore: LocalProgressStore(),
-            completionStore: RoutineCompletionStore()
-        )
+        progressStore: progressStore,
+        completionStore: completionStore,
+        syncManager: syncManager
     )
 } 

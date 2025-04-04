@@ -1,8 +1,9 @@
 import Foundation
+import SwiftUI
 
 @MainActor
-public class SupabaseSyncManager {
-    private let db: DB
+public class SupabaseSyncManager: ObservableObject {
+    public private(set) var db: DB
     private let progressStore: LocalProgressStore
     private let completionStore: RoutineCompletionStore
     private let pendingStore: PendingCompletionStore
@@ -122,9 +123,7 @@ public class SupabaseSyncManager {
         
         // Create a local copy to avoid mutation during iteration
         let pendingCompletions = pendingStore.pendingCompletions
-        let pendingDeletions = pendingStore.pendingDeletions
         
-        // First, try to sync completions
         for pending in pendingCompletions {
             do {
                 // Record completion with Supabase
@@ -140,17 +139,6 @@ public class SupabaseSyncManager {
                 // Update attempt count and timestamp
                 pendingStore.updateAttempt(id: pending.completion.id)
                 print("Failed to sync pending completion: \(error)")
-            }
-        }
-        
-        // Then, try to sync deletions
-        for deletion in pendingDeletions {
-            do {
-                try await db.userService.softDeleteCompletion(completionId: deletion.id, userId: userId)
-                pendingStore.removePendingDeletion(deletion.id)
-            } catch {
-                pendingStore.updateDeletionAttempt(deletion.id)
-                print("Failed to sync pending deletion: \(error)")
             }
         }
     }

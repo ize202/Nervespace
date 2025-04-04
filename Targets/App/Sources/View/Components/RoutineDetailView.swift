@@ -192,15 +192,18 @@ private struct DurationControls: View {
 #Preview {
     let progressStore = LocalProgressStore()
     let completionStore = RoutineCompletionStore()
+    let pendingStore = PendingCompletionStore()
     let db = DB()
     let syncManager = SupabaseSyncManager(
         db: db,
         progressStore: progressStore,
-        completionStore: completionStore
+        completionStore: completionStore,
+        pendingStore: pendingStore
     )
     
-    return RoutineDetailView(routine: RoutineLibrary.routines.first!)
+    RoutineDetailView(routine: RoutineLibrary.routines.first!)
         .environmentObject(progressStore)
         .environmentObject(completionStore)
+        .environmentObject(pendingStore)
         .environmentObject(syncManager)
 } 

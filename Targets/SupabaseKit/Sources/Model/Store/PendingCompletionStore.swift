@@ -4,8 +4,8 @@ import SharedKit
 /// Stores routine completions that failed to sync with Supabase for later retry
 @MainActor
 public class PendingCompletionStore: ObservableObject {
-    @Published private(set) var pendingCompletions: [PendingCompletion] = []
-    @Published private(set) var pendingDeletions: [PendingDeletion] = []
+    @Published public private(set) var pendingCompletions: [PendingCompletion] = []
+    @Published public private(set) var pendingDeletions: [PendingDeletion] = []
     
     private let fileManager: FileManager
     private let storeURL: URL
@@ -23,9 +23,9 @@ public class PendingCompletionStore: ObservableObject {
         loadFromDisk()
     }
     
-    // MARK: - Public Methods for Completions
+    // MARK: - Public Methods
     
-    func addPendingCompletion(_ completion: Model.RoutineCompletion) {
+    public func addPendingCompletion(_ completion: Model.RoutineCompletion) {
         let pending = PendingCompletion(
             completion: completion,
             lastAttempt: Date(),
@@ -35,12 +35,12 @@ public class PendingCompletionStore: ObservableObject {
         saveToDisk()
     }
     
-    func removePendingCompletion(id: UUID) {
+    public func removePendingCompletion(id: UUID) {
         pendingCompletions.removeAll { $0.completion.id == id }
         saveToDisk()
     }
     
-    func updateAttempt(id: UUID) {
+    public func updateAttempt(id: UUID) {
         if let index = pendingCompletions.firstIndex(where: { $0.completion.id == id }) {
             pendingCompletions[index].lastAttempt = Date()
             pendingCompletions[index].attemptCount += 1
@@ -48,28 +48,26 @@ public class PendingCompletionStore: ObservableObject {
         }
     }
     
-    // MARK: - Public Methods for Deletions
-    
-    func addPendingDeletion(_ id: UUID) {
+    public func addPendingDeletion(_ id: UUID) {
         let pending = PendingDeletion(
             id: id,
             lastAttempt: Date(),
             attemptCount: 0
         )
         pendingDeletions.append(pending)
-        saveToDisk()
+        saveDeletionsToDisk()
     }
     
-    func removePendingDeletion(_ id: UUID) {
+    public func removePendingDeletion(_ id: UUID) {
         pendingDeletions.removeAll { $0.id == id }
-        saveToDisk()
+        saveDeletionsToDisk()
     }
     
-    func updateDeletionAttempt(_ id: UUID) {
+    public func updateDeletionAttempt(_ id: UUID) {
         if let index = pendingDeletions.firstIndex(where: { $0.id == id }) {
             pendingDeletions[index].lastAttempt = Date()
             pendingDeletions[index].attemptCount += 1
-            saveToDisk()
+            saveDeletionsToDisk()
         }
     }
     
@@ -77,13 +75,11 @@ public class PendingCompletionStore: ObservableObject {
     
     private func loadFromDisk() {
         do {
-            // Load pending completions
             if fileManager.fileExists(atPath: storeURL.path) {
                 let data = try Data(contentsOf: storeURL)
                 pendingCompletions = try JSONDecoder().decode([PendingCompletion].self, from: data)
             }
             
-            // Load pending deletions
             if fileManager.fileExists(atPath: deletionsURL.path) {
                 let data = try Data(contentsOf: deletionsURL)
                 pendingDeletions = try JSONDecoder().decode([PendingDeletion].self, from: data)
@@ -95,29 +91,33 @@ public class PendingCompletionStore: ObservableObject {
     
     private func saveToDisk() {
         do {
-            // Save pending completions
-            let completionsData = try JSONEncoder().encode(pendingCompletions)
-            try completionsData.write(to: storeURL)
-            
-            // Save pending deletions
-            let deletionsData = try JSONEncoder().encode(pendingDeletions)
-            try deletionsData.write(to: deletionsURL)
+            let data = try JSONEncoder().encode(pendingCompletions)
+            try data.write(to: storeURL)
         } catch {
-            print("Error saving pending data: \(error)")
+            print("Error saving pending completions: \(error)")
+        }
+    }
+    
+    private func saveDeletionsToDisk() {
+        do {
+            let data = try JSONEncoder().encode(pendingDeletions)
+            try data.write(to: deletionsURL)
+        } catch {
+            print("Error saving pending deletions: \(error)")
         }
     }
 }
 
 /// Represents a completion that failed to sync with additional metadata
-struct PendingCompletion: Codable {
-    let completion: Model.RoutineCompletion
-    var lastAttempt: Date
-    var attemptCount: Int
+public struct PendingCompletion: Codable {
+    public let completion: Model.RoutineCompletion
+    public var lastAttempt: Date
+    public var attemptCount: Int
 }
 
 /// Represents a deletion that failed to sync with additional metadata
-struct PendingDeletion: Codable {
-    let id: UUID
-    var lastAttempt: Date
-    var attemptCount: Int
+public struct PendingDeletion: Codable {
+    public let id: UUID
+    public var lastAttempt: Date
+    public var attemptCount: Int
 } 

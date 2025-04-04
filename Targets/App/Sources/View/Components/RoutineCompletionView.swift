@@ -329,14 +329,16 @@ struct ConfettiPiece: View {
 #Preview {
     let progressStore = LocalProgressStore()
     let completionStore = RoutineCompletionStore()
+    let pendingStore = PendingCompletionStore()
     let db = DB()
     let syncManager = SupabaseSyncManager(
         db: db,
         progressStore: progressStore,
-        completionStore: completionStore
+        completionStore: completionStore,
+        pendingStore: pendingStore
     )
     
-    return RoutineCompletionView(
+    RoutineCompletionView(
         routine: RoutineLibrary.routines.first!,
         completionId: UUID(),
         progressStore: progressStore,

@@ -26,13 +26,11 @@ struct MainApp: App {
 	@UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
 
 	/// Core state objects
-	@StateObject private var db = DB()
-	@StateObject private var progressStore = LocalProgressStore()
-	@StateObject private var completionStore = RoutineCompletionStore()
-	@StateObject private var pendingStore = PendingCompletionStore()
-
-	// Sync management
-	private let syncManager: SupabaseSyncManager
+	@StateObject private var db: DB
+	@StateObject private var progressStore: LocalProgressStore
+	@StateObject private var completionStore: RoutineCompletionStore
+	@StateObject private var pendingStore: PendingCompletionStore
+	@StateObject private var syncManager: SupabaseSyncManager
 	@StateObject private var syncCoordinator: SyncCoordinator
 
 	// To track when app goes into foreground/background
@@ -40,6 +38,18 @@ struct MainApp: App {
 	@Environment(\.scenePhase) var scenePhase
 
 	init() {
+		// Initialize core dependencies first
+		let db = DB()
+		let progressStore = LocalProgressStore()
+		let completionStore = RoutineCompletionStore()
+		let pendingStore = PendingCompletionStore()
+		
+		// Initialize StateObjects using underscore prefix
+		_db = StateObject(wrappedValue: db)
+		_progressStore = StateObject(wrappedValue: progressStore)
+		_completionStore = StateObject(wrappedValue: completionStore)
+		_pendingStore = StateObject(wrappedValue: pendingStore)
+		
 		// Initialize sync management
 		let syncManager = SupabaseSyncManager(
 			db: db,
@@ -47,8 +57,8 @@ struct MainApp: App {
 			completionStore: completionStore,
 			pendingStore: pendingStore
 		)
-		self.syncManager = syncManager
-
+		_syncManager = StateObject(wrappedValue: syncManager)
+		
 		let coordinator = SyncCoordinator(syncManager: syncManager)
 		_syncCoordinator = StateObject(wrappedValue: coordinator)
 	}
@@ -75,17 +85,6 @@ struct MainApp: App {
 				// This modifier allows you to show the sign in sheet with the `showSignInSheet` function (SupabaseKit)
 				.modifier(ShowSignInSheetWhenCalledModifier(db))
 
-				// Clear all notifications when app is opened (NotifKit)
-				.onAppearAndChange(of: scenePhase) { phase in
-					if phase == .active {
-						PushNotifications.clearAllAppNotifications()
-						// Sync when returning to foreground
-						Task {
-							await syncCoordinator.performSync()
-						}
-					}
-				}
-
 				// Environment Objects
 				.environmentObject(db)
 				.environmentObject(progressStore)
@@ -109,6 +108,27 @@ struct MainApp: App {
 						}
 					} else {
 						PushNotifications.removeUserIDAssociation()
+					}
+				}
+
+				// Handle scene phase changes
+				.onChange(of: scenePhase) { phase in
+					// Handle scene phase changes
+					switch phase {
+					case .active:
+						// App became active
+						Task {
+							await syncCoordinator.performSync()
+						}
+					case .background:
+						// App went to background
+						Task {
+							await syncManager.syncLocalToSupabase()
+						}
+					case .inactive:
+						break
+					@unknown default:
+						break
 					}
 				}
 		}

@@ -13,7 +13,6 @@ Nervespace is a mobile application designed to help users manage stress, restore
 ### Scope
 The initial versions of Nervespace (up to v1.0) will prioritize delivering high-quality somatic sessions and daily reset routines, establishing a solid user base and core functionality. Future iterations (v1.2 to v1.5) will introduce advanced features like biofeedback integration, personalization, building on a stable foundation.
 
-
 ## Market Analysis
 
 ### Competitors
@@ -27,7 +26,7 @@ The initial versions of Nervespace (up to v1.0) will prioritize delivering high-
 - Provide a generous free tier to build trust and attract users frustrated by restrictive models.
 - Focus on somatic exercises as a niche differentiator from meditation-centric apps.
 - Ensure technical reliability and transparent billing to address common competitor pain points.
-	 
+
 ## User Personas
 
 ### Demographics
@@ -75,6 +74,8 @@ public extension Color {
 - Customer Support: In-app chat or email support.
 - Freemium Model: 3-day trial for premium features.
 - Platform Support: iOS and Android.
+- **Local-First Architecture**: Offline support with syncing via SupabaseSyncManager.
+- **Swipe-to-Delete History**: Users can swipe on history rows to delete completions, using soft deletion and sync retry.
 
 ### v0.9
 - Expanded Content: Additional free/premium sessions and routines.
@@ -82,7 +83,7 @@ public extension Color {
 - Milestone Celebrations: Visual rewards for streak milestones (e.g., 7 days, 30 days).
 - Settings Menu: Options for notification preferences.
 - Stability Improvements: Bug fixes and performance enhancements.
-	 
+
 ### v1.0
 - Premium Content: Unlock additional sessions and routines.
 - Mood Reflections: Log mood post-session in progress tracking.
@@ -94,7 +95,7 @@ public extension Color {
 - Personal Goal Setting: Set and track wellness goals.
 - Custom Playlists: Create personalized session sequences.
 - Accessibility Features: Text-to-speech for session narration.
-	 
+
 ### v1.5
 - Advanced Sessions: Trauma-informed and neurodiversity-focused content.
 - Biofeedback Integration: Sync with wearables for real-time data.
@@ -108,7 +109,7 @@ public extension Color {
 - Aesthetic: Minimalist and calming, featuring Digital Lavender (#9B79C1) with soft accents.
 - Navigation: Intuitive layout with large buttons and clear labels.
 - Accessibility: High-contrast mode and text-to-speech options for inclusivity.
-	 
+
 ### User Flow
 1. Onboarding: 
 	1. Welcome screens with a brief app overview and tutorial.
