@@ -10,6 +10,7 @@ import Foundation
 import SharedKit
 import Supabase
 import SwiftUI
+import os
 
 /// Enum representing authentication states.
 public enum AuthState {
@@ -96,19 +97,40 @@ public class DB: ObservableObject {
 		)
 		
 		Task {
+			print("[DB] Registering auth state listener...")
 			await registerAuthStateListener(additionalHandler: onAuthStateChange)
-			try? await loadProgress()
+			
+			// Check current session
+			if let session = try? await _db.auth.session {
+				print("[DB] Found existing session, updating auth state...")
+				await MainActor.run {
+					self.currentUser = session.user
+					self.authState = .signedIn
+				}
+				print("[DB] Initial progress load...")
+				try? await loadProgress()
+			} else {
+				print("[DB] No existing session found")
+				await MainActor.run {
+					self.currentUser = nil
+					self.authState = .signedOut
+				}
+			}
 		}
 	}
 	
 	// MARK: - Progress Tracking
 	
 	public func loadProgress() async throws {
+		print("[DB] Attempting to load progress...")
 		guard authState == .signedIn, let userId = currentUser?.id else {
+			print("[DB] Cannot load progress - User not authenticated. AuthState: \(authState), User: \(String(describing: currentUser))")
 			throw NSError(domain: "SupabaseKit", code: 401, userInfo: [NSLocalizedDescriptionKey: "User must be authenticated"])
 		}
 		
+		print("[DB] Loading progress for user: \(userId)")
 		let progress = try await userService.fetchProgress(userId: userId)
+		print("[DB] Successfully fetched progress from server")
 		
 		// Update state with server data
 		await MainActor.run {
@@ -116,9 +138,11 @@ public class DB: ObservableObject {
 			dailyMinutes = progress.dailyMinutes
 			totalMinutes = progress.totalMinutes
 			lastActivity = progress.lastActivity
+			print("[DB] Updated local state with progress: streak=\(progress.streak), dailyMinutes=\(progress.dailyMinutes), totalMinutes=\(progress.totalMinutes)")
 		}
 		
 		// Load completions
+		print("[DB] Loading recent completions...")
 		await loadRecentCompletions()
 	}
 	
@@ -148,19 +172,32 @@ public class DB: ObservableObject {
 		)
 	}
 	
-	public func loadRecentCompletions() async {
-		guard authState == .signedIn, let userId = currentUser?.id else { return }
+	public func loadRecentCompletions() async throws -> [Model.RoutineCompletion] {
+		os_log(.debug, "Loading recent completions...")
+		
+		guard let userId = self.userId else {
+			os_log(.error, "Cannot load recent completions - no user ID available")
+			throw SupabaseError.notAuthenticated
+		}
+		
+		let response = try await client.database
+			.rpc(fn: "get_recent_completions", params: ["user_id": userId.uuidString])
+			.execute()
+		
+		guard let data = response.data else {
+			os_log(.error, "No data returned from get_recent_completions")
+			throw SupabaseError.noData
+		}
 		
 		do {
-			let completions = try await userService.getRecentCompletions(
-				userId: userId,
-				days: 30
-			)
-			await MainActor.run {
-				self.recentCompletions = completions
-			}
+			let decoder = JSONDecoder()
+			decoder.dateDecodingStrategy = .iso8601
+			let completions = try decoder.decode([Model.RoutineCompletion].self, from: data)
+			os_log(.debug, "Successfully loaded %d recent completions", completions.count)
+			return completions
 		} catch {
-			print("[DB] Failed to load recent completions: \(error.localizedDescription)")
+			os_log(.error, "Failed to decode recent completions: %{public}@", error.localizedDescription)
+			throw SupabaseError.decodingError(error)
 		}
 	}
 }

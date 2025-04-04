@@ -25,12 +25,31 @@ struct MainApp: App {
 	// Allows us to tap into AppDelegate
 	@UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
 
-	/// Object to access DBKit and AuthKit (SupabaseKit).
+	/// Core state objects
 	@StateObject private var db = DB()
+	@StateObject private var progressStore = LocalProgressStore()
+	@StateObject private var completionStore = RoutineCompletionStore()
+
+	// Sync management
+	private let syncManager: SupabaseSyncManager
+	@StateObject private var syncCoordinator: SyncCoordinator
 
 	// To track when app goes into foreground/background
 	// We use this to clear push notifications when the app is opened.
 	@Environment(\.scenePhase) var scenePhase
+
+	init() {
+		// Initialize sync management
+		let syncManager = SupabaseSyncManager(
+			db: db,
+			progressStore: progressStore,
+			completionStore: completionStore
+		)
+		self.syncManager = syncManager
+
+		let coordinator = SyncCoordinator(syncManager: syncManager)
+		_syncCoordinator = StateObject(wrappedValue: coordinator)
+	}
 
 	var body: some Scene {
 		WindowGroup {
@@ -55,24 +74,38 @@ struct MainApp: App {
 				.modifier(ShowSignInSheetWhenCalledModifier(db))
 
 				// Clear all notifications when app is opened (NotifKit)
-				.onAppearAndChange(of: scenePhase) {
-					if scenePhase == .active {
+				.onAppearAndChange(of: scenePhase) { phase in
+					if phase == .active {
 						PushNotifications.clearAllAppNotifications()
+						// Sync when returning to foreground
+						Task {
+							await syncCoordinator.performSync()
+						}
 					}
 				}
 
+				// Environment Objects
 				.environmentObject(db)
-				.task {
-					await db.registerAuthStateListener { event, session in
-						if let user = session?.user {
-							// Logged in => Privacy Consent Given during signup (NotifKit)
-							PushNotifications.oneSignalConsentGiven()
+				.environmentObject(progressStore)
+				.environmentObject(completionStore)
+				.environmentObject(syncManager)
+				.environmentObject(syncCoordinator)
 
-							// Identify OneSignal with Supabase user (NotifKit & AuthKit)
-							PushNotifications.associateUserWithID(user.id.uuidString)
-						} else {
-							PushNotifications.removeUserIDAssociation()
+				// Sync when auth state changes
+				.onChange(of: db.authState) { newState in
+					if newState == .signedIn {
+						// Handle OneSignal setup
+						PushNotifications.oneSignalConsentGiven()
+						if let userId = db.currentUser?.id {
+							PushNotifications.associateUserWithID(userId.uuidString)
 						}
+						
+						// Force sync after sign in
+						Task {
+							await syncCoordinator.forceSync()
+						}
+					} else {
+						PushNotifications.removeUserIDAssociation()
 					}
 				}
 		}

@@ -5,98 +5,36 @@ import SupabaseKit
 @MainActor
 final class ProgressViewModel: ObservableObject {
     // MARK: - Published Properties
-    
-    @AppStorage("streak") private var cachedStreak: Int = 0
-    @AppStorage("dailyMinutes") private var cachedDailyMinutes: Int = 0
-    @AppStorage("totalMinutes") private var cachedTotalMinutes: Int = 0
-    @AppStorage("lastActivity") private var cachedLastActivityTimestamp: TimeInterval = 0
-    
-    @Published private(set) var streak: Int = 0
-    @Published private(set) var dailyMinutes: Int = 0
-    @Published private(set) var totalMinutes: Int = 0
-    @Published private(set) var lastActivity: Date?
     @Published private(set) var isLoading = false
     @Published var error: Error?
     
     // MARK: - Private Properties
-    
     private let calendar = Calendar.current
-    private let db: DB
-    private var userId: UUID? { db.currentUser?.id }
+    private let progressStore: LocalProgressStore
+    private let syncManager: SupabaseSyncManager
+    
+    // MARK: - Public Properties
+    
+    var streak: Int { progressStore.streak }
+    var dailyMinutes: Int { progressStore.dailyMinutes }
+    var totalMinutes: Int { progressStore.totalMinutes }
+    var lastActivity: Date? { progressStore.lastActivity }
     
     // MARK: - Initialization
     
-    init(db: DB) {
-        self.db = db
-        loadFromCache()
+    init(progressStore: LocalProgressStore, syncManager: SupabaseSyncManager) {
+        self.progressStore = progressStore
+        self.syncManager = syncManager
     }
     
     // MARK: - Public Methods
     
-    func refreshFromSupabase() async {
-        isLoading = true
-        defer { isLoading = false }
-        
-        guard let userId = userId else {
-            error = NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "No user ID available"])
-            return
-        }
-        
-        do {
-            let progress = try await db.userService.fetchProgress(userId: userId)
-            
-            // Compare server and local values
-            let serverValues = (
-                streak: progress.streak,
-                dailyMinutes: progress.dailyMinutes,
-                totalMinutes: progress.totalMinutes,
-                lastActivity: progress.lastActivity
-            )
-            
-            let localValues = (
-                streak: streak,
-                dailyMinutes: dailyMinutes,
-                totalMinutes: totalMinutes,
-                lastActivity: lastActivity
-            )
-            
-            // Take max values between local and server
-            let mergedValues = (
-                streak: max(serverValues.streak, localValues.streak),
-                dailyMinutes: max(serverValues.dailyMinutes, localValues.dailyMinutes),
-                totalMinutes: max(serverValues.totalMinutes, localValues.totalMinutes),
-                lastActivity: localValues.lastActivity ?? serverValues.lastActivity
-            )
-            
-            // Update local storage with merged values
-            streak = mergedValues.streak
-            dailyMinutes = mergedValues.dailyMinutes
-            totalMinutes = mergedValues.totalMinutes
-            lastActivity = mergedValues.lastActivity
-            
-            // Only sync back if numerical values are ahead of server
-            if mergedValues.streak > serverValues.streak ||
-               mergedValues.dailyMinutes > serverValues.dailyMinutes ||
-               mergedValues.totalMinutes > serverValues.totalMinutes {
-                await syncToServer()
-            }
-            
-        } catch {
-            self.error = error
-            
-            // Try to initialize progress if it doesn't exist
-            do {
-                let progress = try await db.userService.initializeProgress(userId: userId)
-                
-                // Update local storage with initial values
-                streak = progress.streak
-                dailyMinutes = progress.dailyMinutes
-                totalMinutes = progress.totalMinutes
-                lastActivity = progress.lastActivity
-                
-            } catch {
-                self.error = error
-            }
+    /// Refreshes data from local store and optionally syncs with Supabase
+    func refresh(syncWithSupabase: Bool = true) async {
+        if syncWithSupabase {
+            isLoading = true
+            await syncManager.syncSupabaseToLocal()
+            isLoading = false
         }
     }
     
@@ -124,16 +62,18 @@ final class ProgressViewModel: ObservableObject {
         
         let newTotalMinutes = totalMinutes + minutes
         
-        // Update local values immediately
-        updateLocalValues(
+        // Update local store immediately
+        progressStore.updateProgress(
             streak: newStreak,
             dailyMinutes: newDailyMinutes,
             totalMinutes: newTotalMinutes,
             lastActivity: now
         )
         
-        // Sync to server in background
-        await syncToServer()
+        // Sync to Supabase in background
+        Task {
+            await syncManager.syncLocalToSupabase()
+        }
     }
     
     // Test method for development only
@@ -142,52 +82,4 @@ final class ProgressViewModel: ObservableObject {
         await updateProgress(minutes: 5)
     }
     #endif
-    
-    // MARK: - Private Methods
-    
-    private func loadFromCache() {
-        streak = cachedStreak
-        dailyMinutes = cachedDailyMinutes
-        totalMinutes = cachedTotalMinutes
-        lastActivity = cachedLastActivityTimestamp > 0 ? Date(timeIntervalSince1970: cachedLastActivityTimestamp) : nil
-    }
-    
-    private func updateLocalValues(streak: Int, dailyMinutes: Int, totalMinutes: Int, lastActivity: Date?) {
-        // Update @AppStorage values
-        self.cachedStreak = streak
-        self.cachedDailyMinutes = dailyMinutes
-        self.cachedTotalMinutes = totalMinutes
-        self.cachedLastActivityTimestamp = lastActivity?.timeIntervalSince1970 ?? 0
-        
-        // Update @Published values
-        self.streak = streak
-        self.dailyMinutes = dailyMinutes
-        self.totalMinutes = totalMinutes
-        self.lastActivity = lastActivity
-    }
-    
-    private func syncToServer() async {
-        guard let userId = userId else { return }
-        
-        do {
-            _ = try await db.userService.updateProgress(
-                userId: userId,
-                streak: streak,
-                dailyMinutes: dailyMinutes,
-                totalMinutes: totalMinutes,
-                lastActivity: lastActivity
-            )
-        } catch {
-            self.error = error
-        }
-    }
-    
-    private func latestDate(_ date1: Date?, _ date2: Date?) -> Date? {
-        switch (date1, date2) {
-        case (nil, nil): return nil
-        case (let date?, nil): return date
-        case (nil, let date?): return date
-        case (let date1?, let date2?): return date1 > date2 ? date1 : date2
-        }
-    }
 } 

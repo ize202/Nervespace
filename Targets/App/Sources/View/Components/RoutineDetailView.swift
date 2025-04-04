@@ -1,5 +1,6 @@
 import SwiftUI
 import SharedKit
+import SupabaseKit
 
 public struct RoutineDetailView: View {
     let routine: Routine
@@ -8,6 +9,11 @@ public struct RoutineDetailView: View {
     @State private var showingActiveSession = false
     @State private var selectedExercise: Exercise?
     @StateObject private var bookmarkManager = BookmarkManager.shared
+    
+    // Local-first dependencies
+    @EnvironmentObject private var progressStore: LocalProgressStore
+    @EnvironmentObject private var completionStore: RoutineCompletionStore
+    @EnvironmentObject private var syncManager: SupabaseSyncManager
     
     public init(routine: Routine, previewMode: Bool = false) {
         self.routine = routine
@@ -101,7 +107,10 @@ public struct RoutineDetailView: View {
         .fullScreenCover(isPresented: $showingActiveSession) {
             ActiveSessionView(
                 routine: routine,
-                customDurations: exerciseDurations
+                customDurations: exerciseDurations,
+                progressStore: progressStore,
+                completionStore: completionStore,
+                syncManager: syncManager
             )
         }
     }
@@ -181,9 +190,17 @@ private struct DurationControls: View {
 }
 
 #Preview {
-    NavigationView {
-        RoutineDetailView(
-            routine: RoutineLibrary.routines.first!
-        )
-    }
+    let progressStore = LocalProgressStore()
+    let completionStore = RoutineCompletionStore()
+    let db = DB()
+    let syncManager = SupabaseSyncManager(
+        db: db,
+        progressStore: progressStore,
+        completionStore: completionStore
+    )
+    
+    return RoutineDetailView(routine: RoutineLibrary.routines.first!)
+        .environmentObject(progressStore)
+        .environmentObject(completionStore)
+        .environmentObject(syncManager)
 } 

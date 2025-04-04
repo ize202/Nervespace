@@ -10,47 +10,47 @@ final class RoutineCompletionViewModel: ObservableObject {
     @Published var errorMessage = ""
     @Published var showConfetti = false
     
-    private let db: DB
+    private let completionStore: RoutineCompletionStore
+    private let progressStore: LocalProgressStore
+    private let syncManager: SupabaseSyncManager
     private let completionId: UUID
     private let routine: Routine
     
-    init(db: DB, completionId: UUID, routine: Routine) {
-        self.db = db
+    init(
+        completionStore: RoutineCompletionStore,
+        progressStore: LocalProgressStore,
+        syncManager: SupabaseSyncManager,
+        completionId: UUID,
+        routine: Routine
+    ) {
+        self.completionStore = completionStore
+        self.progressStore = progressStore
+        self.syncManager = syncManager
         self.completionId = completionId
         self.routine = routine
+        loadData()
     }
     
     var currentStreak: Int {
-        db.currentStreak
+        progressStore.streak
     }
     
     func loadData() {
         isLoading = true
         
+        // Load completion from local store
+        let recentCompletions = completionStore.getRecentCompletions()
+        if let completion = recentCompletions.first(where: { $0.id == completionId }) {
+            self.completion = completion
+        }
+        
+        // Show success animation
+        self.showConfetti = true
+        self.isLoading = false
+        
+        // Trigger background sync
         Task {
-            do {
-                // Load completion details in background
-                let completions = try await db.getRecentCompletions()
-                if let completion = completions.first(where: { $0.id == completionId }) {
-                    await MainActor.run {
-                        self.completion = completion
-                    }
-                }
-                
-                // Update progress data
-                try await db.loadProgress()
-                
-                await MainActor.run {
-                    self.showConfetti = true
-                    self.isLoading = false
-                }
-            } catch {
-                await MainActor.run {
-                    self.showError = true
-                    self.errorMessage = error.localizedDescription
-                    self.isLoading = false
-                }
-            }
+            await syncManager.syncLocalToSupabase()
         }
     }
 }
@@ -59,17 +59,24 @@ struct RoutineCompletionView: View {
     let routine: Routine
     let completionId: UUID
     @Environment(\.dismiss) private var dismiss
-    @EnvironmentObject private var db: DB
     @StateObject private var viewModel: RoutineCompletionViewModel
     
     private let weekDays = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"]
     private let calendar = Calendar.current
     
-    init(routine: Routine, completionId: UUID, db: DB) {
+    init(
+        routine: Routine,
+        completionId: UUID,
+        progressStore: LocalProgressStore,
+        completionStore: RoutineCompletionStore,
+        syncManager: SupabaseSyncManager
+    ) {
         self.routine = routine
         self.completionId = completionId
         self._viewModel = StateObject(wrappedValue: RoutineCompletionViewModel(
-            db: db,
+            completionStore: completionStore,
+            progressStore: progressStore,
+            syncManager: syncManager,
             completionId: completionId,
             routine: routine
         ))
@@ -320,10 +327,20 @@ struct ConfettiPiece: View {
 }
 
 #Preview {
-    RoutineCompletionView(
+    let progressStore = LocalProgressStore()
+    let completionStore = RoutineCompletionStore()
+    let db = DB()
+    let syncManager = SupabaseSyncManager(
+        db: db,
+        progressStore: progressStore,
+        completionStore: completionStore
+    )
+    
+    return RoutineCompletionView(
         routine: RoutineLibrary.routines.first!,
         completionId: UUID(),
-        db: DB()
+        progressStore: progressStore,
+        completionStore: completionStore,
+        syncManager: syncManager
     )
-    .environmentObject(DB())
 } 

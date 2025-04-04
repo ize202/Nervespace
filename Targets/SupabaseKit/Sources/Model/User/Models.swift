@@ -122,20 +122,17 @@ public enum Model {
 
     public struct RoutineCompletion: Identifiable, Codable, Hashable {
         public let id: UUID
-        public let userId: UUID
         public let routineId: String
         public let completedAt: Date
         public let durationMinutes: Int
         
         public init(
             id: UUID = UUID(),
-            userId: UUID,
             routineId: String,
             completedAt: Date = Date(),
             durationMinutes: Int
         ) {
             self.id = id
-            self.userId = userId
             self.routineId = routineId
             self.completedAt = completedAt
             self.durationMinutes = durationMinutes
@@ -143,7 +140,6 @@ public enum Model {
         
         enum CodingKeys: String, CodingKey {
             case id
-            case userId = "user_id"
             case routineId = "routine_id"
             case completedAt = "completed_at"
             case durationMinutes = "duration_minutes"

@@ -13,8 +13,11 @@ struct ProgressView: View {
     private let calendar = Calendar.current
     private let daysOfWeek = ["S", "M", "T", "W", "T", "F", "S"]
     
-    init(db: DB) {
-        _viewModel = StateObject(wrappedValue: ProgressViewModel(db: db))
+    init(progressStore: LocalProgressStore, syncManager: SupabaseSyncManager) {
+        _viewModel = StateObject(wrappedValue: ProgressViewModel(
+            progressStore: progressStore,
+            syncManager: syncManager
+        ))
     }
     
     private var currentMinutes: Int {
@@ -51,7 +54,10 @@ struct ProgressView: View {
                                     
                                     Spacer()
                                     
-                                    NavigationLink(destination: HistoryView()) {
+                                    NavigationLink(destination: HistoryView(
+                                        completionStore: completionStore,
+                                        syncManager: syncManager
+                                    )) {
                                         HStack(spacing: 4) {
                                             Text("History")
                                                 .font(.headline)
@@ -138,7 +144,11 @@ struct ProgressView: View {
             .navigationBarHidden(true)
             .task {
                 await loadStreakDays()
-                await viewModel.refreshFromSupabase()
+                await viewModel.refresh()
+            }
+            .refreshable {
+                await viewModel.refresh()
+                await loadStreakDays()
             }
         }
         .preferredColorScheme(.dark)
@@ -225,6 +235,6 @@ struct DayCell: View {
 }
 
 #Preview {
-    ProgressView(db: DB())
+    ProgressView(progressStore: LocalProgressStore(), syncManager: SupabaseSyncManager())
         .preferredColorScheme(.dark)
 }

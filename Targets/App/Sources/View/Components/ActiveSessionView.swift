@@ -17,15 +17,28 @@ public struct ActiveSessionView: View {
     @State private var showError = false
     @State private var errorMessage = ""
     @State private var completionId: UUID?
-    @EnvironmentObject private var db: DB
     @State private var isUpdating = false
     @State private var sessionStartTime: Date = Date()
     @State private var totalPausedTime: TimeInterval = 0
     @State private var lastPauseTime: Date?
     
-    public init(routine: Routine, customDurations: [String: Int]) {
+    // Local-first dependencies
+    private let progressStore: LocalProgressStore
+    private let completionStore: RoutineCompletionStore
+    private let syncManager: SupabaseSyncManager
+    
+    public init(
+        routine: Routine,
+        customDurations: [String: Int],
+        progressStore: LocalProgressStore,
+        completionStore: RoutineCompletionStore,
+        syncManager: SupabaseSyncManager
+    ) {
         self.routine = routine
         self.customDurations = customDurations
+        self.progressStore = progressStore
+        self.completionStore = completionStore
+        self.syncManager = syncManager
         // Initialize with the first exercise duration
         _timeRemaining = State(initialValue: routine.exercises.first.map { customDurations[$0.exercise.id] ?? $0.duration } ?? 30)
     }
@@ -188,7 +201,13 @@ public struct ActiveSessionView: View {
         }
         .sheet(isPresented: $showingCompletion) {
             if let completionId = completionId {
-                RoutineCompletionView(routine: routine, completionId: completionId, db: db)
+                RoutineCompletionView(
+                    routine: routine,
+                    completionId: completionId,
+                    progressStore: progressStore,
+                    completionStore: completionStore,
+                    syncManager: syncManager
+                )
             }
         }
         .alert("Error", isPresented: $showError) {
@@ -222,12 +241,28 @@ public struct ActiveSessionView: View {
             // Calculate actual duration in minutes, rounded up
             let durationMinutes = Int(ceil(actualSessionDuration / 60.0))
             
-            // Record completion with actual duration
-            completionId = try await db.recordCompletion(
-                routine: routine,
+            // Create completion record
+            let completion = Model.RoutineCompletion(
+                id: UUID(), // New local ID
+                routineId: routine.id,
+                completedAt: Date(),
                 durationMinutes: durationMinutes
             )
+            
+            // Save to local store
+            completionStore.addCompletion(completion)
+            
+            // Update progress
+            progressStore.addMinutes(durationMinutes)
+            
+            // Set completion ID for the completion view
+            completionId = completion.id
             showingCompletion = true
+            
+            // Trigger background sync
+            Task {
+                await syncManager.syncLocalToSupabase()
+            }
         } catch {
             showError = true
             errorMessage = error.localizedDescription
@@ -306,7 +341,13 @@ public struct ActiveSessionView: View {
 #Preview {
     ActiveSessionView(
         routine: RoutineLibrary.routines.first!,
-        customDurations: [:]
+        customDurations: [:],
+        progressStore: LocalProgressStore(),
+        completionStore: RoutineCompletionStore(),
+        syncManager: SupabaseSyncManager(
+            db: DB(),
+            progressStore: LocalProgressStore(),
+            completionStore: RoutineCompletionStore()
+        )
     )
-    .environmentObject(DB())
 } 

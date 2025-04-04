@@ -1,0 +1,74 @@
+import SwiftUI
+import SharedKit
+import SupabaseKit
+
+@MainActor
+final class HistoryViewModel: ObservableObject {
+    @Published private(set) var completedRoutines: [CompletedRoutine] = []
+    @Published private(set) var isLoading = false
+    @Published var error: Error?
+    
+    private let completionStore: RoutineCompletionStore
+    private let syncManager: SupabaseSyncManager
+    
+    init(completionStore: RoutineCompletionStore, syncManager: SupabaseSyncManager) {
+        self.completionStore = completionStore
+        self.syncManager = syncManager
+        loadFromLocalStore()
+    }
+    
+    func refresh(syncWithSupabase: Bool = true) async {
+        if syncWithSupabase {
+            isLoading = true
+            await syncManager.syncSupabaseToLocal()
+            isLoading = false
+        }
+        
+        loadFromLocalStore()
+    }
+    
+    private func loadFromLocalStore() {
+        let recentCompletions = completionStore.getRecentCompletions(days: 30)
+        completedRoutines = recentCompletions.map { CompletedRoutine(completion: $0) }
+    }
+    
+    func groupedRoutines() -> [(String, [CompletedRoutine])] {
+        let calendar = Calendar.current
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "d MMMM"
+        
+        let grouped = Dictionary(grouping: completedRoutines) { routine in
+            if calendar.isDateInToday(routine.date) {
+                return "Today"
+            } else if calendar.isDateInYesterday(routine.date) {
+                return "Yesterday"
+            } else {
+                return dateFormatter.string(from: routine.date)
+            }
+        }
+        
+        return grouped.sorted { lhs, rhs in
+            let lhsDate = completedRoutines.first { routine in
+                if calendar.isDateInToday(routine.date) {
+                    return lhs.key == "Today"
+                } else if calendar.isDateInYesterday(routine.date) {
+                    return lhs.key == "Yesterday"
+                } else {
+                    return dateFormatter.string(from: routine.date) == lhs.key
+                }
+            }?.date ?? Date.distantPast
+            
+            let rhsDate = completedRoutines.first { routine in
+                if calendar.isDateInToday(routine.date) {
+                    return rhs.key == "Today"
+                } else if calendar.isDateInYesterday(routine.date) {
+                    return rhs.key == "Yesterday"
+                } else {
+                    return dateFormatter.string(from: routine.date) == rhs.key
+                }
+            }?.date ?? Date.distantPast
+            
+            return lhsDate > rhsDate
+        }
+    }
+} 
