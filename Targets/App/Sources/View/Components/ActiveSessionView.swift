@@ -261,7 +261,12 @@ public struct ActiveSessionView: View {
             
             // Trigger background sync
             Task {
-                await syncManager.syncLocalToSupabase()
+                do {
+                    await syncManager.syncLocalToSupabase()
+                } catch {
+                    // If sync fails, store completion for later retry
+                    syncManager.handleFailedSync(completion)
+                }
             }
         } catch {
             showError = true

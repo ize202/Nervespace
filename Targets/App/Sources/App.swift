@@ -29,6 +29,7 @@ struct MainApp: App {
 	@StateObject private var db = DB()
 	@StateObject private var progressStore = LocalProgressStore()
 	@StateObject private var completionStore = RoutineCompletionStore()
+	@StateObject private var pendingStore = PendingCompletionStore()
 
 	// Sync management
 	private let syncManager: SupabaseSyncManager
@@ -43,7 +44,8 @@ struct MainApp: App {
 		let syncManager = SupabaseSyncManager(
 			db: db,
 			progressStore: progressStore,
-			completionStore: completionStore
+			completionStore: completionStore,
+			pendingStore: pendingStore
 		)
 		self.syncManager = syncManager
 
@@ -88,6 +90,7 @@ struct MainApp: App {
 				.environmentObject(db)
 				.environmentObject(progressStore)
 				.environmentObject(completionStore)
+				.environmentObject(pendingStore)
 				.environmentObject(syncManager)
 				.environmentObject(syncCoordinator)
 
