@@ -19,6 +19,9 @@ public struct ActiveSessionView: View {
     @State private var completionId: UUID?
     @EnvironmentObject private var db: DB
     @State private var isUpdating = false
+    @State private var sessionStartTime: Date = Date()
+    @State private var totalPausedTime: TimeInterval = 0
+    @State private var lastPauseTime: Date?
     
     public init(routine: Routine, customDurations: [String: Int]) {
         self.routine = routine
@@ -38,6 +41,16 @@ public struct ActiveSessionView: View {
     
     private var progressText: String {
         "\(currentExerciseIndex + 1) of \(routine.exercises.count)"
+    }
+    
+    private var actualSessionDuration: TimeInterval {
+        guard !isPaused else {
+            if let lastPause = lastPauseTime {
+                return lastPause.timeIntervalSince(sessionStartTime) - totalPausedTime
+            }
+            return 0
+        }
+        return Date().timeIntervalSince(sessionStartTime) - totalPausedTime
     }
     
     public var body: some View {
@@ -206,13 +219,13 @@ public struct ActiveSessionView: View {
     private func completeRoutine() async {
         isUpdating = true
         do {
-            // Record completion with duration
-            let totalDuration = routine.exercises.reduce(0) { sum, exercise in
-                sum + (customDurations[exercise.exercise.id] ?? exercise.duration)
-            }
+            // Calculate actual duration in minutes, rounded up
+            let durationMinutes = Int(ceil(actualSessionDuration / 60.0))
+            
+            // Record completion with actual duration
             completionId = try await db.recordCompletion(
                 routine: routine,
-                durationMinutes: totalDuration / 60
+                durationMinutes: durationMinutes
             )
             showingCompletion = true
         } catch {
@@ -251,9 +264,14 @@ public struct ActiveSessionView: View {
     private func togglePause() {
         isPaused.toggle()
         if isPaused {
+            lastPauseTime = Date()
             timer?.invalidate()
             timer = nil
         } else {
+            if let lastPause = lastPauseTime {
+                totalPausedTime += Date().timeIntervalSince(lastPause)
+            }
+            lastPauseTime = nil
             startTimer()
         }
     }

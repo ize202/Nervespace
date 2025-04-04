@@ -26,10 +26,19 @@ struct ProfileView: View {
                 // Settings Section
                 Section("SETTINGS") {
                     NavigationLink {
-                        Text("Reminder")
+                        Text("Workout Reminder")
                     } label: {
                         HStack {
-                            Text("Reminder")
+                            Text("Workout Reminder")
+                            Spacer()
+                        }
+                    }
+
+                    NavigationLink {
+                        Text("Daily Minutes Goal")
+                    } label: {
+                        HStack {
+                            Text("Daily Minutes Goal")
                             Spacer()
                         }
                     }
