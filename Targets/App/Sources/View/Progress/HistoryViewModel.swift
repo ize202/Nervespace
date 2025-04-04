@@ -27,6 +27,18 @@ final class HistoryViewModel: ObservableObject {
         loadFromLocalStore()
     }
     
+    /// Deletes a completion both locally and in Supabase
+    func deleteCompletion(id: UUID) async {
+        // First, remove from local completed routines for immediate UI update
+        completedRoutines.removeAll { $0.id == id }
+        
+        // Then delete through sync manager (handles both local store and Supabase)
+        await syncManager.deleteCompletion(id: id)
+        
+        // Reload the local store to ensure UI is in sync with store
+        loadFromLocalStore()
+    }
+    
     private func loadFromLocalStore() {
         let recentCompletions = completionStore.getRecentCompletions(days: 30)
         completedRoutines = recentCompletions.map { CompletedRoutine(completion: $0) }

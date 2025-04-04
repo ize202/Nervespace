@@ -99,6 +99,16 @@ struct HistoryView: View {
                                         RoundedRectangle(cornerRadius: 12)
                                             .fill(.ultraThinMaterial)
                                     }
+                                    .swipeActions(edge: .trailing) {
+                                        Button(role: .destructive) {
+                                            Task {
+                                                await viewModel.deleteCompletion(id: completed.id)
+                                            }
+                                        } label: {
+                                            Label("Delete", systemImage: "trash")
+                                        }
+                                        .tint(.red)
+                                    }
                                 }
                             }
                             .padding(.horizontal)
