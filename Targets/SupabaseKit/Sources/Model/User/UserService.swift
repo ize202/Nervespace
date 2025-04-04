@@ -30,6 +30,9 @@ public protocol UserService {
         days: Int
     ) async throws -> [Model.RoutineCompletion]
     
+    // Add soft delete completion method
+    func softDeleteCompletion(completionId: UUID, userId: UUID) async throws
+    
     // Utility methods
     func findProfileByAppleId(_ appleId: String) async throws -> Model.UserProfile?
 }

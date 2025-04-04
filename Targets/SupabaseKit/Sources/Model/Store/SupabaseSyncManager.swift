@@ -95,6 +95,25 @@ public class SupabaseSyncManager {
         pendingStore.addPendingCompletion(completion)
     }
     
+    /// Handles soft deletion of a completion
+    public func deleteCompletion(id: UUID) async {
+        guard let userId = db.currentUser?.id else { return }
+        guard !isSyncing else { return }
+        
+        // Remove from local store first
+        completionStore.removeCompletion(id: id)
+        
+        do {
+            // Try to soft delete in Supabase
+            try await db.userService.softDeleteCompletion(completionId: id, userId: userId)
+        } catch {
+            // If deletion fails, store the deletion intent for later retry
+            pendingStore.addPendingDeletion(id)
+            lastSyncError = error
+            print("Error deleting completion: \(error)")
+        }
+    }
+    
     // MARK: - Private Methods
     
     /// Attempts to sync pending completions with Supabase
@@ -103,7 +122,9 @@ public class SupabaseSyncManager {
         
         // Create a local copy to avoid mutation during iteration
         let pendingCompletions = pendingStore.pendingCompletions
+        let pendingDeletions = pendingStore.pendingDeletions
         
+        // First, try to sync completions
         for pending in pendingCompletions {
             do {
                 // Record completion with Supabase
@@ -119,6 +140,17 @@ public class SupabaseSyncManager {
                 // Update attempt count and timestamp
                 pendingStore.updateAttempt(id: pending.completion.id)
                 print("Failed to sync pending completion: \(error)")
+            }
+        }
+        
+        // Then, try to sync deletions
+        for deletion in pendingDeletions {
+            do {
+                try await db.userService.softDeleteCompletion(completionId: deletion.id, userId: userId)
+                pendingStore.removePendingDeletion(deletion.id)
+            } catch {
+                pendingStore.updateDeletionAttempt(deletion.id)
+                print("Failed to sync pending deletion: \(error)")
             }
         }
     }

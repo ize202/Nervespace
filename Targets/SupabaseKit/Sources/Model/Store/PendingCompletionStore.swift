@@ -5,9 +5,11 @@ import SharedKit
 @MainActor
 public class PendingCompletionStore: ObservableObject {
     @Published private(set) var pendingCompletions: [PendingCompletion] = []
+    @Published private(set) var pendingDeletions: [PendingDeletion] = []
     
     private let fileManager: FileManager
     private let storeURL: URL
+    private let deletionsURL: URL
     
     public init() {
         self.fileManager = .default
@@ -15,12 +17,13 @@ public class PendingCompletionStore: ObservableObject {
         // Get the app's Documents directory
         let documentsDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask)[0]
         self.storeURL = documentsDirectory.appendingPathComponent("pending_completions.json")
+        self.deletionsURL = documentsDirectory.appendingPathComponent("pending_deletions.json")
         
         // Load initial data
         loadFromDisk()
     }
     
-    // MARK: - Public Methods
+    // MARK: - Public Methods for Completions
     
     func addPendingCompletion(_ completion: Model.RoutineCompletion) {
         let pending = PendingCompletion(
@@ -45,25 +48,62 @@ public class PendingCompletionStore: ObservableObject {
         }
     }
     
+    // MARK: - Public Methods for Deletions
+    
+    func addPendingDeletion(_ id: UUID) {
+        let pending = PendingDeletion(
+            id: id,
+            lastAttempt: Date(),
+            attemptCount: 0
+        )
+        pendingDeletions.append(pending)
+        saveToDisk()
+    }
+    
+    func removePendingDeletion(_ id: UUID) {
+        pendingDeletions.removeAll { $0.id == id }
+        saveToDisk()
+    }
+    
+    func updateDeletionAttempt(_ id: UUID) {
+        if let index = pendingDeletions.firstIndex(where: { $0.id == id }) {
+            pendingDeletions[index].lastAttempt = Date()
+            pendingDeletions[index].attemptCount += 1
+            saveToDisk()
+        }
+    }
+    
     // MARK: - Private Methods
     
     private func loadFromDisk() {
         do {
-            guard fileManager.fileExists(atPath: storeURL.path) else { return }
+            // Load pending completions
+            if fileManager.fileExists(atPath: storeURL.path) {
+                let data = try Data(contentsOf: storeURL)
+                pendingCompletions = try JSONDecoder().decode([PendingCompletion].self, from: data)
+            }
             
-            let data = try Data(contentsOf: storeURL)
-            pendingCompletions = try JSONDecoder().decode([PendingCompletion].self, from: data)
+            // Load pending deletions
+            if fileManager.fileExists(atPath: deletionsURL.path) {
+                let data = try Data(contentsOf: deletionsURL)
+                pendingDeletions = try JSONDecoder().decode([PendingDeletion].self, from: data)
+            }
         } catch {
-            print("Error loading pending completions: \(error)")
+            print("Error loading pending data: \(error)")
         }
     }
     
     private func saveToDisk() {
         do {
-            let data = try JSONEncoder().encode(pendingCompletions)
-            try data.write(to: storeURL)
+            // Save pending completions
+            let completionsData = try JSONEncoder().encode(pendingCompletions)
+            try completionsData.write(to: storeURL)
+            
+            // Save pending deletions
+            let deletionsData = try JSONEncoder().encode(pendingDeletions)
+            try deletionsData.write(to: deletionsURL)
         } catch {
-            print("Error saving pending completions: \(error)")
+            print("Error saving pending data: \(error)")
         }
     }
 }
@@ -71,6 +111,13 @@ public class PendingCompletionStore: ObservableObject {
 /// Represents a completion that failed to sync with additional metadata
 struct PendingCompletion: Codable {
     let completion: Model.RoutineCompletion
+    var lastAttempt: Date
+    var attemptCount: Int
+}
+
+/// Represents a deletion that failed to sync with additional metadata
+struct PendingDeletion: Codable {
+    let id: UUID
     var lastAttempt: Date
     var attemptCount: Int
 } 

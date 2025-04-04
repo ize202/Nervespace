@@ -98,6 +98,7 @@
 		B0CB05DD9BF6B551BBECAC31 /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C81FB8187D2C75C5F20311CD /* HistoryView.swift */; };
 		B22AB690FA8233FD4018EEA0 /* ExerciseLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49BB65485C8AD2F12F9C1DA /* ExerciseLibrary.swift */; };
 		B26234992D49707AE6557B5A /* TuistBundle+CrashlyticsKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 387F180DB5885A8E912AFDD5 /* TuistBundle+CrashlyticsKit.swift */; };
+		B52989AA282A9E9926B3CB36 /* PendingCompletionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F40C70744D86B5E96EA614AE /* PendingCompletionStore.swift */; };
 		B7520CB5A12EC0F7086D5121 /* PaywallManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12B9A5F9A3DA6C183E3C040F /* PaywallManager.swift */; };
 		B82F7C3952592C951DE83D5A /* HistoryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD22D3434F6B22E8FA5AC600 /* HistoryViewModel.swift */; };
 		BBAB0DC133553F3F427CF059 /* Mixpanel-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C158375CFEB51F1DF3835DE1 /* Mixpanel-Info.plist */; };
@@ -399,6 +400,7 @@
 		E8A6EE964B30D294427E8570 /* Nervespace.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Nervespace.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		EDA25E2E3D1A1DE59AAFCCBE /* CrashlyticsKit-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "CrashlyticsKit-Info.plist"; sourceTree = "<group>"; };
 		F1B45027C04793D1C7C5909B /* currentPlatform.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = currentPlatform.swift; sourceTree = "<group>"; };
+		F40C70744D86B5E96EA614AE /* PendingCompletionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PendingCompletionStore.swift; sourceTree = "<group>"; };
 		FA326228F13EFB0EB155C980 /* NotifKit-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "NotifKit-Info.plist"; sourceTree = "<group>"; };
 		FA592D584CE1DAC849EA9F2D /* PlanDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanDetailView.swift; sourceTree = "<group>"; };
 		FAE741F68BDCA070A422A0F3 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -615,6 +617,7 @@
 			isa = PBXGroup;
 			children = (
 				5ACABB14AB66FD28BAC4C9CB /* LocalProgressStore.swift */,
+				F40C70744D86B5E96EA614AE /* PendingCompletionStore.swift */,
 				88E7F60B492D3F8FCB2B3306 /* RoutineCompletionStore.swift */,
 				1F6DF23EDC8B5FC5D1072ADB /* SupabaseSyncManager.swift */,
 				DDC06E2866460DC64926B4E8 /* SyncCoordinator.swift */,
@@ -1459,6 +1462,7 @@
 				8CEAB25115A63D8452C7790D /* AuthKitError.swift in Sources */,
 				C93F1D8A78A7DFE88844E617 /* SignInWithApple.swift in Sources */,
 				F37603910F50B1322694491A /* LocalProgressStore.swift in Sources */,
+				B52989AA282A9E9926B3CB36 /* PendingCompletionStore.swift in Sources */,
 				110C6F01296E6E3977E84168 /* RoutineCompletionStore.swift in Sources */,
 				2469D456693A9CE88A2508D9 /* SupabaseSyncManager.swift in Sources */,
 				965FD08E870FEF7DC9ACD1E5 /* SyncCoordinator.swift in Sources */,

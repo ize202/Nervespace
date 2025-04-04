@@ -154,17 +154,21 @@ public class SupabaseUserService: UserService {
         durationMinutes: Int,
         userId: UUID
     ) async throws -> UUID {
-        let params = RecordRoutineCompletionParams(
-            p_routine_id: routineId,
-            p_duration_minutes: durationMinutes
-        )
-        
-        let response: UUID = try await client
-            .rpc("record_routine_completion", params: params)
+        let response = try await client.database
+            .rpc(fn: "record_routine_completion", params: [
+                "routine_id": routineId,
+                "duration_minutes": durationMinutes,
+                "user_id": userId.uuidString
+            ])
             .execute()
-            .value
         
-        return response
+        guard let data = response.data else {
+            throw SupabaseError.noData
+        }
+        
+        let decoder = JSONDecoder()
+        let completionId = try decoder.decode(UUID.self, from: data)
+        return completionId
     }
     
     private struct GetRecentCompletionsParams: Encodable {
@@ -175,13 +179,29 @@ public class SupabaseUserService: UserService {
         userId: UUID,
         days: Int
     ) async throws -> [Model.RoutineCompletion] {
-        let params = GetRecentCompletionsParams(p_days: days)
-        
-        let response: [Model.RoutineCompletion] = try await client
-            .rpc("get_recent_completions", params: params)
+        let response = try await client.database
+            .rpc(fn: "get_recent_completions", params: [
+                "user_id": userId.uuidString,
+                "days_ago": days
+            ])
             .execute()
-            .value
-        return response
+        
+        guard let data = response.data else {
+            throw SupabaseError.noData
+        }
+        
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        let completions = try decoder.decode([Model.RoutineCompletion].self, from: data)
+        return completions
+    }
+    
+    public func softDeleteCompletion(completionId: UUID, userId: UUID) async throws {
+        try await client.database
+            .rpc(fn: "soft_delete_completion", params: [
+                "p_completion_id": completionId.uuidString
+            ])
+            .execute()
     }
     
     // MARK: - Utility Methods

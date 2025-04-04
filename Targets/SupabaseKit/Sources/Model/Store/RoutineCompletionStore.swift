@@ -36,6 +36,12 @@ public class RoutineCompletionStore: ObservableObject {
         saveToDisk()
     }
     
+    // Remove a completion from the store
+    public func removeCompletion(id: UUID) {
+        completions.removeAll { $0.id == id }
+        saveToDisk()
+    }
+    
     // MARK: - Private Methods
     
     private func loadFromDisk() {
