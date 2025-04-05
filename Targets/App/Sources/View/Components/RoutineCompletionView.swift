@@ -72,6 +72,7 @@ struct RoutineCompletionView: View {
     let completionId: UUID
     @Environment(\.dismiss) private var dismiss
     @StateObject private var viewModel: RoutineCompletionViewModel
+    let onComplete: () -> Void
     
     private let weekDays = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"]
     private let calendar = Calendar.current
@@ -85,10 +86,12 @@ struct RoutineCompletionView: View {
         completionId: UUID,
         progressStore: LocalProgressStore,
         completionStore: RoutineCompletionStore,
-        syncManager: SupabaseSyncManager
+        syncManager: SupabaseSyncManager,
+        onComplete: @escaping () -> Void
     ) {
         self.routineId = routineId
         self.completionId = completionId
+        self.onComplete = onComplete
         self._viewModel = StateObject(wrappedValue: RoutineCompletionViewModel(
             completionStore: completionStore,
             progressStore: progressStore,
@@ -217,6 +220,7 @@ struct RoutineCompletionView: View {
                         // Continue Button
                         Button(action: {
                             dismiss()
+                            onComplete()
                         }) {
                             HStack {
                                 Text(buttonText)
@@ -390,6 +394,7 @@ struct ConfettiPiece: View {
         completionId: UUID(),
         progressStore: progressStore,
         completionStore: completionStore,
-        syncManager: syncManager
+        syncManager: syncManager,
+        onComplete: {}
     )
 } 

@@ -207,7 +207,8 @@ public struct ActiveSessionView: View {
                     completionId: data.id,
                     progressStore: progressStore,
                     completionStore: completionStore,
-                    syncManager: syncManager
+                    syncManager: syncManager,
+                    onComplete: { dismiss() }
                 )
             }
         }
