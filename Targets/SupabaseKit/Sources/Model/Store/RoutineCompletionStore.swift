@@ -31,6 +31,10 @@ public class RoutineCompletionStore: ObservableObject {
         saveToDisk()
     }
     
+    public func getCompletion(id: UUID) -> Model.RoutineCompletion? {
+        return completions.first { $0.id == id }
+    }
+    
     public func getRecentCompletions(days: Int = 30) -> [Model.RoutineCompletion] {
         let cutoffDate = Calendar.current.date(byAdding: .day, value: -days, to: Date()) ?? Date()
         return completions.filter { $0.completedAt >= cutoffDate }

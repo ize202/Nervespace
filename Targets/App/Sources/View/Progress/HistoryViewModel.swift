@@ -14,32 +14,44 @@ final class HistoryViewModel: ObservableObject {
     init(completionStore: RoutineCompletionStore, syncManager: SupabaseSyncManager) {
         self.completionStore = completionStore
         self.syncManager = syncManager
-        loadFromLocalStore() // Load local data immediately
         
-        // Start background sync
-        Task {
-            await syncInBackground()
-        }
+        // Load local data immediately - this is fast and doesn't require network
+        loadFromLocalStore()
     }
     
     func refresh() async {
-        // Load local data immediately
-        loadFromLocalStore()
+        isLoading = true
         
-        // Then sync in background
-        await syncInBackground()
-    }
-    
-    private func syncInBackground() async {
-        do {
-            await syncManager.syncSupabaseToLocal()
-            // Only reload from local store if sync succeeded
+        if let userId = syncManager.db.currentUser?.id {
+            do {
+                print("[History] Forcing refresh from server...")
+                
+                // Directly fetch completions from the server
+                let serverCompletions = try await syncManager.db.userService.getRecentCompletions(userId: userId, days: 30)
+                
+                // Update the local store with server data
+                completionStore.updateCompletions(serverCompletions)
+                
+                // Reload from local store to update the UI
+                loadFromLocalStore()
+                
+                print("[History] Updated with \(serverCompletions.count) completions from server")
+                error = nil
+            } catch {
+                print("[History] Server refresh failed: \(error)")
+                
+                // Still load from local store as fallback
+                loadFromLocalStore()
+                
+                // For history view, we don't show an error since no completions is a valid state
+                // Just use whatever we have locally
+            }
+        } else {
+            // No user ID - load from local store only
             loadFromLocalStore()
-        } catch {
-            // Just log the error, don't show loading or error states to user
-            // since we're operating in local-first mode
-            print("[History] Background sync failed: \(error)")
         }
+        
+        isLoading = false
     }
     
     /// Deletes a completion both locally and in Supabase

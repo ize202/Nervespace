@@ -129,21 +129,47 @@ public class DB: ObservableObject {
 		}
 		
 		print("[DB] Loading progress for user: \(userId)")
-		let progress = try await userService.fetchProgress(userId: userId)
-		print("[DB] Successfully fetched progress from server")
 		
-		// Update state with server data
-		await MainActor.run {
-			currentStreak = progress.streak
-			dailyMinutes = progress.dailyMinutes
-			totalMinutes = progress.totalMinutes
-			lastActivity = progress.lastActivity
-			print("[DB] Updated local state with progress: streak=\(progress.streak), dailyMinutes=\(progress.dailyMinutes), totalMinutes=\(progress.totalMinutes)")
+		do {
+			let progress = try await userService.fetchProgress(userId: userId)
+			print("[DB] Successfully fetched progress from server")
+			
+			// Update state with server data
+			await MainActor.run {
+				currentStreak = progress.streak
+				dailyMinutes = progress.dailyMinutes
+				totalMinutes = progress.totalMinutes
+				lastActivity = progress.lastActivity
+				print("[DB] Updated local state with progress: streak=\(progress.streak), dailyMinutes=\(progress.dailyMinutes), totalMinutes=\(progress.totalMinutes)")
+			}
+			
+			// Load completions
+			print("[DB] Loading recent completions...")
+			try await loadRecentCompletions()
+		} catch {
+			print("[DB] Error loading progress: \(error)")
+			
+			// For new users, set default values
+			await MainActor.run {
+				currentStreak = 0
+				dailyMinutes = 0
+				totalMinutes = 0
+				lastActivity = nil
+				print("[DB] Using default progress values for new user")
+			}
+			
+			// Attempt to initialize progress record
+			let errorDescription = error.localizedDescription
+			if errorDescription.contains("multiple (or no) rows") {
+				do {
+					print("[DB] Attempting to initialize progress for new user...")
+					_ = try await userService.initializeProgress(userId: userId)
+					print("[DB] Successfully initialized progress for new user")
+				} catch {
+					print("[DB] Failed to initialize progress: \(error)")
+				}
+			}
 		}
-		
-		// Load completions
-		print("[DB] Loading recent completions...")
-		try await loadRecentCompletions()
 	}
 	
 	public func recordCompletion(

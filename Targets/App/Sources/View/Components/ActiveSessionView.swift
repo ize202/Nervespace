@@ -274,6 +274,7 @@ public struct ActiveSessionView: View {
                     syncManager.handleFailedSync(completion)
                 }
             }
+
         } catch {
             showError = true
             errorMessage = error.localizedDescription

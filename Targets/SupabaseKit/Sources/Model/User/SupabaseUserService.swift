@@ -95,14 +95,28 @@ public class SupabaseUserService: UserService {
     // MARK: - Progress Tracking
     
     public func fetchProgress(userId: UUID) async throws -> Model.UserProgress {
-        let response: Model.UserProgress = try await client
-            .from("user_progress")
-            .select()
-            .eq("user_id", value: userId)
-            .single()
-            .execute()
-            .value
-        return response
+        do {
+            // Try to fetch existing progress
+            let response: Model.UserProgress = try await client
+                .from("user_progress")
+                .select()
+                .eq("user_id", value: userId)
+                .single()
+                .execute()
+                .value
+            return response
+        } catch let error {
+            // Check if the error message contains "multiple (or no) rows returned"
+            let errorDescription = error.localizedDescription
+            if errorDescription.contains("multiple (or no) rows returned") {
+                // No progress record exists, create a new one
+                print("[DB] No progress record found, initializing new progress for user \(userId)")
+                return try await initializeProgress(userId: userId)
+            } else {
+                // Re-throw any other errors
+                throw error
+            }
+        }
     }
     
     public func initializeProgress(userId: UUID) async throws -> Model.UserProgress {
