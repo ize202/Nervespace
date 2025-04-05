@@ -170,9 +170,9 @@ public class SupabaseUserService: UserService {
     ) async throws -> UUID {
         let response: UUID = try await client
             .rpc("record_routine_completion", params: [
-                "routine_id": routineId,
-                "duration_minutes": String(durationMinutes),
-                "user_id": userId.uuidString
+                "p_routine_id": routineId,
+                "p_duration_minutes": String(durationMinutes),
+                "p_completed_at": ISO8601DateFormatter().string(from: Date())
             ])
             .execute()
             .value

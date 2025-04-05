@@ -44,6 +44,32 @@ public class SupabaseSyncManager: ObservableObject {
             // First, try to sync any pending completions
             await syncPendingCompletions()
             
+            // Then sync any new completions that aren't in pending
+            let localCompletions = completionStore.getRecentCompletions()
+            let serverCompletions = try await db.userService.getRecentCompletions(userId: userId, days: 30)
+            
+            // Find completions that exist locally but not on server
+            let serverIds = Set(serverCompletions.map { $0.id })
+            let newCompletions = localCompletions.filter { !serverIds.contains($0.id) }
+            
+            print("[Sync] Found \(newCompletions.count) new completions to sync")
+            
+            // Sync each new completion
+            for completion in newCompletions {
+                do {
+                    print("[Sync] Recording completion: id=\(completion.id), routineId=\(completion.routineId)")
+                    _ = try await db.userService.recordRoutineCompletion(
+                        routineId: completion.routineId,
+                        durationMinutes: completion.durationMinutes,
+                        userId: userId
+                    )
+                } catch {
+                    print("[Sync] Failed to record completion \(completion.id): \(error)")
+                    // Add to pending store for retry
+                    pendingStore.addPendingCompletion(completion)
+                }
+            }
+            
             // Log the values we're about to push
             print("[Sync] Pushing to Supabase: streak=\(progressStore.streak), dailyMinutes=\(progressStore.dailyMinutes), totalMinutes=\(progressStore.totalMinutes)")
             

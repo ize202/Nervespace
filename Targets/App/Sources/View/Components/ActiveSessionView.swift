@@ -237,7 +237,10 @@ public struct ActiveSessionView: View {
     }
     
     private func completeRoutine() async {
-        guard !isUpdating else { return }
+        guard !isUpdating else { 
+            print("[ActiveSession] Skipping completion - already updating")
+            return 
+        }
         
         await MainActor.run {
             isUpdating = true
@@ -246,11 +249,13 @@ public struct ActiveSessionView: View {
         do {
             // Calculate actual duration in minutes, rounded up
             let durationMinutes = Int(ceil(actualSessionDuration / 60.0))
+            print("[ActiveSession] Completing routine: id=\(routine.id), duration=\(durationMinutes)m")
             
             // Get current user ID
             guard let userId = syncManager.db.currentUser?.id else {
                 throw NSError(domain: "ActiveSessionView", code: 401, userInfo: [NSLocalizedDescriptionKey: "User not authenticated"])
             }
+            print("[ActiveSession] User authenticated: \(userId)")
             
             // Create completion record
             let completion = Model.RoutineCompletion(
@@ -260,29 +265,39 @@ public struct ActiveSessionView: View {
                 completedAt: Date(),
                 durationMinutes: durationMinutes
             )
+            print("[ActiveSession] Created completion record: id=\(completion.id)")
             
             // Save to local store and update UI state atomically
             await MainActor.run {
+                print("[ActiveSession] Saving to local store...")
                 // Update stores first
                 completionStore.addCompletion(completion)
                 progressStore.addMinutes(durationMinutes)
                 
+                print("[ActiveSession] Updating view state...")
                 // Then update view state
                 completionData = (id: completion.id, routineId: routine.id)
                 
                 // Finally show the sheet
                 showingCompletion = true
+                print("[ActiveSession] Sheet presentation triggered")
             }
             
             // Background sync
+            print("[ActiveSession] Starting background sync...")
             Task.detached {
                 do {
+                    print("[ActiveSession] Syncing to Supabase...")
                     await syncManager.syncLocalToSupabase()
+                    print("[ActiveSession] Sync completed successfully")
                 } catch {
+                    print("[ActiveSession] Sync failed: \(error)")
+                    print("[ActiveSession] Adding to pending sync...")
                     await syncManager.handleFailedSync(completion)
                 }
             }
         } catch {
+            print("[ActiveSession] Error completing routine: \(error)")
             await MainActor.run {
                 showError = true
                 errorMessage = error.localizedDescription
