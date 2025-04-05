@@ -9,6 +9,8 @@ public struct RoutineDetailView: View {
     @State private var showingActiveSession = false
     @State private var selectedExercise: Exercise?
     @StateObject private var bookmarkManager = BookmarkManager.shared
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.presentationMode) private var presentationMode
     
     // Local-first dependencies
     @EnvironmentObject private var progressStore: LocalProgressStore
@@ -110,7 +112,11 @@ public struct RoutineDetailView: View {
                 customDurations: exerciseDurations,
                 progressStore: progressStore,
                 completionStore: completionStore,
-                syncManager: syncManager
+                syncManager: syncManager,
+                onSessionComplete: {
+                    // Dismiss both the active session and the routine detail view
+                    presentationMode.wrappedValue.dismiss()
+                }
             )
         }
     }

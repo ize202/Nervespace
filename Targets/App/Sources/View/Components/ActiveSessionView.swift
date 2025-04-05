@@ -22,6 +22,8 @@ public struct ActiveSessionView: View {
     @State private var totalPausedTime: TimeInterval = 0
     @State private var lastPauseTime: Date?
     @State private var completedRoutineId: String?
+    @Environment(\.presentationMode) private var presentationMode
+    let onSessionComplete: () -> Void
     
     // Local-first dependencies
     private let progressStore: LocalProgressStore
@@ -33,13 +35,15 @@ public struct ActiveSessionView: View {
         customDurations: [String: Int],
         progressStore: LocalProgressStore,
         completionStore: RoutineCompletionStore,
-        syncManager: SupabaseSyncManager
+        syncManager: SupabaseSyncManager,
+        onSessionComplete: @escaping () -> Void
     ) {
         self.routine = routine
         self.customDurations = customDurations
         self.progressStore = progressStore
         self.completionStore = completionStore
         self.syncManager = syncManager
+        self.onSessionComplete = onSessionComplete
         // Initialize with the first exercise duration
         _timeRemaining = State(initialValue: routine.exercises.first.map { customDurations[$0.exercise.id] ?? $0.duration } ?? 30)
     }
@@ -208,7 +212,10 @@ public struct ActiveSessionView: View {
                     progressStore: progressStore,
                     completionStore: completionStore,
                     syncManager: syncManager,
-                    onComplete: { dismiss() }
+                    onComplete: {
+                        dismiss()
+                        onSessionComplete()
+                    }
                 )
             }
         }
@@ -395,6 +402,7 @@ public struct ActiveSessionView: View {
         customDurations: [:],
         progressStore: progressStore,
         completionStore: completionStore,
-        syncManager: syncManager
+        syncManager: syncManager,
+        onSessionComplete: {}
     )
 } 
