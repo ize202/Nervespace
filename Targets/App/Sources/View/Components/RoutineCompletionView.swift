@@ -14,21 +14,23 @@ final class RoutineCompletionViewModel: ObservableObject {
     private let progressStore: LocalProgressStore
     private let syncManager: SupabaseSyncManager
     private let completionId: UUID
-    private let routine: Routine
+    public let routineId: String
     
     init(
         completionStore: RoutineCompletionStore,
         progressStore: LocalProgressStore,
         syncManager: SupabaseSyncManager,
         completionId: UUID,
-        routine: Routine
+        routineId: String
     ) {
         self.completionStore = completionStore
         self.progressStore = progressStore
         self.syncManager = syncManager
         self.completionId = completionId
-        self.routine = routine
-        loadData()
+        self.routineId = routineId
+        
+        // Defer loadData to be called externally
+        // This prevents race conditions during initialization
     }
     
     var currentStreak: Int {
@@ -36,27 +38,37 @@ final class RoutineCompletionViewModel: ObservableObject {
     }
     
     func loadData() {
+        guard !isLoading else { return }
+        
         isLoading = true
         
-        // Load completion from local store
-        let recentCompletions = completionStore.getRecentCompletions()
-        if let completion = recentCompletions.first(where: { $0.id == completionId }) {
-            self.completion = completion
-        }
-        
-        // Show success animation
-        self.showConfetti = true
-        self.isLoading = false
-        
-        // Trigger background sync
-        Task {
-            await syncManager.syncLocalToSupabase()
+        // Load completion from local store with retry
+        Task { @MainActor in
+            // Small delay to ensure completion is in store
+            try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
+            
+            let recentCompletions = completionStore.getRecentCompletions()
+            if let completion = recentCompletions.first(where: { $0.id == completionId }) {
+                self.completion = completion
+                self.showConfetti = true
+            } else {
+                print("Warning: Completion \(completionId) not found in store")
+                self.showError = true
+                self.errorMessage = "Could not load completion details"
+            }
+            
+            self.isLoading = false
+            
+            // Trigger background sync
+            Task {
+                await syncManager.syncLocalToSupabase()
+            }
         }
     }
 }
 
 struct RoutineCompletionView: View {
-    let routine: Routine
+    let routineId: String
     let completionId: UUID
     @Environment(\.dismiss) private var dismiss
     @StateObject private var viewModel: RoutineCompletionViewModel
@@ -64,21 +76,25 @@ struct RoutineCompletionView: View {
     private let weekDays = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"]
     private let calendar = Calendar.current
     
+    private var routine: Routine? {
+        RoutineLibrary.routines.first { $0.id == routineId }
+    }
+    
     init(
-        routine: Routine,
+        routineId: String,
         completionId: UUID,
         progressStore: LocalProgressStore,
         completionStore: RoutineCompletionStore,
         syncManager: SupabaseSyncManager
     ) {
-        self.routine = routine
+        self.routineId = routineId
         self.completionId = completionId
         self._viewModel = StateObject(wrappedValue: RoutineCompletionViewModel(
             completionStore: completionStore,
             progressStore: progressStore,
             syncManager: syncManager,
             completionId: completionId,
-            routine: routine
+            routineId: routineId
         ))
     }
     
@@ -95,125 +111,156 @@ struct RoutineCompletionView: View {
             // Background
             Color.baseBlack.ignoresSafeArea()
             
-            ScrollView {
-                VStack(alignment: .leading, spacing: 32) {
-                    // Header Text
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Congrats!")
-                            .font(.largeTitle)
-                            .fontWeight(.bold)
-                            .foregroundColor(.white)
+            if let routine = routine {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 32) {
+                        // Header Text
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Congrats!")
+                                .font(.largeTitle)
+                                .fontWeight(.bold)
+                                .foregroundColor(.white)
+                            
+                            Text("You completed your daily routine.")
+                                .font(.body)
+                                .foregroundColor(.white.opacity(0.7))
+                        }
+                        .padding(.horizontal)
+                        .padding(.top)
                         
-                        Text("You completed your daily routine.")
-                            .font(.body)
-                            .foregroundColor(.white.opacity(0.7))
-                    }
-                    .padding(.horizontal)
-                    .padding(.top)
-                    
-                    // Streak Card
-                    VStack(spacing: 16) {
-                        // Streak count
-                        Text("\(viewModel.currentStreak) day")
-                            .font(.system(size: 44, weight: .bold))
-                            .foregroundColor(.white)
-                        
-                        Text("ACTIVE STREAK")
-                            .font(.subheadline)
-                            .fontWeight(.medium)
-                            .foregroundColor(.white.opacity(0.6))
-                            .textCase(.uppercase)
-                        
-                        // Week view
-                        HStack(spacing: 20) {
-                            ForEach(Array(weekDays.enumerated()), id: \.offset) { index, day in
-                                VStack(spacing: 8) {
-                                    Text(day)
-                                        .font(.footnote)
-                                        .fontWeight(.medium)
-                                        .foregroundColor(.white.opacity(0.6))
-                                    
-                                    Circle()
-                                        .fill(isToday(day) ? .white.opacity(0.2) : Color.white.opacity(0.1))
-                                        .frame(width: 32, height: 32)
-                                        .overlay {
-                                            if isToday(day) {
-                                                Image(systemName: "checkmark")
-                                                    .font(.system(size: 14, weight: .medium))
-                                                    .foregroundColor(.white)
+                        // Streak Card
+                        VStack(spacing: 16) {
+                            // Streak count
+                            Text("\(viewModel.currentStreak) day")
+                                .font(.system(size: 44, weight: .bold))
+                                .foregroundColor(.white)
+                            
+                            Text("ACTIVE STREAK")
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                                .foregroundColor(.white.opacity(0.6))
+                                .textCase(.uppercase)
+                            
+                            // Week view
+                            HStack(spacing: 20) {
+                                ForEach(Array(weekDays.enumerated()), id: \.offset) { index, day in
+                                    VStack(spacing: 8) {
+                                        Text(day)
+                                            .font(.footnote)
+                                            .fontWeight(.medium)
+                                            .foregroundColor(.white.opacity(0.6))
+                                        
+                                        Circle()
+                                            .fill(isToday(day) ? .white.opacity(0.2) : Color.white.opacity(0.1))
+                                            .frame(width: 32, height: 32)
+                                            .overlay {
+                                                if isToday(day) {
+                                                    Image(systemName: "checkmark")
+                                                        .font(.system(size: 14, weight: .medium))
+                                                        .foregroundColor(.white)
+                                                }
                                             }
-                                        }
+                                    }
                                 }
                             }
                         }
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 24)
-                    .padding(.horizontal)
-                    .background(.ultraThinMaterial)
-                    .cornerRadius(16)
-                    .padding(.horizontal)
-                    
-                    // Completed Routine Card with Stats
-                    if let completion = viewModel.completion {
-                        HStack(spacing: 16) {
-                            // Routine Info
-                            HStack(spacing: 16) {
-                                // Thumbnail
-                                Image(routine.thumbnailName)
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fill)
-                                    .frame(width: 56, height: 56)
-                                    .clipShape(RoundedRectangle(cornerRadius: 8))
-                                
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Text(routine.name)
-                                        .font(.headline)
-                                        .foregroundColor(.white)
-                                    
-                                    Text("\(routine.exercises.count) exercises • \(completion.durationMinutes) min")
-                                        .font(.subheadline)
-                                        .foregroundColor(.white.opacity(0.6))
-                                }
-                            }
-                            
-                            Spacer()
-                            
-                            // Checkmark Icon
-                            Circle()
-                                .fill(.ultraThinMaterial)
-                                .frame(width: 44, height: 44)
-                                .overlay {
-                                    Image(systemName: "checkmark")
-                                        .font(.system(size: 20, weight: .medium))
-                                        .foregroundColor(.white)
-                                }
-                        }
-                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 24)
+                        .padding(.horizontal)
                         .background(.ultraThinMaterial)
                         .cornerRadius(16)
                         .padding(.horizontal)
+                        
+                        // Completed Routine Card with Stats
+                        if let completion = viewModel.completion {
+                            HStack(spacing: 16) {
+                                // Routine Info
+                                HStack(spacing: 16) {
+                                    // Thumbnail
+                                    Image(routine.thumbnailName)
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fill)
+                                        .frame(width: 56, height: 56)
+                                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                                    
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text(routine.name)
+                                            .font(.headline)
+                                            .foregroundColor(.white)
+                                        
+                                        Text("\(routine.exercises.count) exercises • \(completion.durationMinutes) min")
+                                            .font(.subheadline)
+                                            .foregroundColor(.white.opacity(0.6))
+                                    }
+                                }
+                                
+                                Spacer()
+                                
+                                // Checkmark Icon
+                                Circle()
+                                    .fill(.ultraThinMaterial)
+                                    .frame(width: 44, height: 44)
+                                    .overlay {
+                                        Image(systemName: "checkmark")
+                                            .font(.system(size: 20, weight: .medium))
+                                            .foregroundColor(.white)
+                                    }
+                            }
+                            .padding()
+                            .background(.ultraThinMaterial)
+                            .cornerRadius(16)
+                            .padding(.horizontal)
+                        }
+                        
+                        Spacer(minLength: 32)
+                        
+                        // Continue Button
+                        Button(action: {
+                            dismiss()
+                        }) {
+                            HStack {
+                                Text(buttonText)
+                                    .font(.headline)
+                                    .foregroundColor(.white)
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.brandPrimary)
+                            .cornerRadius(12)
+                        }
+                        .padding(.horizontal)
+                        .padding(.bottom, 32)
                     }
+                }
+            } else {
+                // Fallback view when routine is not found
+                VStack(spacing: 16) {
+                    Text("Routine Not Found")
+                        .font(.title2)
+                        .bold()
+                        .foregroundColor(.white)
                     
-                    Spacer(minLength: 32)
+                    Text("The routine you completed could not be found.")
+                        .font(.body)
+                        .foregroundColor(.white.opacity(0.7))
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal)
                     
-                    // Continue Button
                     Button(action: {
                         dismiss()
                     }) {
-                        HStack {
-                            Text(buttonText)
-                                .font(.headline)
-                                .foregroundColor(.white)
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.brandPrimary)
-                        .cornerRadius(12)
+                        Text("Close")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.brandPrimary)
+                            .cornerRadius(12)
                     }
                     .padding(.horizontal)
-                    .padding(.bottom, 32)
+                    .padding(.top, 32)
                 }
+                .padding()
             }
             
             // Loading State
@@ -339,7 +386,7 @@ struct ConfettiPiece: View {
     )
     
     RoutineCompletionView(
-        routine: RoutineLibrary.routines.first!,
+        routineId: RoutineLibrary.routines.first!.id,
         completionId: UUID(),
         progressStore: progressStore,
         completionStore: completionStore,

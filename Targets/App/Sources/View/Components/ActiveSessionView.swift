@@ -16,11 +16,12 @@ public struct ActiveSessionView: View {
     @State private var showingCompletion = false
     @State private var showError = false
     @State private var errorMessage = ""
-    @State private var completionId: UUID?
+    @State private var completionData: (id: UUID, routineId: String)?
     @State private var isUpdating = false
     @State private var sessionStartTime: Date = Date()
     @State private var totalPausedTime: TimeInterval = 0
     @State private var lastPauseTime: Date?
+    @State private var completedRoutineId: String?
     
     // Local-first dependencies
     private let progressStore: LocalProgressStore
@@ -200,10 +201,10 @@ public struct ActiveSessionView: View {
             }
         }
         .sheet(isPresented: $showingCompletion) {
-            if let completionId = completionId {
+            if let data = completionData {
                 RoutineCompletionView(
-                    routine: routine,
-                    completionId: completionId,
+                    routineId: data.routineId,
+                    completionId: data.id,
                     progressStore: progressStore,
                     completionStore: completionStore,
                     syncManager: syncManager
@@ -236,7 +237,12 @@ public struct ActiveSessionView: View {
     }
     
     private func completeRoutine() async {
-        isUpdating = true
+        guard !isUpdating else { return }
+        
+        await MainActor.run {
+            isUpdating = true
+        }
+        
         do {
             // Calculate actual duration in minutes, rounded up
             let durationMinutes = Int(ceil(actualSessionDuration / 60.0))
@@ -248,38 +254,44 @@ public struct ActiveSessionView: View {
             
             // Create completion record
             let completion = Model.RoutineCompletion(
-                id: UUID(), // New local ID
+                id: UUID(),
                 userId: userId,
                 routineId: routine.id,
                 completedAt: Date(),
                 durationMinutes: durationMinutes
             )
             
-            // Save to local store
-            completionStore.addCompletion(completion)
+            // Save to local store and update UI state atomically
+            await MainActor.run {
+                // Update stores first
+                completionStore.addCompletion(completion)
+                progressStore.addMinutes(durationMinutes)
+                
+                // Then update view state
+                completionData = (id: completion.id, routineId: routine.id)
+                
+                // Finally show the sheet
+                showingCompletion = true
+            }
             
-            // Update progress
-            progressStore.addMinutes(durationMinutes)
-            
-            // Set completion ID for the completion view
-            completionId = completion.id
-            showingCompletion = true
-            
-            // Trigger background sync
-            Task {
+            // Background sync
+            Task.detached {
                 do {
                     await syncManager.syncLocalToSupabase()
                 } catch {
-                    // If sync fails, store completion for later retry
-                    syncManager.handleFailedSync(completion)
+                    await syncManager.handleFailedSync(completion)
                 }
             }
-
         } catch {
-            showError = true
-            errorMessage = error.localizedDescription
+            await MainActor.run {
+                showError = true
+                errorMessage = error.localizedDescription
+            }
         }
-        isUpdating = false
+        
+        await MainActor.run {
+            isUpdating = false
+        }
     }
 
     private func startTimer() {
