@@ -207,7 +207,7 @@ public class DB: ObservableObject {
 		}
 		
 		let response = try await _db.database
-			.rpc("get_recent_completions", params: ["user_id": userId.uuidString])
+			.rpc("get_recent_completions", params: ["p_days": "30"])
 			.execute()
 		
 		guard let data = response.data as? Data else {
@@ -224,6 +224,21 @@ public class DB: ObservableObject {
 		} catch {
 			os_log(.error, "Failed to decode recent completions: %{public}@", error.localizedDescription)
 			throw SupabaseError.decodingError(error)
+		}
+	}
+	
+	internal func initializeNewUser() async {
+		print("[DB] Initializing new user...")
+		do {
+			try await _db.database
+				.rpc("setup_new_user")
+				.execute()
+			print("[DB] Successfully initialized new user")
+			
+			// Reload progress after initialization
+			try await loadProgress()
+		} catch {
+			print("[DB] Error initializing new user:", error)
 		}
 	}
 }

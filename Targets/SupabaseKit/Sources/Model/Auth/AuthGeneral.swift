@@ -23,6 +23,11 @@ extension DB {
 					self.currentUser = session?.user
 					if session?.user != nil {
 						self.authState = .signedIn
+						
+						// Initialize new user when signed in
+						if event == .signedIn {
+							await self.initializeNewUser()
+						}
 					} else {
 						self.authState = .signedOut
 					}
