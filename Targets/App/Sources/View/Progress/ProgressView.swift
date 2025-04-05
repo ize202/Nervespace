@@ -8,7 +8,7 @@ struct ProgressView: View {
     @EnvironmentObject private var syncManager: SupabaseSyncManager
     
     private let currentDate = Date()
-    @State private var streakDays: Set<Date> = []
+    @State private var streakDays: Set<Date>
     
     // Daily goal in minutes (we can move this to user settings later)
     private let dailyGoal = 5
@@ -21,11 +21,11 @@ struct ProgressView: View {
             progressStore: progressStore,
             syncManager: syncManager
         ))
+        _streakDays = State(initialValue: Set<Date>())
     }
     
     private var currentMinutes: Int {
-        guard let lastActivity = viewModel.lastActivity else { return 0 }
-        return calendar.isDateInToday(lastActivity) ? viewModel.dailyMinutes : 0
+        viewModel.dailyMinutes
     }
     
     var body: some View {
@@ -68,7 +68,7 @@ struct ProgressView: View {
                                                 .font(.headline)
                                         }
                                         .foregroundColor(.brandPrimary)
-                                        .frame(width: 100, height: 44) // Minimum touch target
+                                        .frame(width: 100, height: 44)
                                     }
                                 }
                                 
@@ -144,6 +144,11 @@ struct ProgressView: View {
             .task {
                 await loadStreakDays()
                 await viewModel.refresh()
+            }
+            .onChange(of: viewModel.streak) { _ in
+                Task {
+                    await loadStreakDays()
+                }
             }
             .refreshable {
                 await viewModel.refresh()

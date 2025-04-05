@@ -10,7 +10,7 @@ public class SupabaseSyncManager: ObservableObject {
     
     @Published private(set) var isSyncing = false
     @Published var lastSyncError: Error?
-    private var hasFetchedInitialProgress = false
+    @Published private(set) var hasFetchedInitialProgress = false
     
     public init(
         db: DB,
@@ -110,15 +110,17 @@ public class SupabaseSyncManager: ObservableObject {
                 let today = calendar.startOfDay(for: Date())
                 let progressDate = progress.lastActivity.map { calendar.startOfDay(for: $0) }
                 
-                // Wait to trust fetched progress until it has valid dailyMinutes
-                let isValidInitial = progress.dailyMinutes > 0
-                
-                // Log the values we received
-                print("[Sync] Received from Supabase: streak=\(progress.streak), dailyMinutes=\(progress.dailyMinutes), totalMinutes=\(progress.totalMinutes), isValid=\(isValidInitial)")
+                // Check if this is initial load with valid remote data
+                let hasValidRemoteData = progress.dailyMinutes > 0 || progress.totalMinutes > 0 || progress.streak > 0
+                let hasValidLocalData = progressStore.dailyMinutes > 0 || progressStore.totalMinutes > 0 || progressStore.streak > 0
                 
                 if !hasFetchedInitialProgress {
-                    if isValidInitial {
-                        print("[Sync] Confirmed valid initial progress from Supabase")
+                    print("[Sync] Initial progress load - Remote: valid=\(hasValidRemoteData), daily=\(progress.dailyMinutes), total=\(progress.totalMinutes), streak=\(progress.streak)")
+                    print("[Sync] Initial progress load - Local: valid=\(hasValidLocalData), daily=\(progressStore.dailyMinutes), total=\(progressStore.totalMinutes), streak=\(progressStore.streak)")
+                    
+                    if hasValidRemoteData {
+                        // Use remote data for initial load if it's valid
+                        print("[Sync] Using valid remote data for initial load")
                         progressStore.updateProgress(
                             streak: progress.streak,
                             dailyMinutes: progress.dailyMinutes,
@@ -126,10 +128,18 @@ public class SupabaseSyncManager: ObservableObject {
                             lastActivity: progress.lastActivity
                         )
                         hasFetchedInitialProgress = true
+                    } else if hasValidLocalData {
+                        // If we have valid local data but invalid remote, push local to remote
+                        print("[Sync] Using valid local data for initial load")
+                        hasFetchedInitialProgress = true
+                        await syncLocalToSupabase()
                     } else {
-                        print("[Sync] Ignoring initial progress — probably uninitialized or stale")
+                        print("[Sync] No valid progress data found, waiting for initialization")
                         return
                     }
+                    
+                    // Force view update
+                    objectWillChange.send()
                 } else {
                     // Normal sync logic for subsequent fetches
                     let updatedStreak = max(progress.streak, progressStore.streak)

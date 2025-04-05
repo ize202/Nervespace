@@ -15,16 +15,19 @@ final class ProgressViewModel: ObservableObject {
     
     // MARK: - Public Properties
     
-    public var streak: Int { progressStore.streak }
-    public var dailyMinutes: Int { progressStore.dailyMinutes }
-    public var totalMinutes: Int { progressStore.totalMinutes }
-    public var lastActivity: Date? { progressStore.lastActivity }
+    @Published private(set) var streak: Int = 0
+    @Published private(set) var dailyMinutes: Int = 0
+    @Published private(set) var totalMinutes: Int = 0
+    @Published private(set) var lastActivity: Date?
     
     // MARK: - Initialization
     
     init(progressStore: LocalProgressStore, syncManager: SupabaseSyncManager) {
         self.progressStore = progressStore
         self.syncManager = syncManager
+        
+        // Load initial values
+        updateFromStore()
         
         // Start background sync
         Task {
@@ -36,9 +39,21 @@ final class ProgressViewModel: ObservableObject {
     
     /// Refreshes data from local store and syncs with Supabase in background
     func refresh() async {
+        print("[Progress] Starting refresh")
+        guard !isLoading else { return }
+        
         isLoading = true
+        defer { isLoading = false }
+        
+        // First update from local store to show immediate values
+        updateFromStore()
+        
+        // Then sync with remote
         await syncManager.syncSupabaseToLocal()
-        isLoading = false
+        
+        // Update again after sync
+        updateFromStore()
+        print("[Progress] Completed refresh")
     }
     
     public func updateProgress(minutes: Int) async {
@@ -88,13 +103,33 @@ final class ProgressViewModel: ObservableObject {
     
     // MARK: - Private Methods
     
-    private func syncInBackground() async {
-        do {
-            await syncManager.syncSupabaseToLocal()
-        } catch {
-            // Just log the error, don't show loading or error states to user
-            // since we're operating in local-first mode
-            print("[Progress] Background sync failed: \(error)")
+    private func updateFromStore() {
+        let newStreak = progressStore.streak
+        let newDailyMinutes = progressStore.dailyMinutes
+        let newTotalMinutes = progressStore.totalMinutes
+        let newLastActivity = progressStore.lastActivity
+        
+        // Only update if values actually changed
+        if streak != newStreak {
+            streak = newStreak
         }
+        if dailyMinutes != newDailyMinutes {
+            dailyMinutes = newDailyMinutes
+        }
+        if totalMinutes != newTotalMinutes {
+            totalMinutes = newTotalMinutes
+        }
+        if lastActivity != newLastActivity {
+            lastActivity = newLastActivity
+        }
+        
+        print("[Progress] Updated from store: streak=\(streak), daily=\(dailyMinutes), total=\(totalMinutes)")
+    }
+    
+    private func syncInBackground() async {
+        print("[Progress] Starting background sync")
+        await syncManager.syncSupabaseToLocal()
+        updateFromStore()
+        print("[Progress] Completed background sync")
     }
 } 
