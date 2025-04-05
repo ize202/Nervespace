@@ -12,7 +12,7 @@ public enum RoutineLibrary {
                 RoutineExercise(exercise: ExerciseLibrary.exercises.first { $0.name == "High Knees" }!, duration: 30),
                 RoutineExercise(exercise: ExerciseLibrary.exercises.first { $0.name == "Air Squats" }!, duration: 30),
                 RoutineExercise(exercise: ExerciseLibrary.exercises.first { $0.name == "Warrior I" }!, duration: 30),
-                RoutineExercise(exercise: ExerciseLibrary.exercises.first { $0.name == "Deep Breathing" }!, duration: 60)
+                RoutineExercise(exercise: ExerciseLibrary.exercises.first { $0.name == "Deep Breathing" }!, duration: 30)
             ],
             category: .core,
             difficulty: .beginner,
@@ -39,7 +39,7 @@ public enum RoutineLibrary {
             name: "Evening Calm",
             description: "Relax and release tension before bed.",
             exercises: [
-                RoutineExercise(exercise: ExerciseLibrary.exercises.first { $0.name == "Deep Breathing" }!, duration: 60),
+                RoutineExercise(exercise: ExerciseLibrary.exercises.first { $0.name == "Deep Breathing" }!, duration: 30),
                 RoutineExercise(exercise: ExerciseLibrary.exercises.first { $0.name == "Seated Forward Fold" }!, duration: 30),
                 RoutineExercise(exercise: ExerciseLibrary.exercises.first { $0.name == "Lying Figure Four" }!, duration: 30),
                 RoutineExercise(exercise: ExerciseLibrary.exercises.first { $0.name == "Happy Baby Pose" }!, duration: 30),
@@ -59,7 +59,7 @@ public enum RoutineLibrary {
                 RoutineExercise(exercise: ExerciseLibrary.exercises.first { $0.name == "Wall Sit" }!, duration: 30),
                 RoutineExercise(exercise: ExerciseLibrary.exercises.first { $0.name == "Bridge Pose" }!, duration: 30),
                 RoutineExercise(exercise: ExerciseLibrary.exercises.first { $0.name == "Hip Circles" }!, duration: 30),
-                RoutineExercise(exercise: ExerciseLibrary.exercises.first { $0.name == "Deep Breathing" }!, duration: 60)
+                RoutineExercise(exercise: ExerciseLibrary.exercises.first { $0.name == "Deep Breathing" }!, duration: 30)
             ],
             category: .core,
             difficulty: .beginner,
@@ -70,7 +70,7 @@ public enum RoutineLibrary {
             name: "Somatic Ease",
             description: "Calm the nervous system and promote relaxation.",
             exercises: [
-                RoutineExercise(exercise: ExerciseLibrary.exercises.first { $0.name == "Deep Breathing" }!, duration: 60),
+                RoutineExercise(exercise: ExerciseLibrary.exercises.first { $0.name == "Deep Breathing" }!, duration: 30),
                 RoutineExercise(exercise: ExerciseLibrary.exercises.first { $0.name == "Cat Cow" }!, duration: 60),
                 RoutineExercise(exercise: ExerciseLibrary.exercises.first { $0.name == "Child's Pose" }!, duration: 30),
                 RoutineExercise(exercise: ExerciseLibrary.exercises.first { $0.name == "Happy Baby Pose" }!, duration: 30),
@@ -93,6 +93,7 @@ public enum RoutineLibrary {
             category: .quick,
             difficulty: .beginner
         ),
+        
         
         Routine(
             name: "Rapid Relax",
@@ -140,6 +141,16 @@ public enum RoutineLibrary {
             ],
             category: .quick,
             difficulty: .intermediate
+        ),
+        
+        Routine(
+            name: "Grounding Breath",
+            description: "A breathwork exercise for stress relief.",
+            exercises: [
+                RoutineExercise(exercise: ExerciseLibrary.exercises.first { $0.name == "Deep Breathing" }!, duration: 30)
+            ],
+            category: .quick,
+            difficulty: .beginner
         )
     ]
     

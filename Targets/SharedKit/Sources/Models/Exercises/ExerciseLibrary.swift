@@ -139,8 +139,8 @@ public enum ExerciseLibrary {
             description: "A breathwork exercise for stress relief.",
             instructions: """
             1. Sit comfortably with a straight back.
-            2. Inhale deeply through the nose, filling your lungs.
-            3. Exhale slowly through the mouth.
+            2. Inhale deeply through the nose, filling your lungs for 6s.
+            3. Exhale slowly through the mouth for 6s.
             4. Focus on the rhythm of your breath.
             """,
             modifications: "Use a guided audio for assistance.",
@@ -148,7 +148,7 @@ public enum ExerciseLibrary {
             categories: [.somatic],
             positions: [.seated],
             areas: [.core],
-            duration: 60
+            duration: 30
         ),
         
         Exercise(
