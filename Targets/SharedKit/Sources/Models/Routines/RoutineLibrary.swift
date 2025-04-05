@@ -3,6 +3,15 @@ import Foundation
 public enum RoutineLibrary {
     // MARK: - All Routines
     public static let routines: [Routine] = [
+        Routine(
+            name: "Grounding Breath",
+            description: "A breathwork exercise for stress relief.",
+            exercises: [
+                RoutineExercise(exercise: ExerciseLibrary.exercises.first { $0.name == "Deep Breathing" }!, duration: 30)
+            ],
+            category: .custom,
+            difficulty: .beginner
+        ),
         // Core Routines (5-7 minutes)
         Routine(
             name: "Morning Boost",
@@ -70,7 +79,7 @@ public enum RoutineLibrary {
             name: "Somatic Ease",
             description: "Calm the nervous system and promote relaxation.",
             exercises: [
-                RoutineExercise(exercise: ExerciseLibrary.exercises.first { $0.name == "Deep Breathing" }!, duration: 30),
+                RoutineExercise(exercise: ExerciseLibrary.exercises.first { $0.name == "Deep Breathing" }!, duration: 60),
                 RoutineExercise(exercise: ExerciseLibrary.exercises.first { $0.name == "Cat Cow" }!, duration: 60),
                 RoutineExercise(exercise: ExerciseLibrary.exercises.first { $0.name == "Child's Pose" }!, duration: 30),
                 RoutineExercise(exercise: ExerciseLibrary.exercises.first { $0.name == "Happy Baby Pose" }!, duration: 30),
@@ -142,16 +151,6 @@ public enum RoutineLibrary {
             category: .quick,
             difficulty: .intermediate
         ),
-        
-        Routine(
-            name: "Grounding Breath",
-            description: "A breathwork exercise for stress relief.",
-            exercises: [
-                RoutineExercise(exercise: ExerciseLibrary.exercises.first { $0.name == "Deep Breathing" }!, duration: 30)
-            ],
-            category: .quick,
-            difficulty: .beginner
-        )
     ]
     
     // MARK: - Premium Status
