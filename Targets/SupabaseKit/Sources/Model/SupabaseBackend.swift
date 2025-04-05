@@ -108,7 +108,19 @@ public class DB: ObservableObject {
 					self.authState = .signedIn
 				}
 				print("[DB] Initial progress load...")
-				try? await loadProgress()
+				do {
+					try await loadProgress()
+				} catch {
+					// If loading progress fails for a new user, try to initialize them
+					if let err = error as? NSError, err.localizedDescription.contains("multiple (or no) rows") {
+						print("[DB] No progress found, attempting to initialize new user...")
+						try await initializeNewUser()
+					} else {
+						// Handle or log other errors here if needed
+						print("[DB] Unexpected error loading progress: \(error)")
+						throw error
+					}
+				}
 			} else {
 				print("[DB] No existing session found")
 				await MainActor.run {
@@ -134,7 +146,6 @@ public class DB: ObservableObject {
 			let progress = try await userService.fetchProgress(userId: userId)
 			print("[DB] Successfully fetched progress from server")
 			
-			// Update state with server data
 			await MainActor.run {
 				currentStreak = progress.streak
 				dailyMinutes = progress.dailyMinutes
@@ -143,32 +154,16 @@ public class DB: ObservableObject {
 				print("[DB] Updated local state with progress: streak=\(progress.streak), dailyMinutes=\(progress.dailyMinutes), totalMinutes=\(progress.totalMinutes)")
 			}
 			
-			// Load completions
+			// Try to load completions, but don't reset progress if it fails
 			print("[DB] Loading recent completions...")
-			try await loadRecentCompletions()
+			do {
+                self.recentCompletions = try await loadRecentCompletions()
+			} catch {
+				print("[DB] Error loading completions: \(error). Keeping existing progress data.")
+			}
 		} catch {
 			print("[DB] Error loading progress: \(error)")
-			
-			// For new users, set default values
-			await MainActor.run {
-				currentStreak = 0
-				dailyMinutes = 0
-				totalMinutes = 0
-				lastActivity = nil
-				print("[DB] Using default progress values for new user")
-			}
-			
-			// Attempt to initialize progress record
-			let errorDescription = error.localizedDescription
-			if errorDescription.contains("multiple (or no) rows") {
-				do {
-					print("[DB] Attempting to initialize progress for new user...")
-					_ = try await userService.initializeProgress(userId: userId)
-					print("[DB] Successfully initialized progress for new user")
-				} catch {
-					print("[DB] Failed to initialize progress: \(error)")
-				}
-			}
+			throw error // Let the caller handle initialization if needed
 		}
 	}
 	

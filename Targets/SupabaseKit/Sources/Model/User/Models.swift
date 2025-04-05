@@ -156,5 +156,53 @@ public enum Model {
             case deletedAt = "deleted_at"
             case syncStatus = "sync_status"
         }
+        
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            
+            // Decode non-date fields normally
+            id = try container.decode(UUID.self, forKey: .id)
+            userId = try container.decode(UUID.self, forKey: .userId)
+            routineId = try container.decode(String.self, forKey: .routineId)
+            durationMinutes = try container.decode(Int.self, forKey: .durationMinutes)
+            syncStatus = try container.decodeIfPresent(String.self, forKey: .syncStatus)
+            
+            // Custom date decoding with multiple format attempts
+            let dateFormatter = ISO8601DateFormatter()
+            dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+            
+            // Decode completedAt
+            let completedAtString = try container.decode(String.self, forKey: .completedAt)
+            if let date = dateFormatter.date(from: completedAtString) {
+                completedAt = date
+            } else {
+                // Try without fractional seconds
+                dateFormatter.formatOptions = [.withInternetDateTime]
+                if let date = dateFormatter.date(from: completedAtString) {
+                    completedAt = date
+                } else {
+                    throw DecodingError.dataCorrupted(
+                        DecodingError.Context(
+                            codingPath: [CodingKeys.completedAt],
+                            debugDescription: "Date string '\(completedAtString)' does not match expected format",
+                            underlyingError: nil
+                        )
+                    )
+                }
+            }
+            
+            // Decode optional deletedAt with same logic
+            if let deletedAtString = try container.decodeIfPresent(String.self, forKey: .deletedAt) {
+                dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+                if let date = dateFormatter.date(from: deletedAtString) {
+                    deletedAt = date
+                } else {
+                    dateFormatter.formatOptions = [.withInternetDateTime]
+                    deletedAt = dateFormatter.date(from: deletedAtString)
+                }
+            } else {
+                deletedAt = nil
+            }
+        }
     }
 } 
