@@ -104,6 +104,8 @@ struct MainApp: App {
 						
 						// Force sync after sign in
 						Task {
+							// Small delay to give Supabase time to finish setup_new_user()
+							try? await Task.sleep(nanoseconds: 2_500_000_000) // 2.5 seconds
 							await syncCoordinator.forceSync()
 						}
 					} else {

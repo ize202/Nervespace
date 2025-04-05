@@ -37,36 +37,7 @@ final class ProgressViewModel: ObservableObject {
     /// Refreshes data from local store and syncs with Supabase in background
     func refresh() async {
         isLoading = true
-        
-        // Force a sync from Supabase to ensure we get the latest data
-        // especially after server-side deletions
-        do {
-            print("[Progress] Forcing refresh from server...")
-            
-            if let userId = syncManager.db.currentUser?.id {
-                do {
-                    // Directly fetch server data
-                    let serverProgress = try await syncManager.db.userService.fetchProgress(userId: userId)
-                    
-                    // Update the local store with server data
-                    progressStore.updateProgress(
-                        streak: serverProgress.streak,
-                        dailyMinutes: serverProgress.dailyMinutes,
-                        totalMinutes: serverProgress.totalMinutes,
-                        lastActivity: serverProgress.lastActivity
-                    )
-                    
-                    print("[Progress] Updated with server data: daily=\(serverProgress.dailyMinutes), total=\(serverProgress.totalMinutes)")
-                    error = nil
-                } catch {
-                    print("[Progress] Could not fetch server data: \(error). Will use local data.")
-                    // Not setting error to keep UI clean - we'll just use local data
-                }
-            }
-        } catch {
-            print("[Progress] Server refresh failed: \(error)")
-        }
-        
+        await syncManager.syncSupabaseToLocal()
         isLoading = false
     }
     

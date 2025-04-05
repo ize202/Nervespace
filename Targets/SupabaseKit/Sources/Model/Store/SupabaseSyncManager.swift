@@ -10,6 +10,7 @@ public class SupabaseSyncManager: ObservableObject {
     
     @Published private(set) var isSyncing = false
     @Published var lastSyncError: Error?
+    private var hasFetchedInitialProgress = false
     
     public init(
         db: DB,
@@ -30,12 +31,21 @@ public class SupabaseSyncManager: ObservableObject {
         guard let userId = db.currentUser?.id else { return }
         guard !isSyncing else { return }
         
+        // Skip if we haven't fetched initial progress yet
+        guard hasFetchedInitialProgress else {
+            print("[Sync] Skipping push — haven't fetched initial progress yet")
+            return
+        }
+        
         isSyncing = true
         defer { isSyncing = false }
         
         do {
             // First, try to sync any pending completions
             await syncPendingCompletions()
+            
+            // Log the values we're about to push
+            print("[Sync] Pushing to Supabase: streak=\(progressStore.streak), dailyMinutes=\(progressStore.dailyMinutes), totalMinutes=\(progressStore.totalMinutes)")
             
             // Then sync progress
             _ = try await db.userService.updateProgress(
@@ -74,33 +84,59 @@ public class SupabaseSyncManager: ObservableObject {
                 let today = calendar.startOfDay(for: Date())
                 let progressDate = progress.lastActivity.map { calendar.startOfDay(for: $0) }
                 
-                let updatedStreak = max(progress.streak, progressStore.streak)
-                var updatedDailyMinutes = progressStore.dailyMinutes
+                // Wait to trust fetched progress until it has valid dailyMinutes
+                let isValidInitial = progress.dailyMinutes > 0
                 
-                // If remote lastActivity is today and has higher minutes, use remote daily minutes
-                if let lastDate = progressDate, calendar.isDate(lastDate, inSameDayAs: today),
-                   progress.dailyMinutes > progressStore.dailyMinutes {
-                    updatedDailyMinutes = progress.dailyMinutes
-                }
+                // Log the values we received
+                print("[Sync] Received from Supabase: streak=\(progress.streak), dailyMinutes=\(progress.dailyMinutes), totalMinutes=\(progress.totalMinutes), isValid=\(isValidInitial)")
                 
-                // Always use the higher total minutes
-                let updatedTotalMinutes = max(progress.totalMinutes, progressStore.totalMinutes)
-                
-                // Use the most recent lastActivity
-                let updatedLastActivity: Date?
-                if let localDate = progressStore.lastActivity, let remoteDate = progress.lastActivity {
-                    updatedLastActivity = localDate > remoteDate ? localDate : remoteDate
+                if !hasFetchedInitialProgress {
+                    if isValidInitial {
+                        print("[Sync] Confirmed valid initial progress from Supabase")
+                        progressStore.updateProgress(
+                            streak: progress.streak,
+                            dailyMinutes: progress.dailyMinutes,
+                            totalMinutes: progress.totalMinutes,
+                            lastActivity: progress.lastActivity
+                        )
+                        hasFetchedInitialProgress = true
+                    } else {
+                        print("[Sync] Ignoring initial progress — probably uninitialized or stale")
+                        return
+                    }
                 } else {
-                    updatedLastActivity = progressStore.lastActivity ?? progress.lastActivity
+                    // Normal sync logic for subsequent fetches
+                    let updatedStreak = max(progress.streak, progressStore.streak)
+                    var updatedDailyMinutes = progressStore.dailyMinutes
+                    
+                    // If remote lastActivity is today and has higher minutes, use remote daily minutes
+                    if let lastDate = progressDate, calendar.isDate(lastDate, inSameDayAs: today),
+                       progress.dailyMinutes > progressStore.dailyMinutes {
+                        updatedDailyMinutes = progress.dailyMinutes
+                    }
+                    
+                    // Always use the higher total minutes
+                    let updatedTotalMinutes = max(progress.totalMinutes, progressStore.totalMinutes)
+                    
+                    // Use the most recent lastActivity
+                    let updatedLastActivity: Date?
+                    if let localDate = progressStore.lastActivity, let remoteDate = progress.lastActivity {
+                        updatedLastActivity = localDate > remoteDate ? localDate : remoteDate
+                    } else {
+                        updatedLastActivity = progressStore.lastActivity ?? progress.lastActivity
+                    }
+                    
+                    // Log the values we're about to update locally
+                    print("[Sync] Updating local state with progress: streak=\(updatedStreak), dailyMinutes=\(updatedDailyMinutes), totalMinutes=\(updatedTotalMinutes)")
+                    
+                    // Update local store with merged data
+                    progressStore.updateProgress(
+                        streak: updatedStreak,
+                        dailyMinutes: updatedDailyMinutes,
+                        totalMinutes: updatedTotalMinutes,
+                        lastActivity: updatedLastActivity
+                    )
                 }
-                
-                // Update local store with merged data
-                progressStore.updateProgress(
-                    streak: updatedStreak,
-                    dailyMinutes: updatedDailyMinutes,
-                    totalMinutes: updatedTotalMinutes,
-                    lastActivity: updatedLastActivity
-                )
             } catch {
                 print("Error fetching progress: \(error). Using local data only.")
             }
