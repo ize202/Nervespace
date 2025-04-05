@@ -28,33 +28,9 @@ final class ProgressViewModel: ObservableObject {
         
         // Load initial values
         updateFromStore()
-        
-        // Start background sync
-        Task {
-            await syncInBackground()
-        }
     }
     
     // MARK: - Public Methods
-    
-    /// Refreshes data from local store and syncs with Supabase in background
-    func refresh() async {
-        print("[Progress] Starting refresh")
-        guard !isLoading else { return }
-        
-        isLoading = true
-        defer { isLoading = false }
-        
-        // First update from local store to show immediate values
-        updateFromStore()
-        
-        // Then sync with remote
-        await syncManager.syncSupabaseToLocal()
-        
-        // Update again after sync
-        updateFromStore()
-        print("[Progress] Completed refresh")
-    }
     
     public func updateProgress(minutes: Int) async {
         guard minutes > 0 else { return }
@@ -88,18 +64,12 @@ final class ProgressViewModel: ObservableObject {
             lastActivity: now
         )
         
-        // Sync to Supabase in background
-        Task {
-            await syncManager.syncLocalToSupabase()
-        }
+        // Update view model state
+        updateFromStore()
+        
+        // Sync to Supabase
+        await syncInBackground()
     }
-    
-    // Test method for development only
-    #if DEBUG
-    func testRecordFiveMinutes() async {
-        await updateProgress(minutes: 5)
-    }
-    #endif
     
     // MARK: - Private Methods
     
@@ -126,10 +96,22 @@ final class ProgressViewModel: ObservableObject {
         print("[Progress] Updated from store: streak=\(streak), daily=\(dailyMinutes), total=\(totalMinutes)")
     }
     
-    private func syncInBackground() async {
+    func syncInBackground() async {
+        guard !isLoading else { return }
+        
+        isLoading = true
+        defer { isLoading = false }
+        
         print("[Progress] Starting background sync")
         await syncManager.syncSupabaseToLocal()
         updateFromStore()
         print("[Progress] Completed background sync")
     }
+    
+    // Test method for development only
+    #if DEBUG
+    func testRecordFiveMinutes() async {
+        await updateProgress(minutes: 5)
+    }
+    #endif
 } 

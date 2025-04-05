@@ -143,16 +143,12 @@ struct ProgressView: View {
             .navigationBarHidden(true)
             .task {
                 await loadStreakDays()
-                await viewModel.refresh()
+                await viewModel.syncInBackground()
             }
             .onChange(of: viewModel.streak) { _ in
                 Task {
                     await loadStreakDays()
                 }
-            }
-            .refreshable {
-                await viewModel.refresh()
-                await loadStreakDays()
             }
         }
         .preferredColorScheme(.dark)

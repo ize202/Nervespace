@@ -43,16 +43,16 @@ struct ProfileView: View {
                         }
                     }
                     
-                    NavigationLink {
-                        Text("Transition Time Settings")
-                    } label: {
-                        HStack {
-                            Text("Transition Time")
-                            Spacer()
-                            Text("5 seconds")
-                                .foregroundColor(.secondary)
-                        }
-                    }
+                    // NavigationLink {
+                    //     Text("Transition Time Settings")
+                    // } label: {
+                    //     HStack {
+                    //         Text("Transition Time")
+                    //         Spacer()
+                    //         Text("5 seconds")
+                    //             .foregroundColor(.secondary)
+                    //     }
+                    // }
                     
                 }
                 
