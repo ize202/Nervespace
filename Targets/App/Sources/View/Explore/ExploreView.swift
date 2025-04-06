@@ -70,7 +70,7 @@ struct AreaCard: View {
                         .resizable()
                         .aspectRatio(contentMode: .fill)
                         .overlay {
-                            color.opacity(0.6)
+                            color.opacity(0.2)
                         }
                 } else {
                     color
@@ -79,8 +79,8 @@ struct AreaCard: View {
                 // Gradient overlay
                 LinearGradient(
                     gradient: Gradient(colors: [
-                        .black.opacity(0.7),
                         .black.opacity(0.3),
+                        .black.opacity(0.1),
                         .clear
                     ]),
                     startPoint: .bottom,
