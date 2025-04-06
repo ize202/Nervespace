@@ -121,6 +121,7 @@
 		E2C2035666066E0B41E865E2 /* OneSignalFramework in Frameworks */ = {isa = PBXBuildFile; productRef = 73A4451A26D46F43055C8E84 /* OneSignalFramework */; };
 		E670585492C9687438ABD52D /* ProfileImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32B592D5EEED8E5B114D2630 /* ProfileImage.swift */; };
 		E674917B24E102446F777879 /* ShowSignInSheetWhenCalledModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE67853F85FCBDD31F1BBD02 /* ShowSignInSheetWhenCalledModifier.swift */; };
+		E718B090DF54B6B09FB0B04F /* DailyGoalSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36CE3072C0ACA35E326C43FC /* DailyGoalSettingsView.swift */; };
 		E7B8914D6D9BC11172D26A54 /* CrashlyticsKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288FC12754F85FB9ED11DD7F /* CrashlyticsKit.framework */; };
 		EB9C03485408E65431F8857B /* DeveloperSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B91DA9A946B618DF10C7A55C /* DeveloperSettingsView.swift */; };
 		EE1BE72FFF720D27642FB55C /* CategoryListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B055696983C91B9B522BF4E1 /* CategoryListView.swift */; };
@@ -307,6 +308,7 @@
 		32B592D5EEED8E5B114D2630 /* ProfileImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileImage.swift; sourceTree = "<group>"; };
 		3382516E12C8CB796FA8811A /* SettingsRowItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsRowItem.swift; sourceTree = "<group>"; };
 		35A5E693BCA6E84AB9464CC9 /* NotificationsSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsSettingsView.swift; sourceTree = "<group>"; };
+		36CE3072C0ACA35E326C43FC /* DailyGoalSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyGoalSettingsView.swift; sourceTree = "<group>"; };
 		387F180DB5885A8E912AFDD5 /* TuistBundle+CrashlyticsKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TuistBundle+CrashlyticsKit.swift"; sourceTree = "<group>"; };
 		38EC50610E4B4466058B8E01 /* CheckmarkToggle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckmarkToggle.swift; sourceTree = "<group>"; };
 		39E86B5FF5E957E5D088F40B /* SharedKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SharedKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -499,6 +501,7 @@
 				7DE694CD3A9F608127E634BA /* OneTimeViews */,
 				008830A50992CEA2C7778B7A /* Profile */,
 				AEBA543ED73550E817B7B3CE /* Progress */,
+				CBE3CDA8230EADF99DAE8FD7 /* Settings */,
 				BB440B4C9B973BDE25EE1EA4 /* ContentView.swift */,
 			);
 			path = View;
@@ -1051,6 +1054,14 @@
 			path = Exercises;
 			sourceTree = "<group>";
 		};
+		CBE3CDA8230EADF99DAE8FD7 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				36CE3072C0ACA35E326C43FC /* DailyGoalSettingsView.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
 		D075EDA48B9CC6F3929481B2 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
@@ -1536,6 +1547,7 @@
 				B82F7C3952592C951DE83D5A /* HistoryViewModel.swift in Sources */,
 				71BA8BA640E472796457CDDB /* ProgressView.swift in Sources */,
 				2F67C83F303C36FEFF75175A /* ProgressViewModel.swift in Sources */,
+				E718B090DF54B6B09FB0B04F /* DailyGoalSettingsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

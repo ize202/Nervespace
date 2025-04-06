@@ -6,6 +6,7 @@ public class LocalProgressStore: ObservableObject {
     @AppStorage("streak") public private(set) var streak: Int = 0
     @AppStorage("dailyMinutes") public private(set) var dailyMinutes: Int = 0
     @AppStorage("totalMinutes") public private(set) var totalMinutes: Int = 0
+    @AppStorage("dailyGoal") public var dailyGoal: Int = 5
     @AppStorage("lastActivityDate") private var lastActivityDateString: String = "" {
         didSet {
             print("[Progress] Last activity date string updated: '\(oldValue)' -> '\(lastActivityDateString)'")

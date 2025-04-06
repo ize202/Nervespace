@@ -6,12 +6,11 @@ struct ProgressView: View {
     @StateObject private var viewModel: ProgressViewModel
     @EnvironmentObject private var completionStore: RoutineCompletionStore
     @EnvironmentObject private var syncManager: SupabaseSyncManager
+    @EnvironmentObject private var progressStore: LocalProgressStore
     
     private let currentDate = Date()
     @State private var completionDays: Set<Date> = []
-    
-    // Daily goal in minutes (we can move this to user settings later)
-    private let dailyGoal = 5
+    @State private var showingGoalSettings = false
     
     private let calendar = Calendar.current
     private let daysOfWeek = ["S", "M", "T", "W", "T", "F", "S"]
@@ -111,15 +110,27 @@ struct ProgressView: View {
                             
                             // Minutes Tracking Chart
                             VStack(alignment: .leading, spacing: 16) {
-                                Text("Daily Minutes Goal")
-                                    .font(.headline)
-                                    .foregroundColor(.white)
+                                HStack {
+                                    Text("Daily Minutes Goal")
+                                        .font(.headline)
+                                        .foregroundColor(.white)
+                                    
+                                    Spacer()
+                                    
+                                    Button(action: {
+                                        showingGoalSettings = true
+                                    }) {
+                                        Image(systemName: "gear")
+                                            .foregroundColor(.brandPrimary)
+                                            .font(.headline)
+                                    }
+                                }
                                 
                                 VStack {
                                     Spacer()
                                     CircularProgressView(
-                                        progress: Double(currentMinutes) / Double(dailyGoal),
-                                        goal: dailyGoal,
+                                        progress: Double(currentMinutes) / Double(progressStore.dailyGoal),
+                                        goal: progressStore.dailyGoal,
                                         current: currentMinutes
                                     )
                                     .frame(height: 250)
@@ -140,6 +151,9 @@ struct ProgressView: View {
                 }
             }
             .navigationBarHidden(true)
+            .sheet(isPresented: $showingGoalSettings) {
+                DailyGoalSettingsView()
+            }
             .task {
                 await updateCompletionDays()
                 await viewModel.syncInBackground()
