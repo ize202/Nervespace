@@ -280,7 +280,7 @@ public struct ActiveSessionView: View {
                 print("[ActiveSession] Saving to local store...")
                 // Update stores first
                 completionStore.addCompletion(completion)
-                progressStore.addMinutes(durationMinutes)
+                progressStore.addCompletion(durationMinutes: durationMinutes)
                 
                 print("[ActiveSession] Updating view state...")
                 // Then update view state

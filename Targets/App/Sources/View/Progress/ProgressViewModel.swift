@@ -32,42 +32,9 @@ final class ProgressViewModel: ObservableObject {
     
     // MARK: - Public Methods
     
+    @available(*, deprecated, message: "Use progressStore.addCompletion(durationMinutes:) directly")
     public func updateProgress(minutes: Int) async {
-        guard minutes > 0 else { return }
-        
-        let now = Date()
-        let startOfToday = calendar.startOfDay(for: now)
-        
-        // Calculate new values
-        var newDailyMinutes = minutes
-        var newStreak = 1
-        
-        if let lastActivity = lastActivity {
-            let lastActivityDay = calendar.startOfDay(for: lastActivity)
-            
-            if lastActivityDay == startOfToday {
-                // More activity today
-                newDailyMinutes = dailyMinutes + minutes
-            } else if calendar.isDate(lastActivityDay, inSameDayAs: calendar.date(byAdding: .day, value: -1, to: startOfToday)!) {
-                // Activity on consecutive day
-                newStreak = streak + 1
-            }
-        }
-        
-        let newTotalMinutes = totalMinutes + minutes
-        
-        // Update local store immediately
-        progressStore.updateProgress(
-            streak: newStreak,
-            dailyMinutes: newDailyMinutes,
-            totalMinutes: newTotalMinutes,
-            lastActivity: now
-        )
-        
-        // Update view model state
-        updateFromStore()
-        
-        // Sync to Supabase
+        await progressStore.addCompletion(durationMinutes: minutes)
         await syncInBackground()
     }
     
