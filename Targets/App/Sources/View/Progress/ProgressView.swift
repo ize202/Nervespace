@@ -8,7 +8,7 @@ struct ProgressView: View {
     @EnvironmentObject private var syncManager: SupabaseSyncManager
     
     private let currentDate = Date()
-    @State private var streakDays: Set<Date>
+    @State private var completionDays: Set<Date> = []
     
     // Daily goal in minutes (we can move this to user settings later)
     private let dailyGoal = 5
@@ -21,7 +21,6 @@ struct ProgressView: View {
             progressStore: progressStore,
             syncManager: syncManager
         ))
-        _streakDays = State(initialValue: Set<Date>())
     }
     
     private var currentMinutes: Int {
@@ -95,7 +94,7 @@ struct ProgressView: View {
                                     LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7), spacing: 8) {
                                         ForEach(Array(days.enumerated()), id: \.offset) { index, date in
                                             if let date = date {
-                                                DayCell(date: date, isSelected: isDateInStreak(date))
+                                                DayCell(date: date, isSelected: isDateCompleted(date))
                                             } else {
                                                 Color.clear
                                                     .aspectRatio(1, contentMode: .fill)
@@ -142,13 +141,17 @@ struct ProgressView: View {
             }
             .navigationBarHidden(true)
             .task {
-                await loadStreakDays()
+                await updateCompletionDays()
                 await viewModel.syncInBackground()
             }
-            .onChange(of: viewModel.streak) { _ in
+            .onChange(of: completionStore.completions) { _ in
                 Task {
-                    await loadStreakDays()
+                    await updateCompletionDays()
                 }
+            }
+            .refreshable {
+                await syncManager.syncSupabaseToLocal()
+                await updateCompletionDays()
             }
         }
         .preferredColorScheme(.dark)
@@ -174,36 +177,21 @@ struct ProgressView: View {
         return prefixDays + monthDays
     }
     
-    private func isDateInStreak(_ date: Date) -> Bool {
-        return streakDays.contains { calendar.isDate($0, inSameDayAs: date) }
+    private func isDateCompleted(_ date: Date) -> Bool {
+        return completionDays.contains { calendar.isDate($0, inSameDayAs: date) }
     }
     
-    private func loadStreakDays() async {
+    private func updateCompletionDays() async {
+        let recentCompletions = completionStore.getRecentCompletions()
         var days: Set<Date> = []
         
-        // Add today if we have activity
-        if let lastActivity = viewModel.lastActivity,
-           calendar.isDateInToday(lastActivity) {
-            // Normalize to start of day to ensure proper comparison
-            if let startOfDay = calendar.date(bySettingHour: 0, minute: 0, second: 0, of: lastActivity) {
+        for completion in recentCompletions {
+            if let startOfDay = calendar.date(bySettingHour: 0, minute: 0, second: 0, of: completion.completedAt) {
                 days.insert(startOfDay)
             }
         }
         
-        // Add previous streak days
-        if viewModel.streak > 1 {
-            let today = Date()
-            // Get start of today for consistent date comparisons
-            if let startOfToday = calendar.date(bySettingHour: 0, minute: 0, second: 0, of: today) {
-                for dayOffset in 1..<viewModel.streak {
-                    if let date = calendar.date(byAdding: .day, value: -dayOffset, to: startOfToday) {
-                        days.insert(date)
-                    }
-                }
-            }
-        }
-        
-        streakDays = days
+        completionDays = days
     }
 }
 
