@@ -44,15 +44,56 @@ struct WorkoutReminderView: View {
         }
     }
     
+    func scheduleNotification() {
+        // Remove existing notifications
+        UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
+        
+        guard isReminderEnabled else { return }
+        
+        // Create notification content
+        let content = UNMutableNotificationContent()
+        content.title = "Time for Your Daily Reset"
+        content.body = "Take a moment to reset and recharge."
+        content.sound = .default
+        
+        // Create date components for daily trigger
+        let calendar = Calendar.current
+        let components = calendar.dateComponents([.hour, .minute], from: reminderTime)
+        
+        // Create trigger
+        let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: true)
+        
+        // Create request
+        let request = UNNotificationRequest(
+            identifier: "daily_workout_reminder",
+            content: content,
+            trigger: trigger
+        )
+        
+        // Schedule notification
+        UNUserNotificationCenter.current().add(request) { error in
+            if let error = error {
+                print("Error scheduling notification: \(error)")
+            }
+        }
+    }
+    
     func saveChanges() {
+        // Save to UserDefaults
         UserDefaults.standard.set(isReminderEnabled, forKey: "workout_reminder_enabled")
         UserDefaults.standard.set(reminderTime, forKey: "workout_reminder_time")
+        
+        // Schedule or remove notification
+        scheduleNotification()
+        
+        // Update UI
         hasChanges = false
         showingSaveConfirmation = true
         
         // Hide confirmation after delay
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
             showingSaveConfirmation = false
+            dismiss() // Dismiss the view after saving
         }
     }
     
@@ -159,20 +200,7 @@ struct WorkoutReminderView: View {
             }
             .navigationTitle("Workout Reminder")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button {
-                        if hasChanges {
-                            // Optionally, you could add an alert here to confirm discarding changes
-                            saveChanges() // Auto-save on dismiss
-                        }
-                        dismiss()
-                    } label: {
-                        Image(systemName: "xmark")
-                            .foregroundColor(.baseWhite)
-                    }
-                }
-            }
+            .interactiveDismissDisabled(hasChanges)
         }
         .onAppear {
             checkNotificationStatus()
