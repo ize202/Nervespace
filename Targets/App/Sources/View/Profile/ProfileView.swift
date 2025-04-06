@@ -26,36 +26,20 @@ struct ProfileView: View {
                 // Settings Section
                 Section("SETTINGS") {
                     NavigationLink {
-                        Text("Workout Reminder")
+                        WorkoutReminderView()
                     } label: {
                         HStack {
                             Text("Workout Reminder")
                             Spacer()
+                            
+                            if UserDefaults.standard.bool(forKey: "workout_reminder_enabled") {
+                                let reminderTime = UserDefaults.standard.object(forKey: "workout_reminder_time") as? Date ?? Date()
+                                Text(reminderTime, style: .time)
+                                    .foregroundColor(.secondary)
+                            }
                         }
                     }
-
-                    NavigationLink {
-                        Text("Daily Minutes Goal")
-                    } label: {
-                        HStack {
-                            Text("Daily Minutes Goal")
-                            Spacer()
-                        }
-                    }
-                    
-                    // NavigationLink {
-                    //     Text("Transition Time Settings")
-                    // } label: {
-                    //     HStack {
-                    //         Text("Transition Time")
-                    //         Spacer()
-                    //         Text("5 seconds")
-                    //             .foregroundColor(.secondary)
-                    //     }
-                    // }
-                    
                 }
-                
                 
                 // Support Section
                 Section("SUPPORT") {

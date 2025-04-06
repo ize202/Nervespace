@@ -97,6 +97,7 @@
 		B0CB05DD9BF6B551BBECAC31 /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C81FB8187D2C75C5F20311CD /* HistoryView.swift */; };
 		B22AB690FA8233FD4018EEA0 /* ExerciseLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = B49BB65485C8AD2F12F9C1DA /* ExerciseLibrary.swift */; };
 		B26234992D49707AE6557B5A /* TuistBundle+CrashlyticsKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 387F180DB5885A8E912AFDD5 /* TuistBundle+CrashlyticsKit.swift */; };
+		B45104DD95AE3EC37C3F8DAD /* WorkoutReminderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB70AC57602258ED692A1E31 /* WorkoutReminderView.swift */; };
 		B52989AA282A9E9926B3CB36 /* PendingCompletionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F40C70744D86B5E96EA614AE /* PendingCompletionStore.swift */; };
 		B7520CB5A12EC0F7086D5121 /* PaywallManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12B9A5F9A3DA6C183E3C040F /* PaywallManager.swift */; };
 		B82F7C3952592C951DE83D5A /* HistoryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD22D3434F6B22E8FA5AC600 /* HistoryViewModel.swift */; };
@@ -382,6 +383,7 @@
 		C5C7A11040B45E792FD3DD8D /* modifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = modifier.swift; sourceTree = "<group>"; };
 		C62201F40C303C066A1CFC1D /* requireCapabilityPermission.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = requireCapabilityPermission.swift; sourceTree = "<group>"; };
 		C81FB8187D2C75C5F20311CD /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
+		CB70AC57602258ED692A1E31 /* WorkoutReminderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutReminderView.swift; sourceTree = "<group>"; };
 		CBA347A494EF79936440CC9C /* SignUpButtons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpButtons.swift; sourceTree = "<group>"; };
 		D18AE4FF14A97AE6F967A631 /* visibleOnlyToUserWithID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = visibleOnlyToUserWithID.swift; sourceTree = "<group>"; };
 		D606C8D6CDA599FAFDF76120 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
@@ -483,6 +485,7 @@
 				8C72FB855CB10B1BA0E8FE23 /* AccountSettingsView.swift */,
 				9CC4B27BBC51F694ED58C372 /* AccountSettingsViewModel.swift */,
 				2470AAF9C69F809F21F03D04 /* ProfileView.swift */,
+				CB70AC57602258ED692A1E31 /* WorkoutReminderView.swift */,
 			);
 			path = Profile;
 			sourceTree = "<group>";
@@ -1535,6 +1538,7 @@
 				9C9D2BFE9AB3340B61C46261 /* AccountSettingsView.swift in Sources */,
 				515DB35FE4365B09E55D9FD6 /* AccountSettingsViewModel.swift in Sources */,
 				887A7A89BAFE84FA99F4B50A /* ProfileView.swift in Sources */,
+				B45104DD95AE3EC37C3F8DAD /* WorkoutReminderView.swift in Sources */,
 				B0CB05DD9BF6B551BBECAC31 /* HistoryView.swift in Sources */,
 				B82F7C3952592C951DE83D5A /* HistoryViewModel.swift in Sources */,
 				71BA8BA640E472796457CDDB /* ProgressView.swift in Sources */,

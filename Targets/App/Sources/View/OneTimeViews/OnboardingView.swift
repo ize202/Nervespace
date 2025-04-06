@@ -157,6 +157,12 @@ class OnboardingViewModel: ObservableObject {
 			return
 		}
 		
+		// Save reminder settings when moving from reminder screen
+		if currentScreen == .reminder {
+			UserDefaults.standard.set(selections.reminderTime, forKey: "workout_reminder_time")
+			UserDefaults.standard.set(true, forKey: "workout_reminder_enabled")
+		}
+		
 		currentScreen = OnboardingScreen.allCases[currentIndex + 1]
 		
 		// Track step number (adding 2 because first step was tracked in init)
