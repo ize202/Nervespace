@@ -181,11 +181,11 @@ struct DeveloperSettingsView: View {
 
 				}
 				.navigationTitle("Developer Settings")
-				.sheet(isPresented: $showFeatureSheet) {
-					ShowFeatureSheetOnNewAppVersionModifier.WhatsNewView {
-						showFeatureSheet = false
-					}
-				}
+//				.sheet(isPresented: $showFeatureSheet) {
+//					ShowFeatureSheetOnNewAppVersionModifier.WhatsNewView {
+//						showFeatureSheet = false
+//					}
+//				}
 				.sheet(isPresented: $showOnboarding) {
 					OnboardingView {
 						showOnboarding = false

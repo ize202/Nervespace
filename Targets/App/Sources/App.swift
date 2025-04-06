@@ -74,7 +74,7 @@ struct MainApp: App {
 				.modifier(ShowRequestSheetWhenNeededModifier())
 
 				// Will show the WhatsNewView sheet if the user opens the app for the first time with a specific app version (for updates)
-				.modifier(ShowFeatureSheetOnNewAppVersionModifier())
+//				.modifier(ShowFeatureSheetOnNewAppVersionModifier())
 
 				// Will show the OnboardingView if the user opens the app for the first time
 				.modifier(ShowOnboardingViewOnFirstLaunchEverModifier())
