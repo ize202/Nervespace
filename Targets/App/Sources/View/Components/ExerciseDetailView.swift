@@ -40,74 +40,84 @@ struct ExerciseDetailView: View {
                     
                     VStack(spacing: 32) {
                         // Title and Duration
-                        VStack(alignment: .leading, spacing: 8) {
+                        VStack(alignment: .leading, spacing: 12) {
                             Text(exercise.name)
                                 .font(.system(size: 34, weight: .bold))
                                 .foregroundColor(.white)
+                                .lineSpacing(0)
                             
                             Text("\(exercise.duration / 60) min")
                                 .font(.system(size: 15, weight: .medium))
                                 .foregroundColor(.white.opacity(0.6))
                                 .textCase(.uppercase)
+                                .padding(.bottom, 4)
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.horizontal)
+                        .padding(.horizontal, 24)
                         
                         // Instructions Section
-                        VStack(alignment: .leading, spacing: 24) {
+                        VStack(alignment: .leading, spacing: 20) {
                             Text("INSTRUCTIONS")
-                                .font(.system(size: 15, weight: .medium))
+                                .font(.system(size: 13, weight: .medium))
                                 .foregroundColor(.white.opacity(0.6))
                                 .textCase(.uppercase)
-                                .padding(.horizontal)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(.horizontal, 24)
                             
                             TimelineView(items: exercise.instructions.components(separatedBy: "\n"))
+                                .padding(.horizontal, 24)
                         }
                         
                         // Modifications Section
                         if let modifications = exercise.modifications?.components(separatedBy: "\n") {
-                            VStack(alignment: .leading, spacing: 24) {
+                            VStack(alignment: .leading, spacing: 20) {
                                 Text("MODIFICATIONS")
-                                    .font(.system(size: 15, weight: .medium))
+                                    .font(.system(size: 13, weight: .medium))
                                     .foregroundColor(.white.opacity(0.6))
                                     .textCase(.uppercase)
-                                    .padding(.horizontal)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .padding(.horizontal, 24)
                                 
                                 TimelineView(items: modifications)
+                                    .padding(.horizontal, 24)
                             }
                         }
                         
                         // Benefits Section
-                        VStack(alignment: .leading, spacing: 16) {
+                        VStack(alignment: .leading, spacing: 12) {
                             Text("BENEFITS")
-                                .font(.system(size: 15, weight: .medium))
+                                .font(.system(size: 13, weight: .medium))
                                 .foregroundColor(.white.opacity(0.6))
                                 .textCase(.uppercase)
-                                .padding(.horizontal)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(.horizontal, 24)
                             
                             Text(exercise.benefits)
                                 .font(.system(size: 17))
                                 .foregroundColor(.white)
-                                .lineSpacing(4)
-                                .padding(.horizontal)
+                                .lineSpacing(6)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(.horizontal, 24)
                         }
                         
                         // Areas Section
-                        VStack(alignment: .leading, spacing: 16) {
+                        VStack(alignment: .leading, spacing: 12) {
                             Text("AREAS")
-                                .font(.system(size: 15, weight: .medium))
+                                .font(.system(size: 13, weight: .medium))
                                 .foregroundColor(.white.opacity(0.6))
                                 .textCase(.uppercase)
-                                .padding(.horizontal)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(.horizontal, 24)
                             
                             Text(exercise.areas.map(\.rawValue).joined(separator: ", "))
                                 .font(.system(size: 17))
                                 .foregroundColor(.white)
-                                .lineSpacing(4)
-                                .padding(.horizontal)
+                                .lineSpacing(6)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(.horizontal, 24)
                         }
                     }
-                    .padding(.bottom, 32)
+                    .padding(.vertical, 32)
                 }
             }
         }
@@ -120,7 +130,7 @@ private struct TimelineView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 24) {
             ForEach(Array(items.enumerated()), id: \.offset) { index, item in
-                HStack(alignment: .top, spacing: 12) {
+                HStack(alignment: .top, spacing: 16) {
                     // Step indicator
                     ZStack {
                         Circle()
@@ -131,18 +141,18 @@ private struct TimelineView: View {
                             .font(.system(size: 15, weight: .medium))
                             .foregroundColor(.brandPrimary)
                     }
+                    .frame(width: 32)
                     
                     Text(item)
                         .font(.system(size: 17))
                         .foregroundColor(.white)
-                        .lineSpacing(4)
+                        .lineSpacing(6)
                         .padding(.top, 6)
                     
                     Spacer()
                 }
             }
         }
-        .padding(.horizontal)
     }
 }
 
