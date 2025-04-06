@@ -186,7 +186,7 @@ struct RequestCapabilityContentView: View {
 
 #Preview {
 	Button("Kablamo!") {
-		askUserFor(.locationAccess)
+		askUserFor(.appRating)
 	}
 	.frame(maxWidth: .infinity, maxHeight: .infinity)
 	.modifier(ShowRequestSheetWhenNeededModifier())

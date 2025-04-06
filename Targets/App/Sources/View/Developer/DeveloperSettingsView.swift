@@ -77,7 +77,7 @@ struct DeveloperSettingsView: View {
 							isOn: $protectDeveloperViewWithBiometrics)
 					}
 
-					Section(header: Text("Crash Testing")) {
+					Section {
 						Button("Send Test Event to Sentry") {
 							Crashlytics.shared.captureError(
 								NSError(domain: "test", code: 1234, userInfo: [NSLocalizedDescriptionKey: "This is a test event"])
@@ -95,10 +95,11 @@ struct DeveloperSettingsView: View {
 						Button("Trigger Fatal Error", role: .destructive) {
 							fatalError("This is a test crash triggered from developer settings")
 						}
+					} header: {
+						Text("Crash Testing")
 					}
 
-					Section(header: Text("Ask User For...")) {
-
+					Section {
 						// just examples on how to use `askUserFor` actions.
 						Button("Will Ask for Review on 10th tap") {
 							askUserFor(.appRating) {
@@ -110,52 +111,14 @@ struct DeveloperSettingsView: View {
 							}
 						}
 
-						Button("Ask for Photo Library Permission") {
-							askUserFor(.photosAccess) {
-								showInAppNotification(
-									.success,
-									content: .init(
-										title: "Got Photos Access!", message: "Nice."))
-							} onDismiss: {
-								showInAppNotification(
-									.warning,
-									content: .init(
-										title: "Dismissed :(",
-										message: "User Declined Permission."))
-							}
-						}
-
 						Button("Ask for Push Notifications Permission") {
 							PushNotifications.showNotificationsPermissionsSheet()
 						}
-
-						Button("Ask for Camera Permission") {
-							askUserFor(.cameraAccess)
-						}
-
-						Button("Ask for Microphone Permission") {
-							askUserFor(.microphoneAccess)
-						}
-
-						Button("Ask for Location Access") {
-							askUserFor(.locationAccess)
-						}
-
-						Button("Ask for Contacts Access") {
-							askUserFor(.contactsAccess)
-						}
-
-						Button("Ask for Calendar Access") {
-							askUserFor(.calendarAccess)
-						}
-
-						Button("Ask for Reminders Access") {
-							askUserFor(.remindersAccess)
-						}
+					} header: {
+						Text("Ask User For...")
 					}
 
-					Section(header: Text("AuthKit & DBKit (Supabase)")) {
-
+					Section {
 						Text("User ID")
 							.badge("\(db.currentUser?.id.uuidString ?? "Not Logged In")")
 							.textSelection(.enabled)  // allows the user to hold to copy
@@ -177,6 +140,8 @@ struct DeveloperSettingsView: View {
 						Button("You can see what this opens (if you're signed in)") {
 							showViewWithAccessIfSignedIn = true
 						}
+					} header: {
+						Text("AuthKit & DBKit (Supabase)")
 					}
 
 				}
