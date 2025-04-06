@@ -66,13 +66,12 @@ struct AreaCard: View {
             // Background with gradient overlay
             ZStack {
                 if let imageUrl = imageUrl {
-                    AsyncImage(url: URL(string: imageUrl)) { image in
-                        image
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                    } placeholder: {
-                        color
-                    }
+                    Image(imageUrl)
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .overlay {
+                            color.opacity(0.6)
+                        }
                 } else {
                     color
                 }
@@ -80,8 +79,8 @@ struct AreaCard: View {
                 // Gradient overlay
                 LinearGradient(
                     gradient: Gradient(colors: [
-                        .black.opacity(0.5),
-                        .clear,
+                        .black.opacity(0.7),
+                        .black.opacity(0.3),
                         .clear
                     ]),
                     startPoint: .bottom,
@@ -123,37 +122,37 @@ struct ExploreView: View {
             title: "Upper Body",
             areas: [.shoulders, .chest, .upperBack, .neck],
             color: .brandPrimary,
-            imageUrl: nil
+            imageUrl: "exercise_neck_rolls"
         ),
         AreaGroup(
             title: "Core & Back",
             areas: [.core, .lowerBack, .spine, .obliques],
             color: .brandSecondary,
-            imageUrl: nil
+            imageUrl: "exercise_cat_cow"
         ),
         AreaGroup(
             title: "Lower Body",
             areas: [.hips, .hamstrings, .quadriceps, .glutes],
             color: Color(hex: "6B8E23"),
-            imageUrl: nil
+            imageUrl: "exercise_bridge_pose"
         ),
         AreaGroup(
             title: "Arms",
             areas: [.biceps, .triceps, .forearms],
             color: Color(hex: "CD853F"),
-            imageUrl: nil
+            imageUrl: "exercise_bear_hug"
         ),
         AreaGroup(
             title: "Legs",
             areas: [.calves, .knees, .ankles, .feet],
             color: .brandPrimary,
-            imageUrl: nil
+            imageUrl: "exercise_air_squats"
         ),
         AreaGroup(
             title: "Hip Flexors",
             areas: [.psoas, .groin, .itBand, .hips],
             color: .brandSecondary,
-            imageUrl: nil
+            imageUrl: "exercise_butterfly_stretch"
         )
     ]
     
