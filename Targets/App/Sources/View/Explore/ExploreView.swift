@@ -91,14 +91,22 @@ struct AreaCard: View {
             
             // Title
             Text(title)
-                .font(.title3)
-                .fontWeight(.bold)
+                .font(.system(size: title.count > 15 ? 20 : 24, weight: .bold))
                 .foregroundColor(.white)
                 .padding(16)
+                .minimumScaleFactor(0.8)
+                .lineLimit(1)
         }
         .frame(height: 180)
         .clipShape(RoundedRectangle(cornerRadius: 12))
     }
+}
+
+struct AreaGroup {
+    let title: String
+    let areas: [ExerciseArea]
+    let color: Color
+    let imageUrl: String?
 }
 
 struct ExploreView: View {
@@ -108,6 +116,45 @@ struct ExploreView: View {
     private let gridItems = [
         GridItem(.flexible(), spacing: 16),
         GridItem(.flexible(), spacing: 16)
+    ]
+    
+    private let areaGroups: [AreaGroup] = [
+        AreaGroup(
+            title: "Upper Body",
+            areas: [.shoulders, .chest, .upperBack, .neck],
+            color: .brandPrimary,
+            imageUrl: nil
+        ),
+        AreaGroup(
+            title: "Core & Back",
+            areas: [.core, .lowerBack, .spine, .obliques],
+            color: .brandSecondary,
+            imageUrl: nil
+        ),
+        AreaGroup(
+            title: "Lower Body",
+            areas: [.hips, .hamstrings, .quadriceps, .glutes],
+            color: Color(hex: "6B8E23"),
+            imageUrl: nil
+        ),
+        AreaGroup(
+            title: "Arms",
+            areas: [.biceps, .triceps, .forearms],
+            color: Color(hex: "CD853F"),
+            imageUrl: nil
+        ),
+        AreaGroup(
+            title: "Legs",
+            areas: [.calves, .knees, .ankles, .feet],
+            color: .brandPrimary,
+            imageUrl: nil
+        ),
+        AreaGroup(
+            title: "Hip Flexors",
+            areas: [.psoas, .groin, .itBand, .hips],
+            color: .brandSecondary,
+            imageUrl: nil
+        )
     ]
     
     var body: some View {
@@ -188,65 +235,17 @@ struct ExploreView: View {
                                 .padding(.horizontal)
                             
                             LazyVGrid(columns: gridItems, spacing: 16) {
-                                NavigationLink(destination: AreaListView(
-                                    area: .neck,
-                                    color: .brandPrimary
-                                )) {
-                                    AreaCard(
-                                        title: "Neck",
-                                        color: .brandPrimary,
-                                        imageUrl: nil
-                                    )
-                                }
-                                NavigationLink(destination: AreaListView(
-                                    area: .shoulders,
-                                    color: .brandSecondary
-                                )) {
-                                    AreaCard(
-                                        title: "Shoulders",
-                                        color: .brandSecondary,
-                                        imageUrl: nil
-                                    )
-                                }
-                                NavigationLink(destination: AreaListView(
-                                    area: .lowerBack,
-                                    color: Color(hex: "6B8E23")
-                                )) {
-                                    AreaCard(
-                                        title: "Lower Back",
-                                        color: Color(hex: "6B8E23"),
-                                        imageUrl: nil
-                                    )
-                                }
-                                NavigationLink(destination: AreaListView(
-                                    area: .hips,
-                                    color: Color(hex: "CD853F")
-                                )) {
-                                    AreaCard(
-                                        title: "Hips",
-                                        color: Color(hex: "CD853F"),
-                                        imageUrl: nil
-                                    )
-                                }
-                                NavigationLink(destination: AreaListView(
-                                    area: .core,
-                                    color: .brandPrimary
-                                )) {
-                                    AreaCard(
-                                        title: "Core",
-                                        color: .brandPrimary,
-                                        imageUrl: nil
-                                    )
-                                }
-                                NavigationLink(destination: AreaListView(
-                                    area: .hamstrings,
-                                    color: .brandSecondary
-                                )) {
-                                    AreaCard(
-                                        title: "Hamstrings",
-                                        color: .brandSecondary,
-                                        imageUrl: nil
-                                    )
+                                ForEach(areaGroups, id: \.title) { group in
+                                    NavigationLink(destination: AreaGroupListView(
+                                        title: group.title,
+                                        areas: group.areas
+                                    )) {
+                                        AreaCard(
+                                            title: group.title,
+                                            color: group.color,
+                                            imageUrl: group.imageUrl
+                                        )
+                                    }
                                 }
                             }
                             .padding(.horizontal)
@@ -256,6 +255,159 @@ struct ExploreView: View {
                 }
             }
             .navigationBarHidden(true)
+        }
+    }
+}
+
+struct AreaGroupListView: View {
+    let title: String
+    let areas: [ExerciseArea]
+    @State private var selectedExercise: Exercise?
+    
+    var exercises: [Exercise] {
+        // Get unique exercises that target any of the areas
+        Array(Set(areas.flatMap { area in
+            ExerciseLibrary.exercises(for: area)
+        })).sorted(by: { $0.name < $1.name })
+    }
+    
+    var routines: [Routine] {
+        // Get unique routines that contain exercises targeting any of the areas
+        Array(Set(areas.flatMap { area in
+            RoutineLibrary.routines.filter { routine in
+                routine.exercises.contains { routineExercise in
+                    routineExercise.exercise.areas.contains(area)
+                }
+            }
+        })).sorted(by: { $0.name < $1.name })
+    }
+    
+    var body: some View {
+        ZStack {
+            Color.baseBlack.ignoresSafeArea()
+            
+            VStack(spacing: 0) {
+                // Header
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(title)
+                        .font(.system(size: 34, weight: .bold))
+                        .foregroundColor(.white)
+                    
+                    Text("\(exercises.count + routines.count) ITEMS")
+                        .font(.system(size: 15, weight: .medium))
+                        .foregroundColor(.white.opacity(0.6))
+                        .textCase(.uppercase)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal)
+                .padding(.vertical, 24)
+                
+                ScrollView {
+                    LazyVStack(spacing: 16) {
+                        if !exercises.isEmpty {
+                            Text("Exercises")
+                                .font(.title2)
+                                .bold()
+                                .foregroundColor(.white)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(.horizontal)
+                            
+                            ForEach(exercises) { exercise in
+                                Button(action: { selectedExercise = exercise }) {
+                                    ExerciseRow(exercise: exercise)
+                                        .padding(.horizontal)
+                                }
+                            }
+                        }
+                        
+                        if !routines.isEmpty {
+                            Text("Routines")
+                                .font(.title2)
+                                .bold()
+                                .foregroundColor(.white)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(.horizontal)
+                                .padding(.top, exercises.isEmpty ? 0 : 16)
+                            
+                            ForEach(routines) { routine in
+                                NavigationLink(destination: RoutineDetailView(routine: routine)) {
+                                    RoutineRow(routine: routine)
+                                        .padding(.horizontal)
+                                }
+                            }
+                        }
+                    }
+                    .padding(.vertical)
+                }
+            }
+        }
+        .navigationBarTitleDisplayMode(.inline)
+        .sheet(item: $selectedExercise) { exercise in
+            ExerciseDetailView(exercise: exercise)
+        }
+    }
+}
+
+private struct ExerciseRow: View {
+    let exercise: Exercise
+    
+    var body: some View {
+        HStack(spacing: 12) {
+            // Thumbnail
+            Image(exercise.thumbnailName)
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .frame(width: 56, height: 56)
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+            
+            Text(exercise.name)
+                .font(.headline)
+                .foregroundColor(.white)
+            
+            Spacer()
+            
+            Text("\(exercise.duration / 60) min")
+                .font(.subheadline)
+                .foregroundColor(.white.opacity(0.6))
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
+        .background {
+            RoundedRectangle(cornerRadius: 12)
+                .fill(.ultraThinMaterial)
+        }
+    }
+}
+
+private struct RoutineRow: View {
+    let routine: Routine
+    
+    var body: some View {
+        HStack(spacing: 12) {
+            // Thumbnail
+            Image(routine.thumbnailName)
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .frame(width: 56, height: 56)
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+            
+            VStack(alignment: .leading, spacing: 4) {
+                Text(routine.name)
+                    .font(.headline)
+                    .foregroundColor(.white)
+                
+                Text("\(routine.exercises.count) exercises • \(routine.totalDuration / 60) min")
+                    .font(.subheadline)
+                    .foregroundColor(.white.opacity(0.6))
+            }
+            
+            Spacer()
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
+        .background {
+            RoundedRectangle(cornerRadius: 12)
+                .fill(.ultraThinMaterial)
         }
     }
 }
