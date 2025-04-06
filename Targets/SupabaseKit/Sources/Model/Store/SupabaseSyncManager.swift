@@ -31,12 +31,6 @@ public class SupabaseSyncManager: ObservableObject {
         guard let userId = db.currentUser?.id else { return }
         guard !isSyncing else { return }
         
-        // Skip if we haven't fetched initial progress yet
-        guard hasFetchedInitialProgress else {
-            print("[Sync] Skipping push — haven't fetched initial progress yet")
-            return
-        }
-        
         isSyncing = true
         defer { isSyncing = false }
         
@@ -105,67 +99,52 @@ public class SupabaseSyncManager: ObservableObject {
             do {
                 let progress = try await db.userService.fetchProgress(userId: userId)
                 
-                // Smart merging of progress data
-                let calendar = Calendar.current
-                let today = calendar.startOfDay(for: Date())
-                let progressDate = progress.lastActivity.map { calendar.startOfDay(for: $0) }
-                
-                // Check if this is initial load with valid remote data
-                let hasValidRemoteData = progress.dailyMinutes > 0 || progress.totalMinutes > 0 || progress.streak > 0
-                let hasValidLocalData = progressStore.dailyMinutes > 0 || progressStore.totalMinutes > 0 || progressStore.streak > 0
-                
-                if !hasFetchedInitialProgress {
-                    print("[Sync] Initial progress load - Remote: valid=\(hasValidRemoteData), daily=\(progress.dailyMinutes), total=\(progress.totalMinutes), streak=\(progress.streak)")
-                    print("[Sync] Initial progress load - Local: valid=\(hasValidLocalData), daily=\(progressStore.dailyMinutes), total=\(progressStore.totalMinutes), streak=\(progressStore.streak)")
-                    
-                    if hasValidRemoteData {
-                        // Use remote data for initial load if it's valid
-                        print("[Sync] Using valid remote data for initial load")
-                        progressStore.updateProgress(
-                            streak: progress.streak,
-                            dailyMinutes: progress.dailyMinutes,
-                            totalMinutes: progress.totalMinutes,
-                            lastActivity: progress.lastActivity
-                        )
-                        hasFetchedInitialProgress = true
-                    } else if hasValidLocalData {
-                        // If we have valid local data but invalid remote, push local to remote
-                        print("[Sync] Using valid local data for initial load")
-                        hasFetchedInitialProgress = true
-                        await syncLocalToSupabase()
-                    } else {
-                        print("[Sync] No valid progress data found, waiting for initialization")
-                        return
-                    }
-                    
-                    // Force view update
-                    objectWillChange.send()
+                // Only do initial load if we haven't fetched yet and have no local data
+                if !hasFetchedInitialProgress && progressStore.lastActivity == nil {
+                    print("[Sync] Initial load - using remote data")
+                    progressStore.updateProgress(
+                        streak: progress.streak,
+                        dailyMinutes: progress.dailyMinutes,
+                        totalMinutes: progress.totalMinutes,
+                        lastActivity: progress.lastActivity
+                    )
+                    hasFetchedInitialProgress = true
                 } else {
-                    // Normal sync logic for subsequent fetches
+                    // For subsequent syncs, merge data intelligently
+                    let calendar = Calendar.current
+                    let today = calendar.startOfDay(for: Date())
+                    
+                    // Get the most up-to-date values
                     let updatedStreak = max(progress.streak, progressStore.streak)
-                    var updatedDailyMinutes = progressStore.dailyMinutes
-                    
-                    // If remote lastActivity is today and has higher minutes, use remote daily minutes
-                    if let lastDate = progressDate, calendar.isDate(lastDate, inSameDayAs: today),
-                       progress.dailyMinutes > progressStore.dailyMinutes {
-                        updatedDailyMinutes = progress.dailyMinutes
-                    }
-                    
-                    // Always use the higher total minutes
                     let updatedTotalMinutes = max(progress.totalMinutes, progressStore.totalMinutes)
                     
-                    // Use the most recent lastActivity
+                    // For daily minutes, prefer local value if it's from today
+                    var updatedDailyMinutes = progressStore.dailyMinutes
+                    if let localDate = progressStore.lastActivity,
+                       calendar.isDate(calendar.startOfDay(for: localDate), inSameDayAs: today) {
+                        // Keep local daily minutes if we have activity today
+                        print("[Sync] Using local daily minutes: \(updatedDailyMinutes)")
+                    } else if let remoteDate = progress.lastActivity,
+                              calendar.isDate(calendar.startOfDay(for: remoteDate), inSameDayAs: today) {
+                        // Use remote daily minutes if local isn't from today but remote is
+                        updatedDailyMinutes = progress.dailyMinutes
+                        print("[Sync] Using remote daily minutes: \(updatedDailyMinutes)")
+                    } else {
+                        // Neither is from today, reset daily minutes
+                        updatedDailyMinutes = 0
+                        print("[Sync] Resetting daily minutes - no activity today")
+                    }
+                    
+                    // Use the most recent last activity
                     let updatedLastActivity: Date?
-                    if let localDate = progressStore.lastActivity, let remoteDate = progress.lastActivity {
+                    if let localDate = progressStore.lastActivity,
+                       let remoteDate = progress.lastActivity {
                         updatedLastActivity = localDate > remoteDate ? localDate : remoteDate
                     } else {
                         updatedLastActivity = progressStore.lastActivity ?? progress.lastActivity
                     }
                     
-                    // Log the values we're about to update locally
-                    print("[Sync] Updating local state with progress: streak=\(updatedStreak), dailyMinutes=\(updatedDailyMinutes), totalMinutes=\(updatedTotalMinutes)")
-                    
-                    // Update local store with merged data
+                    print("[Sync] Updating local state - streak: \(updatedStreak), daily: \(updatedDailyMinutes), total: \(updatedTotalMinutes)")
                     progressStore.updateProgress(
                         streak: updatedStreak,
                         dailyMinutes: updatedDailyMinutes,
