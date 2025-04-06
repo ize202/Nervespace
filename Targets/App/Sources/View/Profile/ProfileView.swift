@@ -96,7 +96,7 @@ struct ProfileView: View {
                         Text("Made with ♥️")
                             .font(.footnote)
                             .foregroundColor(.secondary)
-                        Text("© 2024 Slips LLC")
+                        Text("© 2025 Slips LLC")
                             .font(.footnote)
                             .foregroundColor(.secondary)
                     }
