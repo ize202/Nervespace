@@ -8,9 +8,9 @@ public enum ExerciseLibrary {
             name: "Butterfly Stretch",
             description: "A seated stretch that targets the groin and inner thighs.",
             instructions: """
-            1. Sit with feet together and knees bent.
-            2. Use elbows to gently press knees towards the floor.
-            3. Keep your back straight and breathe deeply.
+            Sit with feet together and knees bent.
+            Use elbows to gently press knees towards the floor.
+            Keep your back straight and breathe deeply.
             """,
             modifications: "Place cushions under knees for support or sit on a folded blanket to elevate hips.",
             benefits: "Improves hip flexibility and relieves tension in the groin area.",
@@ -24,9 +24,9 @@ public enum ExerciseLibrary {
             name: "Child's Pose",
             description: "A restorative pose that stretches the lower back and hips.",
             instructions: """
-            1. Kneel on the floor and sit back on heels.
-            2. Stretch arms forward and rest your forehead on the ground.
-            3. Breathe deeply and relax your entire body.
+            Kneel on the floor and sit back on heels.
+            Stretch arms forward and rest your forehead on the ground.
+            Breathe deeply and relax your entire body.
             """,
             modifications: "Use a cushion under your chest for additional support.",
             benefits: "Relieves tension in the back and hips, promotes relaxation.",
@@ -40,9 +40,9 @@ public enum ExerciseLibrary {
             name: "Seated Forward Fold",
             description: "A stretch for the hamstrings and lower back.",
             instructions: """
-            1. Sit with legs extended forward, reach hands towards feet.
-            2. Keep your back straight and fold forward.
-            3. Breathe deeply as you hold the stretch.
+            Sit with legs extended forward, reach hands towards feet.
+            Keep your back straight and fold forward.
+            Breathe deeply as you hold the stretch.
             """,
             modifications: "Use a strap around the feet for assistance.",
             benefits: "Increases flexibility and reduces back tension.",
@@ -57,9 +57,9 @@ public enum ExerciseLibrary {
             name: "Seated Side Bends",
             description: "A dynamic stretch that targets the obliques and spine.",
             instructions: """
-            1. Stand with feet shoulder-width apart.
-            2. Alternate bending to each side while extending the opposite arm overhead.
-            3. Keep movements controlled and breathe rhythmically.
+            Stand with feet shoulder-width apart.
+            Alternate bending to each side while extending the opposite arm overhead.
+            Keep movements controlled and breathe rhythmically.
             """,
             modifications: "Perform slowly for a gentler stretch.",
             benefits: "Increases flexibility and range of motion in the side body.",
@@ -73,9 +73,9 @@ public enum ExerciseLibrary {
             name: "Leg Swings",
             description: "A dynamic movement targeting the hips and hamstrings.",
             instructions: """
-            1. Stand on one leg and swing the opposite leg forward and backward.
-            2. Maintain a controlled motion and balance.
-            3. Focus on smooth, continuous swings.
+            Stand on one leg and swing the opposite leg forward and backward.
+            Maintain a controlled motion and balance.
+            Focus on smooth, continuous swings.
             """,
             modifications: "Hold onto a support for balance.",
             benefits: "Enhances hip mobility and warms up the legs.",
@@ -89,9 +89,9 @@ public enum ExerciseLibrary {
             name: "Plank Hold",
             description: "An isometric exercise that strengthens the core and arms.",
             instructions: """
-            1. Start in a push-up position with forearms on the ground.
-            2. Align elbows under shoulders and keep body straight from head to heels.
-            3. Engage your core and hold the position, breathing steadily.
+            Start in a push-up position with forearms on the ground.
+            Align elbows under shoulders and keep body straight from head to heels.
+            Engage your core and hold the position, breathing steadily.
             """,
             modifications: "Lower knees to the ground for a modified version.",
             benefits: "Builds core stability and arm strength.",
@@ -105,9 +105,9 @@ public enum ExerciseLibrary {
             name: "Wall Sit",
             description: "An isometric exercise that targets the quadriceps and calves.",
             instructions: """
-            1. Lean against a wall and slide down into a seated position.
-            2. Keep your thighs parallel to the ground.
-            3. Hold and breathe steadily, engaging your core and legs.
+            Lean against a wall and slide down into a seated position.
+            Keep your thighs parallel to the ground.
+            Hold and breathe steadily, engaging your core and legs.
             """,
             modifications: "Adjust the depth of the squat for comfort.",
             benefits: "Strengthens the legs and improves endurance.",
@@ -121,10 +121,10 @@ public enum ExerciseLibrary {
             name: "Cat Cow",
             description: "A gentle flow that stretches the spine and core.",
             instructions: """
-            1. Start on hands and knees, wrists under shoulders, knees under hips.
-            2. Inhale, arch your back and look up (Cow).
-            3. Exhale, round your back and tuck chin to chest (Cat).
-            4. Move smoothly with each breath.
+            Start on hands and knees, wrists under shoulders, knees under hips.
+            Inhale, arch your back and look up (Cow).
+            Exhale, round your back and tuck chin to chest (Cat).
+            Move smoothly with each breath.
             """,
             modifications: "Perform slowly to focus on breath and movement.",
             benefits: "Increases spinal flexibility and reduces tension.",
@@ -138,10 +138,10 @@ public enum ExerciseLibrary {
             name: "Deep Breathing",
             description: "A breathwork exercise for stress relief.",
             instructions: """
-            1. Sit comfortably with a straight back.
-            2. Inhale deeply through the nose, filling your lungs for 6s.
-            3. Exhale slowly through the mouth for 6s.
-            4. Focus on the rhythm of your breath.
+            Sit comfortably with a straight back.
+            Inhale deeply through the nose, filling your lungs for 6s.
+            Exhale slowly through the mouth for 6s.
+            Focus on the rhythm of your breath.
             """,
             modifications: "Use a guided audio for assistance.",
             benefits: "Promotes relaxation and reduces stress.",
@@ -155,9 +155,9 @@ public enum ExerciseLibrary {
             name: "Air Squats",
             description: "A bodyweight exercise targeting the legs and glutes.",
             instructions: """
-            1. Stand with feet shoulder-width apart.
-            2. Lower into a squat, keeping chest up and knees aligned over toes.
-            3. Rise back up and repeat, breathing naturally.
+            Stand with feet shoulder-width apart.
+            Lower into a squat, keeping chest up and knees aligned over toes.
+            Rise back up and repeat, breathing naturally.
             """,
             modifications: "Use a chair for support if needed.",
             benefits: "Strengthens the lower body and improves balance.",
@@ -171,9 +171,9 @@ public enum ExerciseLibrary {
             name: "Bear Hug",
             description: "A movement that targets the shoulders, chest, and arms.",
             instructions: """
-            1. Stand and wrap arms around yourself, like a hug.
-            2. Open arms wide and repeat, feeling the stretch in shoulders and chest.
-            3. Breathe deeply and maintain a gentle rhythm.
+            Stand and wrap arms around yourself, like a hug.
+            Open arms wide and repeat, feeling the stretch in shoulders and chest.
+            Breathe deeply and maintain a gentle rhythm.
             """,
             modifications: "Perform slowly for a gentler stretch.",
             benefits: "Opens up the chest and relieves tension in shoulders and arms.",
@@ -187,9 +187,9 @@ public enum ExerciseLibrary {
             name: "Hip Circles",
             description: "A mobility exercise targeting the hips.",
             instructions: """
-            1. Stand with feet hip-width apart.
-            2. Rotate hips in a circular motion, both clockwise and counterclockwise.
-            3. Keep the movement fluid and controlled.
+            Stand with feet hip-width apart.
+            Rotate hips in a circular motion, both clockwise and counterclockwise.
+            Keep the movement fluid and controlled.
             """,
             modifications: "Perform smaller circles for less intensity.",
             benefits: "Increases hip mobility and flexibility.",
@@ -203,9 +203,9 @@ public enum ExerciseLibrary {
             name: "Neck Rolls",
             description: "A gentle movement that targets the neck.",
             instructions: """
-            1. Sit with a straight back.
-            2. Slowly roll your head in a circular motion, both directions.
-            3. Breathe deeply and relax your neck muscles.
+            Sit with a straight back.
+            Slowly roll your head in a circular motion, both directions.
+            Breathe deeply and relax your neck muscles.
             """,
             modifications: "Perform smaller circles for comfort.",
             benefits: "Relieves neck tension and improves flexibility.",
@@ -219,9 +219,9 @@ public enum ExerciseLibrary {
             name: "Downward Dog",
             description: "A yoga pose that stretches the hamstrings, calves, and strengthens the arms.",
             instructions: """
-            1. Start on hands and knees, tuck toes, and lift hips up and back.
-            2. Form an inverted V-shape, pressing heels towards the floor.
-            3. Relax your head between your arms and breathe deeply.
+            Start on hands and knees, tuck toes, and lift hips up and back.
+            Form an inverted V-shape, pressing heels towards the floor.
+            Relax your head between your arms and breathe deeply.
             """,
             modifications: "Bend knees slightly if you feel strain in hamstrings.",
             benefits: "Strengthens and stretches the entire body, including arms.",
@@ -235,9 +235,9 @@ public enum ExerciseLibrary {
             name: "Warrior I",
             description: "A yoga pose that targets the legs, core, and arms.",
             instructions: """
-            1. Step one foot forward into a lunge, bending the front knee.
-            2. Raise arms overhead and square hips forward.
-            3. Hold the pose, breathing steadily.
+            Step one foot forward into a lunge, bending the front knee.
+            Raise arms overhead and square hips forward.
+            Hold the pose, breathing steadily.
             """,
             modifications: "Shorten the stance for better balance.",
             benefits: "Builds strength and stability throughout the body.",
@@ -251,9 +251,9 @@ public enum ExerciseLibrary {
             name: "Bridge Pose",
             description: "A backbend that targets the glutes and lower back.",
             instructions: """
-            1. Lie on your back with knees bent and feet flat.
-            2. Lift hips towards the ceiling, keeping shoulders grounded.
-            3. Hold and breathe deeply, engaging your glutes.
+            Lie on your back with knees bent and feet flat.
+            Lift hips towards the ceiling, keeping shoulders grounded.
+            Hold and breathe deeply, engaging your glutes.
             """,
             modifications: "Place a block under hips for support.",
             benefits: "Strengthens the back and opens the chest.",
@@ -267,9 +267,9 @@ public enum ExerciseLibrary {
             name: "Jumping Jacks",
             description: "A full-body cardio exercise.",
             instructions: """
-            1. Stand tall, jump with legs apart and arms overhead.
-            2. Return to starting position and repeat.
-            3. Maintain a rhythmic pace and breathe naturally.
+            Stand tall, jump with legs apart and arms overhead.
+            Return to starting position and repeat.
+            Maintain a rhythmic pace and breathe naturally.
             """,
             modifications: "Step side-to-side instead of jumping.",
             benefits: "Increases heart rate and improves cardiovascular endurance.",
@@ -283,9 +283,9 @@ public enum ExerciseLibrary {
             name: "High Knees",
             description: "A cardio exercise targeting the core and legs.",
             instructions: """
-            1. Stand and run in place, lifting knees high towards the chest.
-            2. Keep core engaged and arms active.
-            3. Maintain a steady pace and breathe rhythmically.
+            Stand and run in place, lifting knees high towards the chest.
+            Keep core engaged and arms active.
+            Maintain a steady pace and breathe rhythmically.
             """,
             modifications: "March in place for a lower intensity.",
             benefits: "Boosts cardiovascular fitness and leg strength.",
@@ -299,9 +299,9 @@ public enum ExerciseLibrary {
             name: "Lying Figure Four",
             description: "A stretch targeting the hips and glutes.",
             instructions: """
-            1. Lie on your back, cross one ankle over opposite knee.
-            2. Pull the leg towards the chest, feeling a stretch in the hip.
-            3. Breathe deeply and hold the position.
+            Lie on your back, cross one ankle over opposite knee.
+            Pull the leg towards the chest, feeling a stretch in the hip.
+            Breathe deeply and hold the position.
             """,
             modifications: "Keep the foot on the ground for less intensity.",
             benefits: "Improves hip flexibility and relieves tension.",
@@ -315,9 +315,9 @@ public enum ExerciseLibrary {
             name: "Happy Baby Pose",
             description: "A restorative pose targeting the lower back and hips.",
             instructions: """
-            1. Lie on your back, bend knees and hold feet.
-            2. Gently pull knees towards the armpits.
-            3. Breathe deeply and relax your lower back.
+            Lie on your back, bend knees and hold feet.
+            Gently pull knees towards the armpits.
+            Breathe deeply and relax your lower back.
             """,
             modifications: "Hold the back of thighs if unable to reach feet.",
             benefits: "Relaxes the lower back and opens the hips.",

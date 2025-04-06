@@ -127,6 +127,13 @@ struct ExerciseDetailView: View {
 private struct TimelineView: View {
     let items: [String]
     
+    private func cleanInstructionText(_ text: String) -> String {
+        // Remove the leading number and dot, then trim whitespace
+        let pattern = "^\\d+\\.\\s*"
+        return text.replacingOccurrences(of: pattern, with: "", options: .regularExpression)
+            .trimmingCharacters(in: .whitespaces)
+    }
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 24) {
             ForEach(Array(items.enumerated()), id: \.offset) { index, item in
@@ -143,7 +150,7 @@ private struct TimelineView: View {
                     }
                     .frame(width: 32)
                     
-                    Text(item)
+                    Text(cleanInstructionText(item))
                         .font(.system(size: 17))
                         .foregroundColor(.white)
                         .lineSpacing(6)
