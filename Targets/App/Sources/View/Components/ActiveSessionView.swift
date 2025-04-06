@@ -94,14 +94,18 @@ public struct ActiveSessionView: View {
                     
                     Spacer()
                     
-                    Button(action: {
-                        // TODO: Show more options
-                    }) {
-                        Image(systemName: "gear")
-                            .font(.system(size: 20))
-                            .foregroundColor(Color.baseWhite)
-                            .frame(width: 44, height: 44)
-                    }
+                          // Button(action: {
+                    //     // TODO: Show more options
+                    // }) {
+                    //     Image(systemName: "gear")
+                    //         .font(.system(size: 20))
+                    //         .foregroundColor(Color.baseWhite)
+                    //         .frame(width: 44, height: 44)
+                    // }
+                    
+                    // Placeholder view to maintain symmetry
+                    Color.clear
+                        .frame(width: 44, height: 44)
                 }
                 .padding(.horizontal)
                 
