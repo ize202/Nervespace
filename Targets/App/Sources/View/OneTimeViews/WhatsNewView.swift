@@ -168,9 +168,4 @@ import SwiftUI
 			}
 		}
 	}
-}
 
-#Preview {
-	Text("Hello")
-		.modifier(ShowFeatureSheetOnNewAppVersionModifier())
-}
