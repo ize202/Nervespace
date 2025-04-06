@@ -1,32 +1,6 @@
 import SwiftUI
 import SharedKit
 
-struct SearchBar: View {
-    @Binding var text: String
-    
-    var body: some View {
-        HStack {
-            Image(systemName: "magnifyingglass")
-                .foregroundColor(Color.baseWhite.opacity(0.6))
-            
-            TextField("Areas, Exercises, Categories, and More", text: $text)
-                .textFieldStyle(PlainTextFieldStyle())
-                .foregroundColor(Color.baseWhite)
-                .tint(.brandPrimary)
-            
-            if !text.isEmpty {
-                Button(action: { text = "" }) {
-                    Image(systemName: "xmark.circle.fill")
-                        .foregroundColor(Color.baseWhite.opacity(0.6))
-                }
-            }
-        }
-        .padding(12)
-        .background(Color.white.opacity(0.15))
-        .cornerRadius(10)
-    }
-}
-
 struct CategoryCard: View {
     let title: String
     let systemImage: String
@@ -109,8 +83,6 @@ struct AreaGroup {
 }
 
 struct ExploreView: View {
-    @State private var searchText = ""
-    
     // Grid layout configuration
     private let gridItems = [
         GridItem(.flexible(), spacing: 16),
@@ -181,10 +153,6 @@ struct ExploreView: View {
                         }
                         .padding(.horizontal)
                         .padding(.top)
-                        
-                        // Search Bar
-                        SearchBar(text: $searchText)
-                            .padding(.horizontal)
                         
                         // Browse by Category
                         VStack(alignment: .leading, spacing: 16) {
