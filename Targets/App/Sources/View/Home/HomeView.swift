@@ -1,9 +1,11 @@
 import SwiftUI
+import SupabaseKit
 import SharedKit
 
 // MARK: - Header View
 private struct HomeHeaderView: View {
     @Binding var showingProfile: Bool
+    let streak: Int
     
     var body: some View {
         HStack {
@@ -17,7 +19,7 @@ private struct HomeHeaderView: View {
             HStack(spacing: 4) {
                 Image(systemName: "flame.fill")
                     .foregroundStyle(.orange)
-                Text("4")
+                Text("\(streak)")
                     .font(.subheadline)
                     .fontWeight(.semibold)
                     .foregroundStyle(Color.baseWhite)
@@ -159,6 +161,8 @@ struct HomeView: View {
     @State private var currentIndex: Int = 0
     @State private var showingProfile = false
     @StateObject private var bookmarkManager = BookmarkManager.shared
+    @EnvironmentObject private var progressStore: LocalProgressStore
+    @EnvironmentObject private var syncManager: SupabaseSyncManager
     
     // Common Routines for Carousel (core routines)
     private var commonRoutines: [Routine] {
@@ -177,7 +181,7 @@ struct HomeView: View {
                 
                 ScrollView(showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 40) {
-                        HomeHeaderView(showingProfile: $showingProfile)
+                        HomeHeaderView(showingProfile: $showingProfile, streak: progressStore.streak)
                         
                         // Common Routines Carousel
                         SnapCarousel(spacing: 9,
@@ -201,6 +205,14 @@ struct HomeView: View {
         }
         .sheet(isPresented: $showingProfile) {
             ProfileView()
+        }
+        .task {
+            // Initial sync when view appears
+            await syncManager.syncSupabaseToLocal()
+        }
+        .refreshable {
+            // Allow manual refresh to sync
+            await syncManager.syncSupabaseToLocal()
         }
     }
 }
