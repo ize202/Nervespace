@@ -53,11 +53,9 @@
 		4E56E4B1449C7049A2E30FC2 /* InAppNotificationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A1DD652E263B114BC2B50D9 /* InAppNotificationView.swift */; };
 		50910C0AFAFF3F345E6257E4 /* captureTaps.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5507FF85704924F325225747 /* captureTaps.swift */; };
 		515DB35FE4365B09E55D9FD6 /* AccountSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CC4B27BBC51F694ED58C372 /* AccountSettingsViewModel.swift */; };
-		5620B44B33DAB337229EBF9D /* sensitiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65E69E217434ADAC2A1B9129 /* sensitiveView.swift */; };
 		5E8DA7FF62F08794025361FB /* ExerciseDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2840F9D5CBF284ABBB70BCD /* ExerciseDetailView.swift */; };
 		5F3DC110D5E209A65485438A /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9832E64FAC80EB454827E3C3 /* OnboardingView.swift */; };
 		601DE389CF83417329FC8964 /* WebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1B46AE411535472D53C8A05 /* WebView.swift */; };
-		605605FBBCB12F16F6C1648E /* BiometricAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C0FB06C6665D672F2E3F45C /* BiometricAuth.swift */; };
 		66D223B163C18D10D156C5F6 /* SharedKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 39E86B5FF5E957E5D088F40B /* SharedKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		6712A1D6389D74911B57F6E6 /* SettingsRowItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3382516E12C8CB796FA8811A /* SettingsRowItem.swift */; };
 		67A63CBD9499D6DDC2B62785 /* squircle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ABB9FEAD6E86F6A57C86CA8 /* squircle.swift */; };
@@ -318,7 +316,6 @@
 		4065C60AB9E5466ACC434A9E /* RoutineCompletionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineCompletionView.swift; sourceTree = "<group>"; };
 		448A821E0020473F069733A8 /* AuthGeneral.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthGeneral.swift; sourceTree = "<group>"; };
 		4634A94D674EB513386D2C52 /* SignInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInView.swift; sourceTree = "<group>"; };
-		4C0FB06C6665D672F2E3F45C /* BiometricAuth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BiometricAuth.swift; sourceTree = "<group>"; };
 		4C2ECC22973D7C1A97317E4D /* BookmarkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkManager.swift; sourceTree = "<group>"; };
 		4E02216AA4E7BC3EFE3DDC5C /* ProgressViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressViewModel.swift; sourceTree = "<group>"; };
 		4F95AB075CFCC69E3E00BE35 /* isPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = isPreview.swift; sourceTree = "<group>"; };
@@ -336,7 +333,6 @@
 		5F30ADB8BC53945EEF346BDA /* SupabaseKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SupabaseKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		633A256FA034894812F8FDB9 /* ExerciseTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseTypes.swift; sourceTree = "<group>"; };
 		65AE6300BE637983E99BF16A /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
-		65E69E217434ADAC2A1B9129 /* sensitiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = sensitiveView.swift; sourceTree = "<group>"; };
 		66F7833E2C3320D7BD7D173F /* SharedKit-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "SharedKit-Info.plist"; sourceTree = "<group>"; };
 		681108479F00858CF5D712F9 /* ShowRequestSheetWhenNeededModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowRequestSheetWhenNeededModifier.swift; sourceTree = "<group>"; };
 		68127D761F8CF5F33120898D /* SupabaseBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseBackend.swift; sourceTree = "<group>"; };
@@ -702,7 +698,6 @@
 				B1C6F0DD2685F535945971DF /* if.swift */,
 				C5C7A11040B45E792FD3DD8D /* modifier.swift */,
 				A25FDB8C55E8EE2B7738981C /* onAppearAndChange.swift */,
-				65E69E217434ADAC2A1B9129 /* sensitiveView.swift */,
 				5ABB9FEAD6E86F6A57C86CA8 /* squircle.swift */,
 			);
 			path = ViewModifier;
@@ -913,7 +908,6 @@
 				F13A478EE70A8D080A331C6B /* Helper */,
 				C76F196824DF9FCF9A1AA628 /* View */,
 				57464A7C6227B38946BA4385 /* ViewModifier */,
-				4C0FB06C6665D672F2E3F45C /* BiometricAuth.swift */,
 				65AE6300BE637983E99BF16A /* Constants.swift */,
 				BC181803EA789693E0C569E6 /* Haptics.swift */,
 			);
@@ -1422,7 +1416,6 @@
 				F91D9E9281A73705484A68ED /* ShowRequestSheetWhenNeededModifier.swift in Sources */,
 				91B16D43A65C65D86EF10C63 /* requireCapabilityPermission.swift in Sources */,
 				410E74101F603F786047437E /* askUserFor.swift in Sources */,
-				605605FBBCB12F16F6C1648E /* BiometricAuth.swift in Sources */,
 				765469CBCD1F16CFD013590C /* Constants.swift in Sources */,
 				3FDBB637086310BAA31C24A1 /* Color+Extensions.swift in Sources */,
 				AA1111D90009E438B4C09554 /* UserDefaults+Extensions.swift in Sources */,
@@ -1437,7 +1430,6 @@
 				79DB6C3455227F4E62D49C1E /* if.swift in Sources */,
 				198CAF6CCBD09F35193D821E /* modifier.swift in Sources */,
 				4B6FDA1F1B9575838AA1A6E2 /* onAppearAndChange.swift in Sources */,
-				5620B44B33DAB337229EBF9D /* sensitiveView.swift in Sources */,
 				67A63CBD9499D6DDC2B62785 /* squircle.swift in Sources */,
 				4E56E4B1449C7049A2E30FC2 /* InAppNotificationView.swift in Sources */,
 				9EFC0B9D77821CC5A7E1460C /* showInAppNotification.swift in Sources */,

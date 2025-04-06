@@ -17,12 +17,6 @@ import SwiftUI
 import CrashlyticsKit
 
 struct DeveloperSettingsView: View {
-
-	/// Will persist the setting on whether to always require biometric auth or just hide the view in the app switcher.
-	///
-	/// Used as a demo for .sensitiveView()
-	@AppStorage("protectDeveloperViewWithBiometrics") private var protectDeveloperViewWithBiometrics: Bool = false
-
 	@EnvironmentObject var db: DB
 
 	@State var showOnboarding = false
@@ -71,10 +65,6 @@ struct DeveloperSettingsView: View {
 									size: .compact)
 							)
 						}
-
-						Toggle(
-							"Protect this View with Biometrics",
-							isOn: $protectDeveloperViewWithBiometrics)
 					}
 
 					Section {
@@ -182,7 +172,6 @@ struct DeveloperSettingsView: View {
 
 			#endif
 		}
-		.sensitiveView(protectWithBiometrics: protectDeveloperViewWithBiometrics)
 	}
 }
 
