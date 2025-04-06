@@ -103,6 +103,8 @@ private struct HistoryListView: View {
                                 }
                             }
                         )
+                        .listRowBackground(Color.clear)
+                        .listRowSeparator(.hidden)
                     }
                 }
             }
