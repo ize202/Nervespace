@@ -87,17 +87,17 @@ public enum ExerciseLibrary {
         
         Exercise(
             name: "Plank Hold",
-            description: "An isometric exercise that strengthens the core.",
+            description: "An isometric exercise that strengthens the core and arms.",
             instructions: """
             1. Start in a push-up position with forearms on the ground.
             2. Align elbows under shoulders and keep body straight from head to heels.
             3. Engage your core and hold the position, breathing steadily.
             """,
             modifications: "Lower knees to the ground for a modified version.",
-            benefits: "Builds core stability and strength.",
+            benefits: "Builds core stability and arm strength.",
             categories: [.isometrics],
             positions: [.floor],
-            areas: [.core],
+            areas: [.core, .triceps, .forearms],
             duration: 30
         ),
         
@@ -169,17 +169,17 @@ public enum ExerciseLibrary {
         
         Exercise(
             name: "Bear Hug",
-            description: "A movement that targets the shoulders and chest.",
+            description: "A movement that targets the shoulders, chest, and arms.",
             instructions: """
             1. Stand and wrap arms around yourself, like a hug.
             2. Open arms wide and repeat, feeling the stretch in shoulders and chest.
             3. Breathe deeply and maintain a gentle rhythm.
             """,
             modifications: "Perform slowly for a gentler stretch.",
-            benefits: "Opens up the chest and relieves shoulder tension.",
+            benefits: "Opens up the chest and relieves tension in shoulders and arms.",
             categories: [.calisthenics],
             positions: [.standing],
-            areas: [.shoulders, .chest],
+            areas: [.shoulders, .chest, .biceps, .forearms],
             duration: 30
         ),
         
@@ -217,33 +217,33 @@ public enum ExerciseLibrary {
         
         Exercise(
             name: "Downward Dog",
-            description: "A yoga pose that stretches the hamstrings and calves.",
+            description: "A yoga pose that stretches the hamstrings, calves, and strengthens the arms.",
             instructions: """
             1. Start on hands and knees, tuck toes, and lift hips up and back.
             2. Form an inverted V-shape, pressing heels towards the floor.
             3. Relax your head between your arms and breathe deeply.
             """,
             modifications: "Bend knees slightly if you feel strain in hamstrings.",
-            benefits: "Strengthens and stretches the entire body.",
+            benefits: "Strengthens and stretches the entire body, including arms.",
             categories: [.yoga],
             positions: [.floor],
-            areas: [.hamstrings, .calves],
+            areas: [.hamstrings, .calves, .triceps, .forearms],
             duration: 30
         ),
         
         Exercise(
             name: "Warrior I",
-            description: "A yoga pose that targets the legs and core.",
+            description: "A yoga pose that targets the legs, core, and arms.",
             instructions: """
             1. Step one foot forward into a lunge, bending the front knee.
             2. Raise arms overhead and square hips forward.
             3. Hold the pose, breathing steadily.
             """,
             modifications: "Shorten the stance for better balance.",
-            benefits: "Builds strength and stability.",
+            benefits: "Builds strength and stability throughout the body.",
             categories: [.yoga],
             positions: [.standing],
-            areas: [.quadriceps, .core],
+            areas: [.quadriceps, .core, .shoulders, .triceps],
             duration: 30
         ),
         
@@ -275,7 +275,7 @@ public enum ExerciseLibrary {
             benefits: "Increases heart rate and improves cardiovascular endurance.",
             categories: [.cardio],
             positions: [.standing],
-            areas: [.core, .quadriceps],
+            areas: [.core, .quadriceps, .shoulders, .triceps],
             duration: 30
         ),
         
