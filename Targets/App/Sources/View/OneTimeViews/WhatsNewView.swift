@@ -15,31 +15,32 @@ import SwiftUI
 /// Is attached to the root ContentView in App.swift, and shown when the app version saved in UserDefaults
 /// doesn't match the actual version (except if the saved app verison is nil, which means the user is shown the app
 /// for the first time ever, then we don't show this view, but rather the OnboardingView)
-struct ShowFeatureSheetOnNewAppVersionModifier: ViewModifier {
-	@AppStorage(Constants.UserDefaults.General.lastAppVersionAppWasOpenedAt)
-	private var lastAppVersionAppWasOpenedAt: String = "NONE"
 
-	@State private var showSheet: Bool = false
+// struct ShowFeatureSheetOnNewAppVersionModifier: ViewModifier {
+// 	@AppStorage(Constants.UserDefaults.General.lastAppVersionAppWasOpenedAt)
+// 	private var lastAppVersionAppWasOpenedAt: String = "NONE"
 
-	func body(content: Content) -> some View {
-		content
-			.sheet(isPresented: $showSheet) {
-				WhatsNewView {
-					showSheet = false
-				}
-			}
-			.onAppear {
-				if isPreview {
-					showSheet = true
-				} else {
-					Task {
-						try? await Task.sleep(for: .seconds(1))
-						showSheet = lastAppVersionAppWasOpenedAt != Constants.AppData.appVersion
-						self.lastAppVersionAppWasOpenedAt = Constants.AppData.appVersion
-					}
-				}
-			}
-	}
+// 	@State private var showSheet: Bool = false
+
+// 	func body(content: Content) -> some View {
+// 		content
+// 			.sheet(isPresented: $showSheet) {
+// 				WhatsNewView {
+// 					showSheet = false
+// 				}
+// 			}
+// 			.onAppear {
+// 				if isPreview {
+// 					showSheet = true
+// 				} else {
+// 					Task {
+// 						try? await Task.sleep(for: .seconds(1))
+// 						showSheet = lastAppVersionAppWasOpenedAt != Constants.AppData.appVersion
+// 						self.lastAppVersionAppWasOpenedAt = Constants.AppData.appVersion
+// 					}
+// 				}
+// 			}
+// 	}
 
 	struct WhatsNewView: View {
 
