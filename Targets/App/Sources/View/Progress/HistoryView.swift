@@ -87,48 +87,28 @@ private struct HistoryListView: View {
     }()
     
     var body: some View {
-        ScrollView {
-            LazyVStack(spacing: 24) {
-                ForEach(viewModel.groupedRoutines(), id: \.0) { date, routines in
-                    HistoryDaySection(
-                        date: date,
-                        routines: routines,
-                        timeFormatter: timeFormatter,
-                        onDelete: { id in
-                            Task {
-                                await viewModel.deleteCompletion(id: id)
+        List {
+            ForEach(viewModel.groupedRoutines(), id: \.0) { date, routines in
+                Section(header: Text(date)
+                    .font(.headline)
+                    .foregroundColor(.white)
+                ) {
+                    ForEach(routines) { routine in
+                        HistoryRoutineRow(
+                            routine: routine,
+                            timeFormatter: timeFormatter,
+                            onDelete: {
+                                Task {
+                                    await viewModel.deleteCompletion(id: routine.id)
+                                }
                             }
-                        }
-                    )
+                        )
+                    }
                 }
             }
-            .padding(.vertical)
         }
-    }
-}
-
-// MARK: - History Day Section
-private struct HistoryDaySection: View {
-    let date: String
-    let routines: [CompletedRoutine]
-    let timeFormatter: DateFormatter
-    let onDelete: (UUID) -> Void
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text(date)
-                .font(.headline)
-                .foregroundColor(.white)
-                .padding(.horizontal)
-            
-            ForEach(routines) { routine in
-                HistoryRoutineRow(
-                    routine: routine,
-                    timeFormatter: timeFormatter,
-                    onDelete: { onDelete(routine.id) }
-                )
-            }
-        }
+        .listStyle(.plain)
+        .background(Color.baseBlack)
     }
 }
 
@@ -159,7 +139,6 @@ private struct HistoryRoutineRow: View {
         .padding()
         .background(Color.white.opacity(0.1))
         .cornerRadius(12)
-        .padding(.horizontal)
         .swipeActions {
             Button(role: .destructive) {
                 onDelete()
