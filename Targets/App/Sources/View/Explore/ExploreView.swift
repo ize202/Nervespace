@@ -189,61 +189,61 @@ struct ExploreView: View {
                             
                             LazyVGrid(columns: gridItems, spacing: 16) {
                                 NavigationLink(destination: AreaListView(
-                                    area: .core,
+                                    area: .neck,
                                     color: .brandPrimary
                                 )) {
                                     AreaCard(
-                                        title: "Stress Relief",
+                                        title: "Neck",
                                         color: .brandPrimary,
-                                        imageUrl: nil
-                                    )
-                                }
-                                NavigationLink(destination: AreaListView(
-                                    area: .psoas,
-                                    color: .brandSecondary
-                                )) {
-                                    AreaCard(
-                                        title: "Anxiety",
-                                        color: .brandSecondary,
-                                        imageUrl: nil
-                                    )
-                                }
-                                NavigationLink(destination: AreaListView(
-                                    area: .neck,
-                                    color: Color(hex: "6B8E23")
-                                )) {
-                                    AreaCard(
-                                        title: "Focus & Clarity",
-                                        color: Color(hex: "6B8E23"),
                                         imageUrl: nil
                                     )
                                 }
                                 NavigationLink(destination: AreaListView(
                                     area: .shoulders,
+                                    color: .brandSecondary
+                                )) {
+                                    AreaCard(
+                                        title: "Shoulders",
+                                        color: .brandSecondary,
+                                        imageUrl: nil
+                                    )
+                                }
+                                NavigationLink(destination: AreaListView(
+                                    area: .lowerBack,
+                                    color: Color(hex: "6B8E23")
+                                )) {
+                                    AreaCard(
+                                        title: "Lower Back",
+                                        color: Color(hex: "6B8E23"),
+                                        imageUrl: nil
+                                    )
+                                }
+                                NavigationLink(destination: AreaListView(
+                                    area: .hips,
                                     color: Color(hex: "CD853F")
                                 )) {
                                     AreaCard(
-                                        title: "Energy Boost",
+                                        title: "Hips",
                                         color: Color(hex: "CD853F"),
                                         imageUrl: nil
                                     )
                                 }
                                 NavigationLink(destination: AreaListView(
-                                    area: .spine,
+                                    area: .core,
                                     color: .brandPrimary
                                 )) {
                                     AreaCard(
-                                        title: "Better Sleep",
+                                        title: "Core",
                                         color: .brandPrimary,
                                         imageUrl: nil
                                     )
                                 }
                                 NavigationLink(destination: AreaListView(
-                                    area: .upperBack,
+                                    area: .hamstrings,
                                     color: .brandSecondary
                                 )) {
                                     AreaCard(
-                                        title: "Quick Reset",
+                                        title: "Hamstrings",
                                         color: .brandSecondary,
                                         imageUrl: nil
                                     )
