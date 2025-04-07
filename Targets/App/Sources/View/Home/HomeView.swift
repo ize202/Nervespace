@@ -210,10 +210,6 @@ struct HomeView: View {
             // Initial sync when view appears
             await syncManager.syncSupabaseToLocal()
         }
-        .refreshable {
-            // Allow manual refresh to sync
-            await syncManager.syncSupabaseToLocal()
-        }
     }
 }
 
