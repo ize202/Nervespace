@@ -163,10 +163,6 @@ struct ProgressView: View {
                     await updateCompletionDays()
                 }
             }
-            .refreshable {
-                await syncManager.syncSupabaseToLocal()
-                await updateCompletionDays()
-            }
         }
         .preferredColorScheme(.dark)
     }
