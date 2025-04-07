@@ -20,76 +20,75 @@ struct ProfileView: View {
     
     var body: some View {
         NavigationView {
-            List {
-                // Account Section
-                Section("ACCOUNT") {
-                    NavigationLink {
-                        AccountSettingsView(db: db)
-                    } label: {
-                        Text("Account Settings")
+            VStack(spacing: 0) {
+                List {
+                    // Account Section
+                    Section("ACCOUNT") {
+                        NavigationLink {
+                            AccountSettingsView(db: db)
+                        } label: {
+                            Text("Account Settings")
+                        }
                     }
-                }
-                
-                // Settings Section
-                Section("SETTINGS") {
-                    NavigationLink {
-                        WorkoutReminderView()
-                    } label: {
-                        HStack {
-                            Text("Workout Reminder")
-                            Spacer()
-                            
-                            if isReminderEnabled, let time = reminderTime {
-                                Text(time, style: .time)
-                                    .foregroundColor(.secondary)
+                    
+                    // Settings Section
+                    Section("SETTINGS") {
+                        NavigationLink {
+                            WorkoutReminderView()
+                        } label: {
+                            HStack {
+                                Text("Workout Reminder")
+                                Spacer()
+                                
+                                if isReminderEnabled, let time = reminderTime {
+                                    Text(time, style: .time)
+                                        .foregroundColor(.secondary)
+                                }
                             }
+                        }
+                    }
+                    
+                    // Support Section
+                    Section("SUPPORT") {
+                        NavigationLink {
+                            Text("Contact Support View")
+                        } label: {
+                            Text("Contact Support")
+                        }
+                        
+                        NavigationLink {
+                            Text("Membership View")
+                        } label: {
+                            Text("Membership")
+                        }
+                        
+                        NavigationLink {
+                            Text("Terms of Use")
+                        } label: {
+                            Text("Terms of Use")
+                        }
+                        
+                        NavigationLink {
+                            Text("Privacy Policy")
+                        } label: {
+                            Text("Privacy Policy")
                         }
                     }
                 }
                 
-                // Support Section
-                Section("SUPPORT") {
-                    NavigationLink {
-                        Text("Contact Support View")
-                    } label: {
-                        Text("Contact Support")
-                    }
-                    
-                    NavigationLink {
-                        Text("Membership View")
-                    } label: {
-                        Text("Membership")
-                    }
-                    
-                    NavigationLink {
-                        Text("Terms of Use")
-                    } label: {
-                        Text("Terms of Use")
-                    }
-                    
-                    NavigationLink {
-                        Text("Privacy Policy")
-                    } label: {
-                        Text("Privacy Policy")
-                    }
-                }
-                
                 // App Info Section
-                Section {
-                    VStack(spacing: 4) {
-                        Text(appVersion)
-                            .font(.footnote)
-                            .foregroundColor(.secondary)
-                        Text("Made with ♥️")
-                            .font(.footnote)
-                            .foregroundColor(.secondary)
-                        Text("© 2025 Slips LLC")
-                            .font(.footnote)
-                            .foregroundColor(.secondary)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .listRowBackground(Color.clear)
+                VStack(spacing: 4) {
+                    Text(appVersion)
+                        .font(.footnote)
+                        .foregroundColor(.secondary)
+                    Text("Made with ♥️")
+                        .font(.footnote)
+                        .foregroundColor(.secondary)
+                    Text("© 2025 Slips LLC")
+                        .font(.footnote)
+                        .foregroundColor(.secondary)
                 }
+                .padding(.vertical)
             }
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
