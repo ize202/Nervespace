@@ -5,10 +5,17 @@ import SupabaseKit
 struct ProfileView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var db: DB
+    @State private var reminderTime: Date?
+    @State private var isReminderEnabled: Bool = false
     
     private var appVersion: String {
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0"
         return "Version \(version)"
+    }
+    
+    private func loadReminderSettings() {
+        isReminderEnabled = UserDefaults.standard.bool(forKey: "workout_reminder_enabled")
+        reminderTime = UserDefaults.standard.object(forKey: "workout_reminder_time") as? Date
     }
     
     var body: some View {
@@ -32,9 +39,8 @@ struct ProfileView: View {
                             Text("Workout Reminder")
                             Spacer()
                             
-                            if UserDefaults.standard.bool(forKey: "workout_reminder_enabled") {
-                                let reminderTime = UserDefaults.standard.object(forKey: "workout_reminder_time") as? Date ?? Date()
-                                Text(reminderTime, style: .time)
+                            if isReminderEnabled, let time = reminderTime {
+                                Text(time, style: .time)
                                     .foregroundColor(.secondary)
                             }
                         }
@@ -43,13 +49,11 @@ struct ProfileView: View {
                 
                 // Support Section
                 Section("SUPPORT") {
-                    
                     NavigationLink {
                         Text("Contact Support View")
                     } label: {
                         Text("Contact Support")
                     }
-                    
                     
                     NavigationLink {
                         Text("Membership View")
@@ -68,7 +72,6 @@ struct ProfileView: View {
                     } label: {
                         Text("Privacy Policy")
                     }
-                    
                 }
                 
                 // App Info Section
@@ -98,6 +101,18 @@ struct ProfileView: View {
                         Image(systemName: "xmark")
                             .foregroundColor(.primary)
                     }
+                }
+            }
+            .onAppear {
+                loadReminderSettings()
+                
+                // Set up notification observer
+                NotificationCenter.default.addObserver(
+                    forName: NSNotification.Name("WorkoutReminderSettingsChanged"),
+                    object: nil,
+                    queue: .main
+                ) { _ in
+                    loadReminderSettings()
                 }
             }
         }

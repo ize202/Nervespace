@@ -14,6 +14,9 @@ struct WorkoutReminderView: View {
     private let initialReminderTime: Date
     private let initialIsEnabled: Bool
     
+    // Notification center for broadcasting changes
+    private let notificationCenter = NotificationCenter.default
+    
     init() {
         let savedTime = UserDefaults.standard.object(forKey: "workout_reminder_time") as? Date ?? Date()
         let enabled = UserDefaults.standard.bool(forKey: "workout_reminder_enabled")
@@ -85,6 +88,9 @@ struct WorkoutReminderView: View {
         
         // Schedule or remove notification
         scheduleNotification()
+        
+        // Post notification that settings changed
+        notificationCenter.post(name: NSNotification.Name("WorkoutReminderSettingsChanged"), object: nil)
         
         // Update UI
         hasChanges = false
