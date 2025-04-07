@@ -3,12 +3,12 @@
 <plist version="1.0">
 <dict>
 	<key>SUPABASE_URL</key>
-	<string>https://erivgwhswleqqclyqrdd.supabase.co</string>
+	<string>https://owjqpbulqsohwgecgqau.supabase.co</string>
 	<key>SUPABASE_KEY</key>
 	<string>eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVyaXZnd2hzd2xlcXFjbHlxcmRkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI4NDM5OTgsImV4cCI6MjA1ODQxOTk5OH0.KEhDYWNT0TefSmENtXIng_tmt07BI_R9UqN-d2biZcU</string>
 	<key>SUPABASE_DEV_URL</key>
 	<string>https://owjqpbulqsohwgecgqau.supabase.co</string>
 	<key>SUPABASE_DEV_KEY</key>
-	<string>eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im93anFwYnVscXNvaHdnZWNncWF1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI4NDQxODgsImV4cCI6MjA1ODQyMDE4OH0.Dqp7_-E27whgBwV_XjV-SdQWcKRjw5PsU_u0rrIgerg</string>
+	<string>eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVyaXZnd2hzd2xlcXFjbHlxcmRkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI4NDM5OTgsImV4cCI6MjA1ODQxOTk5OH0.KEhDYWNT0TefSmENtXIng_tmt07BI_R9UqN-d2biZcU</string>
 </dict>
 </plist>
