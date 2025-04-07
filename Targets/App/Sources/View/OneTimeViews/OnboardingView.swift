@@ -203,6 +203,7 @@ struct ShowOnboardingViewOnFirstLaunchEverModifier: ViewModifier {
 				OnboardingView {
 					withAnimation(.bouncy) {
 						showOnboarding = false
+						lastAppVersionAppWasOpenedAt = Constants.AppData.appVersion
 						Analytics.capture(
 							.success,
 							id: "onboarding_completed",
