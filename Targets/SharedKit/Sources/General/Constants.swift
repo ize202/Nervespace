@@ -102,23 +102,23 @@ public struct Constants {
 		/// Custom description of your app.
 		/// Will be shown under the SignInView if AuthKit was selected during project generation
 		public static let appDescription: LocalizedStringKey =
-			"Description of \(appName).\nIt's truly an engineering marvel."
+			"Stretch. Breathe. Reset."
 
 		/// User's preffered email client will open with this in sender field after tapping "Report a Problem" in SettingsView
-		public static let supportEmail = "support@email.com"
+		public static let supportEmail = "support@useformapp.com"
 
 		/// URL that links to developers website or social media (Will be shown in SettingsView under "About the Developer")
-		public static let developerWebsite = "https://twitter.com/Vlad_Smolyanoy"
+		public static let developerWebsite = "https://www.useformapp.com"
 
 		/// Will be shown in the footer of the SettingsView with a copyright symbol and year
-		public static let developerName = "App Developer LLC"
+		public static let developerName = "Slips LLC"
 
 		/// URL to your app's ToS, will be shown in Settings/Privacy
 		/// Should match the ToS in App Store Connect and in RevenueCat
-		public static let termsOfServiceURL = "https://www.example.com/tos"
+		public static let termsOfServiceURL = "https://www.useformapp.com/policies/terms"
 
 		/// URL to your app's Privacy Policy, will be shown in Settings/Privacy
 		/// Should match the Privacy Policy in App Store Connect and in RevenueCat
-		public static let privacyPolicyURL = "https://www.example.com/privacy-policy"
+		public static let privacyPolicyURL = "https://www.useformapp.com/policies/privacy"
 	}
 }
