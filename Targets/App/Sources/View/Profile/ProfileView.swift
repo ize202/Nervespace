@@ -68,8 +68,6 @@ struct ProfileView: View {
                             HStack {
                                 Text("Contact Support")
                                 Spacer()
-                                Image(systemName: "envelope")
-                                    .foregroundColor(.secondary)
                             }
                         }
                         
@@ -79,8 +77,6 @@ struct ProfileView: View {
                             HStack {
                                 Text("Membership")
                                 Spacer()
-                                Image(systemName: "creditcard")
-                                    .foregroundColor(.secondary)
                             }
                         }
                         
@@ -88,8 +84,6 @@ struct ProfileView: View {
                             HStack {
                                 Text("Terms of Use")
                                 Spacer()
-                                Image(systemName: "doc.text")
-                                    .foregroundColor(.secondary)
                             }
                         }
                         
@@ -97,8 +91,6 @@ struct ProfileView: View {
                             HStack {
                                 Text("Privacy Policy")
                                 Spacer()
-                                Image(systemName: "lock.shield")
-                                    .foregroundColor(.secondary)
                             }
                         }
                     }
