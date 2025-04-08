@@ -18,6 +18,18 @@ struct ProfileView: View {
         reminderTime = UserDefaults.standard.object(forKey: "workout_reminder_time") as? Date
     }
     
+    private func openEmail() {
+        if let url = URL(string: "mailto:support@useformapp.com") {
+            UIApplication.shared.open(url)
+        }
+    }
+    
+    private func openSubscriptions() {
+        if let url = URL(string: "itms-apps://apps.apple.com/account/subscriptions") {
+            UIApplication.shared.open(url)
+        }
+    }
+    
     var body: some View {
         NavigationView {
             VStack(spacing: 0) {
@@ -50,28 +62,44 @@ struct ProfileView: View {
                     
                     // Support Section
                     Section("SUPPORT") {
-                        NavigationLink {
-                            Text("Contact Support View")
+                        Button {
+                            openEmail()
                         } label: {
-                            Text("Contact Support")
+                            HStack {
+                                Text("Contact Support")
+                                Spacer()
+                                Image(systemName: "envelope")
+                                    .foregroundColor(.secondary)
+                            }
                         }
                         
-                        NavigationLink {
-                            Text("Membership View")
+                        Button {
+                            openSubscriptions()
                         } label: {
-                            Text("Membership")
+                            HStack {
+                                Text("Membership")
+                                Spacer()
+                                Image(systemName: "creditcard")
+                                    .foregroundColor(.secondary)
+                            }
                         }
                         
-                        NavigationLink {
-                            Text("Terms of Use")
-                        } label: {
-                            Text("Terms of Use")
+                        Link(destination: URL(string: "https://www.useformapp.com/policies/terms")!) {
+                            HStack {
+                                Text("Terms of Use")
+                                Spacer()
+                                Image(systemName: "doc.text")
+                                    .foregroundColor(.secondary)
+                            }
                         }
                         
-                        NavigationLink {
-                            Text("Privacy Policy")
-                        } label: {
-                            Text("Privacy Policy")
+                        Link(destination: URL(string: "https://www.useformapp.com/policies/privacy")!) {
+                            HStack {
+                                Text("Privacy Policy")
+                                Spacer()
+                                Image(systemName: "lock.shield")
+                                    .foregroundColor(.secondary)
+                            }
                         }
                     }
                 }
