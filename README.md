@@ -46,4 +46,4 @@ The repo includes production assets and the full app code. Exported App Store sc
 
 ## Current status
 
-Active iOS product repo. The main cleanup still underway is repository hygiene around generated files and exported developer state.
+Active iOS product repo with the main app code, production assets, and local setup notes in one place.
