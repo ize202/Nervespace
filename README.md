@@ -1,14 +1,14 @@
 # Nervespace
 
-Nervespace is a SwiftUI iOS app for short movement and recovery routines. It packages guided routines, multi-day plans, reminders, progress tracking, and account sync in a modular Tuist workspace.
+Nervespace is a SwiftUI iOS app for short movement and recovery routines. It includes guided routines, multi-day plans, reminders, progress tracking, and account sync in a Tuist workspace.
 
 ## What it is
 
-This repo holds the full app code for Nervespace. The project is split into a main app target plus smaller framework targets for shared UI/helpers, auth and sync, notifications, analytics, and crash reporting.
+This repo contains the full app code for Nervespace. The project is split into the main app target plus smaller framework targets for shared UI and helpers, auth and sync, notifications, analytics, and crash reporting.
 
 ## What problem it solves
 
-I wanted a phone-first routine app that made it easy to start a short session, keep progress moving, and sync that progress across devices without building a heavy social layer. The code is organized around that goal: quick onboarding, clear browse flows, lightweight history, and optional sign-in.
+I wanted a routine app that was quick to open, easy to follow, and able to keep progress in sync across devices without adding a social layer. The app is built around that, with simple onboarding, clear navigation, history, and optional sign-in.
 
 ## What I built
 
@@ -33,7 +33,7 @@ I wanted a phone-first routine app that made it easy to start a short session, k
 ![Nervespace app icon](docs/nervespace-icon.png)
 ![Bundled routine artwork](docs/routine-evening-calm.jpg)
 
-The repo includes production assets and the full app code. Exported App Store screenshots are not checked in yet.
+The repo includes app assets and the full codebase. Exported App Store screenshots are not checked in yet.
 
 ## Local setup
 
@@ -46,4 +46,4 @@ The repo includes production assets and the full app code. Exported App Store sc
 
 ## Current status
 
-Active iOS product repo with the main app code, production assets, and local setup notes in one place.
+Active iOS app repo with the main app code, production assets, and local setup notes in one place.
