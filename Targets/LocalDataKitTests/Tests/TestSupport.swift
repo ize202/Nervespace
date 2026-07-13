@@ -9,6 +9,26 @@ func testCalendar() -> Calendar {
     return calendar
 }
 
+func torontoTestCalendar() -> Calendar {
+    var calendar = Calendar(identifier: .gregorian)
+    calendar.locale = Locale(identifier: "en_US_POSIX")
+    calendar.timeZone = TimeZone(identifier: "America/Toronto")!
+    return calendar
+}
+
+func testISODate(_ value: String) -> Date {
+    try! Date.ISO8601FormatStyle(includingFractionalSeconds: true).parse(value)
+}
+
+func testLocalDate(
+    _ year: Int,
+    _ month: Int,
+    _ day: Int,
+    calendar: Calendar
+) -> Date {
+    calendar.date(from: DateComponents(year: year, month: month, day: day))!
+}
+
 func testDate(
     _ year: Int,
     _ month: Int,

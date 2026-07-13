@@ -11,14 +11,22 @@ public struct ProgressCalculator: Sendable {
     }
 
     public func activityDay(containing date: Date) -> Date {
-        guard let shiftedDate = calendar.date(
-            byAdding: .hour,
-            value: -rolloverHour,
-            to: date
-        ) else {
-            preconditionFailure("The configured calendar could not calculate an activity day")
+        let civilDayStart = calendar.startOfDay(for: date)
+        var boundaryComponents = calendar.dateComponents(
+            [.era, .year, .month, .day],
+            from: date
+        )
+        boundaryComponents.calendar = calendar
+        boundaryComponents.timeZone = calendar.timeZone
+        boundaryComponents.hour = rolloverHour
+        boundaryComponents.minute = 0
+        boundaryComponents.second = 0
+        boundaryComponents.nanosecond = 0
+
+        guard let boundary = calendar.date(from: boundaryComponents) else {
+            preconditionFailure("The configured calendar could not calculate the rollover boundary")
         }
-        return calendar.startOfDay(for: shiftedDate)
+        return date >= boundary ? civilDayStart : day(before: civilDayStart)
     }
 
     public func summary(

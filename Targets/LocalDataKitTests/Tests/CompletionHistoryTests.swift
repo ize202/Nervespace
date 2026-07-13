@@ -24,4 +24,43 @@ final class CompletionHistoryTests: XCTestCase {
         XCTAssertEqual(sections[0].completions.map(\.id), [lateID, earlyID])
         XCTAssertEqual(sections[1].completions.map(\.id), [previousDayID])
     }
+
+    func testSectionsShareFallBackActivityDayBoundary() {
+        let calendar = torontoTestCalendar()
+        let firstRepeatedID = UUID(uuidString: "aaaaaaaa-4444-4444-4444-444444444441")!
+        let secondRepeatedID = UUID(uuidString: "aaaaaaaa-4444-4444-4444-444444444442")!
+        let boundaryID = UUID(uuidString: "aaaaaaaa-4444-4444-4444-444444444443")!
+
+        let sections = CompletionHistory.sections(
+            from: [
+                completion(
+                    id: firstRepeatedID,
+                    minutes: 5,
+                    at: testISODate("2026-11-01T01:30:00-04:00")
+                ),
+                completion(
+                    id: secondRepeatedID,
+                    minutes: 7,
+                    at: testISODate("2026-11-01T01:30:00-05:00")
+                ),
+                completion(
+                    id: boundaryID,
+                    minutes: 8,
+                    at: testISODate("2026-11-01T04:00:00-05:00")
+                ),
+            ],
+            calendar: calendar,
+            rolloverHour: 4
+        )
+
+        XCTAssertEqual(sections.map(\.activityDay), [
+            testLocalDate(2026, 11, 1, calendar: calendar),
+            testLocalDate(2026, 10, 31, calendar: calendar),
+        ])
+        XCTAssertEqual(sections[0].completions.map(\.id), [boundaryID])
+        XCTAssertEqual(
+            sections[1].completions.map(\.id),
+            [secondRepeatedID, firstRepeatedID]
+        )
+    }
 }

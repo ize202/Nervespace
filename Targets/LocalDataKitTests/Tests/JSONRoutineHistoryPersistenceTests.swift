@@ -38,13 +38,38 @@ final class JSONRoutineHistoryPersistenceTests: XCTestCase {
         let persistence = JSONRoutineHistoryPersistence(fileURL: fileURL)
 
         try persistence.save([expected])
-        let encodedJSON = try String(contentsOf: fileURL, encoding: .utf8)
+        let encodedJSON = try JSONSerialization.jsonObject(with: Data(contentsOf: fileURL))
+        let records = try XCTUnwrap(encodedJSON as? [[String: Any]])
+        let wireInterval = try XCTUnwrap(records.first?["completedAt"] as? NSNumber)
         let loaded = try persistence.load()
 
-        XCTAssertTrue(encodedJSON.contains("\"iso8601\""))
-        XCTAssertTrue(encodedJSON.contains("\"referenceDateSeconds\""))
+        XCTAssertEqual(wireInterval.doubleValue, fractionalDate.timeIntervalSinceReferenceDate)
         XCTAssertEqual(loaded, [expected])
         XCTAssertEqual(loaded[0].completedAt, fractionalDate)
+    }
+
+    func testLoadRejectsDisagreeingExactAndISODateValues() throws {
+        let directory = try temporaryTestDirectory(named: #function)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let fileURL = directory.appendingPathComponent("history.json")
+        let payload = """
+        [{
+          "id": "22222222-2222-2222-2222-222222222224",
+          "routineID": "morning_boost",
+          "durationMinutes": 9,
+          "routine_id": "legacy_fallback_must_not_win",
+          "duration_minutes": 9,
+          "completed_at": 805490100.123456,
+          "completedAt": {
+            "iso8601": "2026-07-11T19:15:00.123456Z",
+            "referenceDateSeconds": 805490100.654321
+          }
+        }]
+        """
+        try Data(payload.utf8).write(to: fileURL)
+        let persistence = JSONRoutineHistoryPersistence(fileURL: fileURL)
+
+        XCTAssertThrowsError(try persistence.load())
     }
 
     func testLoadDecodesNumericAndISO8601LegacyDatesAndFiltersTombstones() throws {

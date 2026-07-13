@@ -19,15 +19,19 @@ public struct JSONRoutineHistoryPersistence: RoutineHistoryPersistence {
         }
 
         let data = try Data(contentsOf: fileURL)
-        do {
-            return try JSONDecoder()
-                .decode([StoredRoutineCompletion].self, from: data)
-                .map(\.completion)
-        } catch {
+        let payloadShapes = try JSONDecoder().decode(
+            [RoutineCompletionPayloadShape].self,
+            from: data
+        )
+        if !payloadShapes.isEmpty,
+           payloadShapes.allSatisfy(\.isUnambiguouslyLegacy) {
             return try JSONDecoder().decode([LegacyRoutineCompletion].self, from: data)
                 .filter { $0.deletedAt == nil }
                 .map(\.completion)
         }
+        return try JSONDecoder()
+            .decode([StoredRoutineCompletion].self, from: data)
+            .map(\.completion)
     }
 
     public func save(_ completions: [RoutineCompletion]) throws {
@@ -59,6 +63,21 @@ public struct JSONRoutineHistoryPersistence: RoutineHistoryPersistence {
             return left.completedAt > right.completedAt
         }
         return left.id.uuidString < right.id.uuidString
+    }
+}
+
+private struct RoutineCompletionPayloadShape: Decodable {
+    let isUnambiguouslyLegacy: Bool
+
+    private enum CodingKeys: String, CodingKey {
+        case routineID
+        case legacyRoutineID = "routine_id"
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        isUnambiguouslyLegacy = container.contains(.legacyRoutineID)
+            && !container.contains(.routineID)
     }
 }
 
@@ -152,23 +171,44 @@ private struct StoredDate: Codable {
 
     init(from decoder: Decoder) throws {
         if let container = try? decoder.container(keyedBy: CodingKeys.self) {
-            if let exactInterval = try container.decodeIfPresent(
+            let exactInterval = try container.decodeIfPresent(
                 Double.self,
                 forKey: .referenceDateSeconds
-            ) {
-                value = Date(timeIntervalSinceReferenceDate: exactInterval)
-                return
-            }
-            if let iso8601 = try container.decodeIfPresent(String.self, forKey: .iso8601) {
-                value = try Self.parseISO8601(iso8601, codingPath: decoder.codingPath)
-                return
-            }
-            throw DecodingError.dataCorrupted(
-                .init(
-                    codingPath: decoder.codingPath,
-                    debugDescription: "Expected an exact reference-date interval or ISO-8601 date"
-                )
             )
+            let iso8601 = try container.decodeIfPresent(String.self, forKey: .iso8601)
+
+            switch (exactInterval, iso8601) {
+            case let (exactInterval?, iso8601?):
+                let exactDate = Date(timeIntervalSinceReferenceDate: exactInterval)
+                let isoDate = try Self.parseISO8601(
+                    iso8601,
+                    codingPath: decoder.codingPath
+                )
+                guard exactDate == isoDate else {
+                    throw DecodingError.dataCorrupted(
+                        .init(
+                            codingPath: decoder.codingPath,
+                            debugDescription: "ISO-8601 and reference-date values disagree"
+                        )
+                    )
+                }
+                value = exactDate
+            case let (exactInterval?, nil):
+                value = Date(timeIntervalSinceReferenceDate: exactInterval)
+            case let (nil, iso8601?):
+                value = try Self.parseISO8601(
+                    iso8601,
+                    codingPath: decoder.codingPath
+                )
+            case (nil, nil):
+                throw DecodingError.dataCorrupted(
+                    .init(
+                        codingPath: decoder.codingPath,
+                        debugDescription: "Expected an exact reference-date interval or ISO-8601 date"
+                    )
+                )
+            }
+            return
         }
 
         let container = try decoder.singleValueContainer()
@@ -182,16 +222,8 @@ private struct StoredDate: Codable {
     }
 
     func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(
-            value.timeIntervalSinceReferenceDate,
-            forKey: .referenceDateSeconds
-        )
-        let format = Date.ISO8601FormatStyle(
-            includingFractionalSeconds: true,
-            timeZone: .gmt
-        )
-        try container.encode(format.format(value), forKey: .iso8601)
+        var container = encoder.singleValueContainer()
+        try container.encode(value.timeIntervalSinceReferenceDate)
     }
 
     private static func parseISO8601(
