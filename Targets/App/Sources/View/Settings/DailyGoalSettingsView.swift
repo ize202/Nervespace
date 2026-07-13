@@ -1,16 +1,11 @@
+import LocalDataKit
 import SwiftUI
-import SharedKit
-import SupabaseKit
 
 struct DailyGoalSettingsView: View {
     @Environment(\.dismiss) private var dismiss
-    @EnvironmentObject private var progressStore: LocalProgressStore
-    @State private var selectedMinutes: Int
-    
-    init() {
-        // Initialize selectedMinutes with the current goal
-        _selectedMinutes = State(initialValue: LocalProgressStore().dailyGoal)
-    }
+    @EnvironmentObject private var activityStore: LocalActivityStore
+    @State private var selectedMinutes = 5
+    @State private var errorMessage: String?
     
     private let minuteOptions = [5, 10, 15, 20, 30, 45, 60]
     
@@ -21,8 +16,12 @@ struct DailyGoalSettingsView: View {
                     ForEach(minuteOptions, id: \.self) { minutes in
                         Button(action: {
                             selectedMinutes = minutes
-                            progressStore.dailyGoal = minutes
-                            dismiss()
+                            do {
+                                try activityStore.setDailyGoal(minutes: minutes)
+                                dismiss()
+                            } catch {
+                                errorMessage = error.localizedDescription
+                            }
                         }) {
                             HStack {
                                 Text("\(minutes) minutes")
@@ -50,10 +49,21 @@ struct DailyGoalSettingsView: View {
             }
         }
         .preferredColorScheme(.dark)
+        .onAppear {
+            selectedMinutes = activityStore.dailyGoalMinutes
+        }
+        .alert("Unable to Save Goal", isPresented: Binding(
+            get: { errorMessage != nil },
+            set: { if !$0 { errorMessage = nil } }
+        )) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(errorMessage ?? "Unknown error")
+        }
     }
 }
 
 #Preview {
     DailyGoalSettingsView()
-        .environmentObject(LocalProgressStore())
-} 
+        .environmentObject(makePreviewActivityStore())
+}

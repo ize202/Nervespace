@@ -56,6 +56,7 @@ func tuistProject() -> Project {
     appDependencies.append(.package(product: "SuperwallKit", type: .runtime))
 
 	addApp()
+	addAppTests()
 
 	// Create staging scheme with StoreKit configuration
 	let stagingScheme = Scheme.scheme(
@@ -65,6 +66,7 @@ func tuistProject() -> Project {
 		buildAction: .buildAction(targets: ["\(appName)"], findImplicitDependencies: true),
 		testAction: .targets(
 			[
+				"AppTests",
 				"LocalDataKitTests",
 				"SharedKitTests",
 			],
@@ -120,6 +122,26 @@ func tuistProject() -> Project {
 		projectTargets.append(mainTarget)
 	}
 
+	func addAppTests() {
+		let targetName = "AppTests"
+		let target: Target = .target(
+			name: targetName,
+			destinations: destinations,
+			product: .unitTests,
+			bundleId: "\(bundleID).\(targetName)",
+			deploymentTargets: .iOS(osVersion),
+			infoPlist: .default,
+			sources: ["Targets/\(targetName)/Tests/**"],
+			dependencies: [
+				.target(name: appName),
+				localDataKit,
+				sharedKit,
+			]
+		)
+
+		projectTargets.append(target)
+	}
+
 	// Code Shared Across all targets
 	func addSharedKit() {
 		let targetName = "SharedKit"
@@ -151,6 +173,7 @@ func tuistProject() -> Project {
 			sources: ["Targets/\(targetName)/Sources/**"]
 		)
 
+		appDependencies.append(localDataKit)
 		projectTargets.append(target)
 	}
 
@@ -316,7 +339,16 @@ func tuistProject() -> Project {
 			bundleId: "\(bundleID).\(targetName)",
 			deploymentTargets: .iOS(osVersion),
 			infoPlist: .default,
-			sources: ["Targets/\(targetName)/Sources/**"],
+			sources: .sourceFilesList(globs: [
+				.glob(
+					"Targets/\(targetName)/Sources/**",
+					excluding: [
+						"Targets/\(targetName)/Sources/Model/Store/PendingCompletionStore.swift",
+						"Targets/\(targetName)/Sources/Model/Store/SupabaseSyncManager.swift",
+						"Targets/\(targetName)/Sources/Model/Store/SyncCoordinator.swift",
+					]
+				),
+			]),
 			resources: [],
 			dependencies: [
 				TargetDependency.package(product: "Supabase", type: .runtime),

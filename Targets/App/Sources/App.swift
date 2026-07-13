@@ -11,6 +11,7 @@
 
 import NotifKit
 import OneSignalFramework
+import LocalDataKit
 import SharedKit
 import SupabaseKit
 import SwiftUI
@@ -27,40 +28,51 @@ struct MainApp: App {
 
 	/// Core state objects
 	@StateObject private var db: DB
-	@StateObject private var progressStore: LocalProgressStore
-	@StateObject private var completionStore: RoutineCompletionStore
-	@StateObject private var pendingStore: PendingCompletionStore
-	@StateObject private var syncManager: SupabaseSyncManager
-	@StateObject private var syncCoordinator: SyncCoordinator
-
-	// To track when app goes into foreground/background
-	// We use this to clear push notifications when the app is opened.
-	@Environment(\.scenePhase) var scenePhase
+	@StateObject private var activityStore: LocalActivityStore
 
 	init() {
-		// Initialize core dependencies first
 		let db = DB()
-		let progressStore = LocalProgressStore()
-		let completionStore = RoutineCompletionStore()
-		let pendingStore = PendingCompletionStore()
-		
-		// Initialize StateObjects using underscore prefix
 		_db = StateObject(wrappedValue: db)
-		_progressStore = StateObject(wrappedValue: progressStore)
-		_completionStore = StateObject(wrappedValue: completionStore)
-		_pendingStore = StateObject(wrappedValue: pendingStore)
-		
-		// Initialize sync management
-		let syncManager = SupabaseSyncManager(
-			db: db,
-			progressStore: progressStore,
-			completionStore: completionStore,
-			pendingStore: pendingStore
-		)
-		_syncManager = StateObject(wrappedValue: syncManager)
-		
-		let coordinator = SyncCoordinator(syncManager: syncManager)
-		_syncCoordinator = StateObject(wrappedValue: coordinator)
+		_activityStore = StateObject(wrappedValue: Self.makeActivityStore())
+	}
+
+	private static func makeActivityStore() -> LocalActivityStore {
+		do {
+			let fileManager = FileManager.default
+			let applicationSupportURL = try fileManager.url(
+				for: .applicationSupportDirectory,
+				in: .userDomainMask,
+				appropriateFor: nil,
+				create: true
+			)
+			.appendingPathComponent("Nervespace", isDirectory: true)
+			.appendingPathComponent("routine_completions.json")
+			let documentsURL = try fileManager.url(
+				for: .documentDirectory,
+				in: .userDomainMask,
+				appropriateFor: nil,
+				create: true
+			)
+			.appendingPathComponent("routine_completions.json")
+
+			try LegacyRoutineHistoryMigrator(
+				sourceURL: documentsURL,
+				destinationURL: applicationSupportURL,
+				fileManager: fileManager
+			).migrate()
+
+			return try LocalActivityStore(
+				persistence: JSONRoutineHistoryPersistence(
+					fileURL: applicationSupportURL,
+					fileManager: fileManager
+				),
+				defaults: .standard,
+				calendar: .current,
+				now: { Date() }
+			)
+		} catch {
+			fatalError("Unable to load local activity history: \(error.localizedDescription)")
+		}
 	}
 
 	var body: some Scene {
@@ -87,11 +99,7 @@ struct MainApp: App {
 
 				// Environment Objects
 				.environmentObject(db)
-				.environmentObject(progressStore)
-				.environmentObject(completionStore)
-				.environmentObject(pendingStore)
-				.environmentObject(syncManager)
-				.environmentObject(syncCoordinator)
+				.environmentObject(activityStore)
 
 				// Sync when auth state changes
 				.onChange(of: db.authState) { newState in
@@ -102,35 +110,8 @@ struct MainApp: App {
 							PushNotifications.associateUserWithID(userId.uuidString)
 						}
 						
-						// Force sync after sign in
-						Task {
-							// Small delay to give Supabase time to finish setup_new_user()
-							try? await Task.sleep(nanoseconds: 2_500_000_000) // 2.5 seconds
-							await syncCoordinator.forceSync()
-						}
 					} else {
 						PushNotifications.removeUserIDAssociation()
-					}
-				}
-
-				// Handle scene phase changes
-				.onChange(of: scenePhase) { phase in
-					// Handle scene phase changes
-					switch phase {
-					case .active:
-						// App became active
-						Task {
-							await syncCoordinator.performSync()
-						}
-					case .background:
-						// App went to background
-						Task {
-							await syncManager.syncLocalToSupabase()
-						}
-					case .inactive:
-						break
-					@unknown default:
-						break
 					}
 				}
 		}
@@ -280,4 +261,3 @@ class PassThroughWindow: UIWindow {
 		return rootViewController?.view == hitView ? nil : hitView
 	}
 }
-

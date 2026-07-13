@@ -1,6 +1,6 @@
-import SwiftUI
-import SupabaseKit
+import LocalDataKit
 import SharedKit
+import SwiftUI
 
 // MARK: - Header View
 private struct HomeHeaderView: View {
@@ -161,8 +161,7 @@ struct HomeView: View {
     @State private var currentIndex: Int = 0
     @State private var showingProfile = false
     @StateObject private var bookmarkManager = BookmarkManager.shared
-    @EnvironmentObject private var progressStore: LocalProgressStore
-    @EnvironmentObject private var syncManager: SupabaseSyncManager
+    @EnvironmentObject private var activityStore: LocalActivityStore
     
     // Common Routines for Carousel (core routines)
     private var commonRoutines: [Routine] {
@@ -181,7 +180,7 @@ struct HomeView: View {
                 
                 ScrollView(showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 40) {
-                        HomeHeaderView(showingProfile: $showingProfile, streak: progressStore.streak)
+                        HomeHeaderView(showingProfile: $showingProfile, streak: activityStore.progress.currentStreak)
                         
                         // Common Routines Carousel
                         SnapCarousel(spacing: 9,
@@ -205,10 +204,6 @@ struct HomeView: View {
         }
         .sheet(isPresented: $showingProfile) {
             ProfileView()
-        }
-        .task {
-            // Initial sync when view appears
-            await syncManager.syncSupabaseToLocal()
         }
     }
 }
@@ -265,6 +260,6 @@ private struct CarouselCard: View {
 
 #Preview {
     HomeView()
+        .environmentObject(makePreviewActivityStore())
         .preferredColorScheme(.dark)
 } 
-

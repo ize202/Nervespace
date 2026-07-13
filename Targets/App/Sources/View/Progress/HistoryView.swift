@@ -1,58 +1,62 @@
-import SwiftUI
+import LocalDataKit
 import SharedKit
-import SupabaseKit
+import SwiftUI
 
-struct CompletedRoutine: Identifiable {
-    let id: UUID
-    let routine: Routine
-    let date: Date
-    let durationMinutes: Int
-    
-    init(completion: Model.RoutineCompletion) {
-        self.id = completion.id
-        self.routine = RoutineLibrary.routines.first { $0.id == completion.routineId } ?? RoutineLibrary.routines[0]
-        self.date = completion.completedAt
-        self.durationMinutes = completion.durationMinutes
-    }
+private struct CompletedRoutine: Identifiable {
+    let completion: LocalDataKit.RoutineCompletion
+    let routine: Routine?
+
+    var id: UUID { completion.id }
 }
 
 struct HistoryView: View {
-    @Environment(\.dismiss) private var dismiss
-    @StateObject private var viewModel: HistoryViewModel
-    
-    init(completionStore: RoutineCompletionStore, syncManager: SupabaseSyncManager) {
-        _viewModel = StateObject(wrappedValue: HistoryViewModel(
-            completionStore: completionStore,
-            syncManager: syncManager
-        ))
+    @EnvironmentObject private var activityStore: LocalActivityStore
+    @State private var errorMessage: String?
+
+    private let calendar = Calendar.current
+
+    private var sections: [CompletionDay] {
+        CompletionHistory.sections(
+            from: activityStore.completions,
+            calendar: calendar,
+            rolloverHour: 4
+        )
     }
-    
+
     var body: some View {
         ZStack {
             Color.baseBlack.ignoresSafeArea()
-            
-            if viewModel.completedRoutines.isEmpty {
+
+            if sections.isEmpty {
                 EmptyHistoryView()
             } else {
-                HistoryListView(viewModel: viewModel)
-            }
-            
-            if viewModel.isLoading {
-                LoadingOverlay()
+                HistoryListView(
+                    sections: sections,
+                    onDelete: deleteCompletion
+                )
             }
         }
         .navigationBarTitleDisplayMode(.inline)
         .navigationTitle("History")
-        .task {
-            await viewModel.refresh()
+        .alert("Unable to Delete Completion", isPresented: Binding(
+            get: { errorMessage != nil },
+            set: { if !$0 { errorMessage = nil } }
+        )) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(errorMessage ?? "Unknown error")
         }
-        .refreshable {
-            await viewModel.refresh()
+    }
+
+    private func deleteCompletion(id: UUID) {
+        do {
+            try activityStore.deleteCompletion(id: id)
+        } catch {
+            errorMessage = error.localizedDescription
         }
     }
 }
 
-// MARK: - Empty State View
 private struct EmptyHistoryView: View {
     var body: some View {
         VStack(spacing: 16) {
@@ -60,8 +64,8 @@ private struct EmptyHistoryView: View {
                 .font(.title2)
                 .bold()
                 .foregroundColor(.white)
-            
-            Text("Complete your first routine to start tracking your progress!")
+
+            Text("Complete your first routine to start tracking your progress.")
                 .font(.body)
                 .foregroundColor(.white.opacity(0.7))
                 .multilineTextAlignment(.center)
@@ -70,42 +74,35 @@ private struct EmptyHistoryView: View {
     }
 }
 
-// MARK: - History List View
 private struct HistoryListView: View {
-    @ObservedObject var viewModel: HistoryViewModel
-    
+    let sections: [CompletionDay]
+    let onDelete: (UUID) -> Void
+
     private let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "d MMMM"
         return formatter
     }()
-    
-    private let timeFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "h:mm a"
-        return formatter
-    }()
-    
+
     var body: some View {
         List {
-            ForEach(viewModel.groupedRoutines(), id: \.0) { date, routines in
-                Section(header: Text(date)
-                    .font(.headline)
-                    .foregroundColor(.white)
-                ) {
-                    ForEach(routines) { routine in
+            ForEach(sections, id: \.activityDay) { section in
+                Section {
+                    ForEach(section.completions) { completion in
                         HistoryRoutineRow(
-                            routine: routine,
-                            timeFormatter: timeFormatter,
-                            onDelete: {
-                                Task {
-                                    await viewModel.deleteCompletion(id: routine.id)
-                                }
-                            }
+                            item: CompletedRoutine(
+                                completion: completion,
+                                routine: RoutineLibrary.routine(id: completion.routineID)
+                            ),
+                            onDelete: { onDelete(completion.id) }
                         )
                         .listRowBackground(Color.clear)
                         .listRowSeparator(.hidden)
                     }
+                } header: {
+                    Text(dateFormatter.string(from: section.activityDay))
+                        .font(.headline)
+                        .foregroundColor(.white)
                 }
             }
         }
@@ -114,27 +111,51 @@ private struct HistoryListView: View {
     }
 }
 
-// MARK: - History Routine Row
 private struct HistoryRoutineRow: View {
-    let routine: CompletedRoutine
-    let timeFormatter: DateFormatter
+    let item: CompletedRoutine
     let onDelete: () -> Void
-    
+
+    private let timeFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "h:mm a"
+        return formatter
+    }()
+
     var body: some View {
-        HStack {
+        HStack(spacing: 12) {
+            if let routine = item.routine {
+                Image(routine.thumbnailName)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: 44, height: 44)
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+            } else {
+                Image(systemName: "questionmark.square.dashed")
+                    .font(.title2)
+                    .foregroundColor(.white.opacity(0.7))
+                    .frame(width: 44, height: 44)
+            }
+
             VStack(alignment: .leading, spacing: 4) {
-                Text(routine.routine.name)
+                Text(item.routine?.name ?? "Unavailable routine")
                     .font(.body)
                     .foregroundColor(.white)
-                
-                Text(timeFormatter.string(from: routine.date))
+
+                if item.routine == nil {
+                    Text(item.completion.routineID)
+                        .font(.caption)
+                        .foregroundColor(.white.opacity(0.55))
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                Text(timeFormatter.string(from: item.completion.completedAt))
                     .font(.subheadline)
                     .foregroundColor(.white.opacity(0.7))
             }
-            
+
             Spacer()
-            
-            Text("\(routine.durationMinutes)m")
+
+            Text("\(item.completion.durationMinutes)m")
                 .font(.body)
                 .foregroundColor(.brandPrimary)
         }
@@ -142,9 +163,7 @@ private struct HistoryRoutineRow: View {
         .background(Color.white.opacity(0.1))
         .cornerRadius(12)
         .swipeActions {
-            Button(role: .destructive) {
-                onDelete()
-            } label: {
+            Button(role: .destructive, action: onDelete) {
                 Label("Delete", systemImage: "trash")
             }
         }
@@ -153,14 +172,7 @@ private struct HistoryRoutineRow: View {
 
 #Preview {
     NavigationStack {
-        HistoryView(
-            completionStore: RoutineCompletionStore(),
-            syncManager: SupabaseSyncManager(
-                db: DB(),
-                progressStore: LocalProgressStore(),
-                completionStore: RoutineCompletionStore(),
-                pendingStore: PendingCompletionStore()
-            )
-        )
+        HistoryView()
+            .environmentObject(makePreviewActivityStore())
     }
-} 
+}

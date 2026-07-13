@@ -4,15 +4,12 @@
 //  https://docs.swiftylaun.ch/module/app
 //
 
-import NotifKit
+import LocalDataKit
 import SharedKit
-import SupabaseKit
 import SwiftUI
 
 struct ContentView: View {
-	@EnvironmentObject private var db: DB
-	@EnvironmentObject private var progressStore: LocalProgressStore
-	@EnvironmentObject private var syncManager: SupabaseSyncManager
+	@EnvironmentObject private var activityStore: LocalActivityStore
 	
 	var body: some View {
 		TabView {
@@ -26,7 +23,7 @@ struct ContentView: View {
 					Label("Explore", systemImage: "square.grid.2x2.fill")
 				}
 			
-			ProgressView(progressStore: progressStore, syncManager: syncManager)
+			ProgressView()
 				.tabItem {
 					Label("Progress", systemImage: "chart.bar.fill")
 				}
@@ -46,4 +43,3 @@ struct ContentView: View {
 		}
 	}
 }
-
