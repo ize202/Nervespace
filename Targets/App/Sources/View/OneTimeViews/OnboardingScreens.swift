@@ -48,6 +48,7 @@ struct OnboardingScreenContainer<Content: View>: View {
     let content: Content
     let isNextButtonEnabled: Bool
     let nextButtonTitle: String
+    let nextButtonAccessibilityIdentifier: String
     let onNext: () -> Void
     let onBack: () -> Void
     let progress: CGFloat
@@ -59,6 +60,7 @@ struct OnboardingScreenContainer<Content: View>: View {
         progress: CGFloat,
         isNextButtonEnabled: Bool = true,
         nextButtonTitle: String = "Continue",
+        nextButtonAccessibilityIdentifier: String = "nervespace.onboarding.next",
         showBackButton: Bool = true,
         onNext: @escaping () -> Void = {},
         onBack: @escaping () -> Void = {},
@@ -68,6 +70,7 @@ struct OnboardingScreenContainer<Content: View>: View {
         self.subtitle = subtitle
         self.isNextButtonEnabled = isNextButtonEnabled
         self.nextButtonTitle = nextButtonTitle
+        self.nextButtonAccessibilityIdentifier = nextButtonAccessibilityIdentifier
         self.onNext = onNext
         self.onBack = onBack
         self.progress = progress
@@ -152,6 +155,7 @@ struct OnboardingScreenContainer<Content: View>: View {
                             .cornerRadius(16)
                     }
                     .disabled(!isNextButtonEnabled)
+                    .accessibilityIdentifier(nextButtonAccessibilityIdentifier)
                     .padding(.horizontal, 24)
                     .padding(.vertical, 16)
                     .background(
@@ -939,6 +943,8 @@ struct ProgressScreen: View {
             progress: 1,
             isNextButtonEnabled: true,
             nextButtonTitle: "Start Your Plan",
+            nextButtonAccessibilityIdentifier:
+                AccessibilityIdentifier.onboardingCompletion,
             onNext: onCompletion,
             onBack: {
                 viewModel.moveToPreviousScreen()

@@ -79,6 +79,9 @@ public struct RoutineDetailView: View {
                             .background(Color.brandPrimary)
                             .cornerRadius(12)
                     }
+                    .accessibilityIdentifier(
+                        AccessibilityIdentifier.startSession
+                    )
                     .padding()
                 }
             }

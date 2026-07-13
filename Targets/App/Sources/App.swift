@@ -7,9 +7,19 @@ import UIKit
 struct MainApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @StateObject private var activityStore: LocalActivityStore
+    private let launchConfiguration: LaunchConfiguration
 
     init() {
-        _activityStore = StateObject(wrappedValue: Self.makeActivityStore())
+        let launchConfiguration = LaunchConfiguration.current
+        self.launchConfiguration = launchConfiguration
+        if launchConfiguration.isUITesting {
+            UIView.setAnimationsEnabled(false)
+        }
+        _activityStore = StateObject(
+            wrappedValue: Self.makeActivityStore(
+                launchConfiguration: launchConfiguration
+            )
+        )
     }
 
     var body: some Scene {
@@ -18,14 +28,42 @@ struct MainApp: App {
                 .preferredColorScheme(.dark)
                 .environment(\.colorScheme, .dark)
                 .modifier(ShowRequestSheetWhenNeededModifier())
-                .modifier(ShowOnboardingViewOnFirstLaunchEverModifier())
+                .modifier(
+                    ShowOnboardingViewOnFirstLaunchEverModifier(
+                        launchConfiguration: launchConfiguration
+                    )
+                )
+                .environment(\.launchConfiguration, launchConfiguration)
                 .environmentObject(activityStore)
+                .transaction { transaction in
+                    if launchConfiguration.isUITesting {
+                        transaction.animation = nil
+                        transaction.disablesAnimations = true
+                    }
+                }
         }
     }
 
-    private static func makeActivityStore() -> LocalActivityStore {
+    private static func makeActivityStore(
+        launchConfiguration: LaunchConfiguration
+    ) -> LocalActivityStore {
         do {
             let fileManager = FileManager.default
+            if launchConfiguration.isUITesting {
+                let fileURL = try launchConfiguration.prepareUITestStore(
+                    fileManager: fileManager
+                )
+                return try LocalActivityStore(
+                    persistence: JSONRoutineHistoryPersistence(
+                        fileURL: fileURL,
+                        fileManager: fileManager
+                    ),
+                    defaults: launchConfiguration.userDefaults,
+                    calendar: .current,
+                    now: { Date() }
+                )
+            }
+
             let applicationSupportURL = try fileManager.url(
                 for: .applicationSupportDirectory,
                 in: .userDomainMask,

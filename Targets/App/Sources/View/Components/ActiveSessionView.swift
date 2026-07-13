@@ -18,10 +18,12 @@ public struct ActiveSessionView: View {
     @State private var errorMessage = ""
     @State private var completion: LocalDataKit.RoutineCompletion?
     @State private var isUpdating = false
+    @State private var hasCompletedSession = false
     @State private var sessionStartTime: Date = Date()
     @State private var totalPausedTime: TimeInterval = 0
     @State private var lastPauseTime: Date?
     @EnvironmentObject private var activityStore: LocalActivityStore
+    @Environment(\.launchConfiguration) private var launchConfiguration
     let onSessionComplete: () -> Void
     
     public init(
@@ -91,9 +93,20 @@ public struct ActiveSessionView: View {
                     //         .frame(width: 44, height: 44)
                     // }
                     
-                    // Placeholder view to maintain symmetry
-                    Color.clear
+                    if launchConfiguration.isUITesting {
+                        Button("Finish", systemImage: "checkmark") {
+                            finishSession()
+                        }
+                        .labelStyle(.iconOnly)
+                        .foregroundColor(Color.baseWhite)
                         .frame(width: 44, height: 44)
+                        .accessibilityIdentifier(
+                            AccessibilityIdentifier.finishSession
+                        )
+                    } else {
+                        Color.clear
+                            .frame(width: 44, height: 44)
+                    }
                 }
                 .padding(.horizontal)
                 
@@ -234,11 +247,6 @@ public struct ActiveSessionView: View {
     
     @MainActor
     private func completeRoutine() {
-        guard !isUpdating else { 
-            print("[ActiveSession] Skipping completion - already updating")
-            return 
-        }
-        
         isUpdating = true
         defer { isUpdating = false }
         
@@ -254,9 +262,21 @@ public struct ActiveSessionView: View {
             self.completion = completion
             showingCompletion = true
         } catch {
+            hasCompletedSession = false
             showError = true
             errorMessage = error.localizedDescription
         }
+    }
+
+    @MainActor
+    private func finishSession() {
+        guard !isUpdating, !hasCompletedSession else {
+            return
+        }
+        hasCompletedSession = true
+        timer?.invalidate()
+        timer = nil
+        completeRoutine()
     }
 
     private func startTimer() {
@@ -275,9 +295,7 @@ public struct ActiveSessionView: View {
                     nextExercise()
                 } else {
                     // Workout complete
-                    timer?.invalidate()
-                    timer = nil
-                    Task { @MainActor in completeRoutine() }
+                    Task { @MainActor in finishSession() }
                 }
             }
         }

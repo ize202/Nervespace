@@ -169,10 +169,21 @@ class OnboardingViewModel: ObservableObject {
 // MARK: - Modifier
 
 struct ShowOnboardingViewOnFirstLaunchEverModifier: ViewModifier {
-	@AppStorage(Constants.UserDefaults.General.lastAppVersionAppWasOpenedAt)
-	private var lastAppVersionAppWasOpenedAt: String = "NONE"
+	@AppStorage private var lastAppVersionAppWasOpenedAt: String
+	private let skipOnboarding: Bool
 	
 	@State private var showOnboarding: Bool = false
+
+	init(
+		launchConfiguration: LaunchConfiguration = .current
+	) {
+		skipOnboarding = launchConfiguration.skipOnboarding
+		_lastAppVersionAppWasOpenedAt = AppStorage(
+			wrappedValue: "NONE",
+			Constants.UserDefaults.General.lastAppVersionAppWasOpenedAt,
+			store: launchConfiguration.userDefaults
+		)
+	}
 	
 	func body(content: Content) -> some View {
 		Group {
@@ -190,6 +201,10 @@ struct ShowOnboardingViewOnFirstLaunchEverModifier: ViewModifier {
 			}
 		}
 		.onAppear {
+			if skipOnboarding {
+				showOnboarding = false
+				return
+			}
 			if isPreview {
 				self.showOnboarding = true
 			} else {

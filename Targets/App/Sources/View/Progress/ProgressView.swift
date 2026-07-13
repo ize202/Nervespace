@@ -80,6 +80,7 @@ struct ProgressView: View {
                     .foregroundColor(.brandPrimary)
                     .frame(width: 100, height: 44)
                 }
+                .accessibilityIdentifier(AccessibilityIdentifier.historyLink)
             }
 
             VStack(spacing: 20) {
@@ -150,6 +151,10 @@ struct ProgressView: View {
             .frame(height: 250)
             .frame(maxWidth: .infinity)
             .padding(.vertical, 20)
+            .accessibilityElement(children: .ignore)
+            .accessibilityIdentifier(AccessibilityIdentifier.minutesToday)
+            .accessibilityLabel("Minutes today")
+            .accessibilityValue("\(summary.minutesToday)")
         }
         .padding()
         .background {

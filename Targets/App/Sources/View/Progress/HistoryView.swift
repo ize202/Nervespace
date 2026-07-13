@@ -162,6 +162,8 @@ private struct HistoryRoutineRow: View {
         .padding()
         .background(Color.white.opacity(0.1))
         .cornerRadius(12)
+        .accessibilityElement(children: .combine)
+        .accessibilityIdentifier(AccessibilityIdentifier.historyRow)
         .swipeActions {
             Button(role: .destructive, action: onDelete) {
                 Label("Delete", systemImage: "trash")

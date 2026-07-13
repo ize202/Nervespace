@@ -56,6 +56,17 @@ private func makeProject() -> Project {
         ]
     )
 
+    let uiTests = Target.target(
+        name: "NervespaceUITests",
+        destinations: [.iPhone],
+        product: .uiTests,
+        bundleId: "\(bundleID).NervespaceUITests",
+        deploymentTargets: deploymentTarget,
+        infoPlist: .default,
+        sources: ["Targets/NervespaceUITests/Tests/**"],
+        dependencies: [.target(name: appName)]
+    )
+
     let sharedTarget = Target.target(
         name: "SharedKit",
         destinations: destinations,
@@ -107,7 +118,12 @@ private func makeProject() -> Project {
             findImplicitDependencies: true
         ),
         testAction: .targets(
-            ["AppTests", "LocalDataKitTests", "SharedKitTests"],
+            [
+                "AppTests",
+                "LocalDataKitTests",
+                "NervespaceUITests",
+                "SharedKitTests",
+            ],
             configuration: .debug
         ),
         runAction: .runAction(configuration: "Debug"),
@@ -135,6 +151,7 @@ private func makeProject() -> Project {
         targets: [
             app,
             appTests,
+            uiTests,
             sharedTarget,
             sharedTests,
             localDataTarget,

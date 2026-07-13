@@ -180,6 +180,7 @@ struct RoutineCompletionView: View {
                 .background(Color.brandPrimary)
                 .cornerRadius(12)
         }
+        .accessibilityIdentifier(AccessibilityIdentifier.saveCompletion)
         .padding(.horizontal)
         .padding(.bottom, 32)
     }

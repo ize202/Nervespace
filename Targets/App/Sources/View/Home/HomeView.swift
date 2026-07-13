@@ -189,6 +189,11 @@ struct HomeView: View {
                             NavigationLink(destination: RoutineDetailView(routine: routine)) {
                                 CarouselCard(routine: routine)
                             }
+                            .accessibilityIdentifier(
+                                routine.id == commonRoutines.first?.id
+                                    ? AccessibilityIdentifier.firstRoutine
+                                    : "nervespace.routine.\(routine.id)"
+                            )
                         }
                         .frame(height: 320)
                         
