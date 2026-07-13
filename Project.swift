@@ -33,8 +33,12 @@ func tuistProject() -> Project {
     ]
 
 	let sharedKit = TargetDependency.target(name: "SharedKit")
+	let localDataKit = TargetDependency.target(name: "LocalDataKit")
 
 	addSharedKit()
+	addLocalDataKit()
+	addLocalDataKitTests()
+	addSharedKitTests()
 	addNotifKit()
 	addSupabaseKit()
     addCrashlyticsKit()
@@ -59,7 +63,13 @@ func tuistProject() -> Project {
 		shared: true,
 		hidden: false,
 		buildAction: .buildAction(targets: ["\(appName)"], findImplicitDependencies: true),
-		testAction: nil,
+		testAction: .targets(
+			[
+				"LocalDataKitTests",
+				"SharedKitTests",
+			],
+			configuration: .debug
+		),
         runAction: .runAction(configuration: "Debug", arguments: nil, options: .options(storeKitConfigurationPath: "Products.storekit")),
 		archiveAction: .archiveAction(configuration: "Release"),
 		profileAction: nil,
@@ -128,6 +138,55 @@ func tuistProject() -> Project {
 
 		appDependencies.append(sharedKit)
 		projectTargets.append(sharedTarget)
+	}
+
+	func addLocalDataKit() {
+		let targetName = "LocalDataKit"
+		let target: Target = .target(
+			name: targetName,
+			destinations: destinations,
+			product: .framework,
+			bundleId: "\(bundleID).\(targetName)",
+			deploymentTargets: .iOS(osVersion),
+			sources: ["Targets/\(targetName)/Sources/**"]
+		)
+
+		projectTargets.append(target)
+	}
+
+	func addLocalDataKitTests() {
+		let targetName = "LocalDataKitTests"
+		let target: Target = .target(
+			name: targetName,
+			destinations: destinations,
+			product: .unitTests,
+			bundleId: "\(bundleID).\(targetName)",
+			deploymentTargets: .iOS(osVersion),
+			infoPlist: .default,
+			sources: ["Targets/\(targetName)/Tests/**"],
+			dependencies: [
+				localDataKit,
+				sharedKit,
+			]
+		)
+
+		projectTargets.append(target)
+	}
+
+	func addSharedKitTests() {
+		let targetName = "SharedKitTests"
+		let target: Target = .target(
+			name: targetName,
+			destinations: destinations,
+			product: .unitTests,
+			bundleId: "\(bundleID).\(targetName)",
+			deploymentTargets: .iOS(osVersion),
+			infoPlist: .default,
+			sources: ["Targets/\(targetName)/Tests/**"],
+			dependencies: [sharedKit]
+		)
+
+		projectTargets.append(target)
 	}
     
     func addAnalyticsKit() {
