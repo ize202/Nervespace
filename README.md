@@ -15,7 +15,7 @@ so the app works without signing in.
 
 ## Demo
 
-[Watch the 28-second app demo](docs/demo/nervespace-demo.mp4) · [Read the capture notes](docs/demo/README.md)
+[Watch the 28-second demo in your browser](https://lyu710l74g.ufs.sh/f/VM4wqBfEQul6EKly2Z5VPAWRTZ5HnMskbYUxaO21oc3KQCvh) · [Read the capture notes](docs/demo/README.md)
 
 The clip follows a routine from selection through a saved local history entry.
 
