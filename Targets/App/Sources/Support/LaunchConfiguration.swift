@@ -96,19 +96,30 @@ struct TabBarItemAccessibilityIdentifier: UIViewRepresentable {
     }
 
     func updateUIView(_ view: IdentifierView, context: Context) {
-        view.index = index
-        view.identifier = identifier
-        view.applyIdentifier()
+        view.update(index: index, identifier: identifier)
     }
 
     final class IdentifierView: UIView {
-        var index: Int
-        var identifier: String
-        private var attemptsRemaining = 10
+        private(set) var index: Int
+        private(set) var identifier: String
+        private let retryInterval: TimeInterval
+        private let retryDuration: TimeInterval
+        private var retryDeadline: TimeInterval?
+        private var retryScheduled = false
+        private var retryGeneration = 0
 
-        init(index: Int, identifier: String) {
+        init(
+            index: Int,
+            identifier: String,
+            retryInterval: TimeInterval = 0.1,
+            retryDuration: TimeInterval = 30
+        ) {
+            precondition(retryInterval > 0)
+            precondition(retryDuration > 0)
             self.index = index
             self.identifier = identifier
+            self.retryInterval = retryInterval
+            self.retryDuration = retryDuration
             super.init(frame: .zero)
             isAccessibilityElement = false
         }
@@ -120,20 +131,36 @@ struct TabBarItemAccessibilityIdentifier: UIViewRepresentable {
 
         override func didMoveToWindow() {
             super.didMoveToWindow()
-            attemptsRemaining = 10
-            applyIdentifier()
+            guard window != nil else {
+                cancelRetries()
+                return
+            }
+            startRetryWindow()
+        }
+
+        func update(index: Int, identifier: String) {
+            let configurationChanged = self.index != index
+                || self.identifier != identifier
+            self.index = index
+            self.identifier = identifier
+
+            if configurationChanged, window != nil {
+                startRetryWindow()
+            } else {
+                applyIdentifier()
+            }
         }
 
         func applyIdentifier() {
             guard
                 let window,
-                let tabBar = findTabBar(in: window),
-                let item = tabBar.items?[safe: index]
+                let item = findTabBar(in: window)?.items?[safe: index]
             else {
                 scheduleRetry()
                 return
             }
             item.accessibilityIdentifier = identifier
+            cancelRetries()
         }
 
         private func findTabBar(in view: UIView) -> UITabBar? {
@@ -148,15 +175,40 @@ struct TabBarItemAccessibilityIdentifier: UIViewRepresentable {
             return nil
         }
 
+        private func startRetryWindow() {
+            cancelRetries()
+            retryDeadline = ProcessInfo.processInfo.systemUptime + retryDuration
+            applyIdentifier()
+        }
+
         private func scheduleRetry() {
-            guard attemptsRemaining > 0, window != nil else {
+            guard
+                !retryScheduled,
+                window != nil,
+                let retryDeadline,
+                ProcessInfo.processInfo.systemUptime < retryDeadline
+            else {
                 return
             }
-            attemptsRemaining -= 1
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            retryScheduled = true
+            let generation = retryGeneration
+            DispatchQueue.main.asyncAfter(deadline: .now() + retryInterval) {
                 [weak self] in
-                self?.applyIdentifier()
+                guard
+                    let self,
+                    self.retryGeneration == generation
+                else {
+                    return
+                }
+                self.retryScheduled = false
+                self.applyIdentifier()
             }
+        }
+
+        private func cancelRetries() {
+            retryGeneration &+= 1
+            retryScheduled = false
+            retryDeadline = nil
         }
     }
 }

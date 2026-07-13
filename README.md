@@ -79,7 +79,7 @@ Run the canonical repository check:
 
 It checks the exact Tuist version, generates the workspace, scans the manifest and active targets for removed private-provider references, selects an available iPhone from the newest installed iOS runtime, runs all four test targets, and builds for a generic iOS Simulator.
 
-The latest local run completed 40 tests with zero failures or skips, followed by a successful generic simulator build. The verifier is the correctness evidence; the screenshots and demo are presentation evidence only.
+The latest local run completed 41 tests with zero failures or skips, followed by a successful generic simulator build. The verifier is the correctness evidence; the screenshots and demo are presentation evidence only.
 
 ## Limitations
 
