@@ -10,7 +10,6 @@
 
 import SharedKit
 import SwiftUI
-import AnalyticsKit
 
 // MARK: - Models and Enums
 
@@ -29,9 +28,9 @@ enum OnboardingScreen: Int, CaseIterable {
 	var title: String {
 		switch self {
 		case .welcome:
-			return "Welcome to Form"
+			return "Welcome to Nervespace"
 		case .motivation:
-			return "What brings you to Form today?"
+			return "What brings you to Nervespace today?"
 		case .tensionAreas:
 			return "Where do you feel the most tension in your body?"
 		case .timeCommitment:
@@ -139,16 +138,7 @@ class OnboardingViewModel: ObservableObject {
 	@Published var selections = OnboardingSelections()
 	
 	init() {
-		// Pre-initialize haptic manager
 		_ = HapticManager.shared
-		
-		// Track start of onboarding
-		Analytics.capture(
-			.info,
-			id: "onboarding_step_1",
-			longDescription: "Welcome screen",
-			source: .general
-		)
 	}
 	
 	func moveToNextScreen() {
@@ -157,21 +147,8 @@ class OnboardingViewModel: ObservableObject {
 			return
 		}
 		
-		// Save reminder settings when moving from reminder screen
-		if currentScreen == .reminder {
-			UserDefaults.standard.set(selections.reminderTime, forKey: "workout_reminder_time")
-			UserDefaults.standard.set(true, forKey: "workout_reminder_enabled")
-		}
-		
 		currentScreen = OnboardingScreen.allCases[currentIndex + 1]
 		
-		// Track step number (adding 2 because first step was tracked in init)
-		Analytics.capture(
-			.info,
-			id: "onboarding_step_\(currentIndex + 2)",
-			longDescription: "\(currentScreen)",
-			source: .general
-		)
 	}
 	
 	func moveToPreviousScreen() {
@@ -204,12 +181,6 @@ struct ShowOnboardingViewOnFirstLaunchEverModifier: ViewModifier {
 					withAnimation(.bouncy) {
 						showOnboarding = false
 						lastAppVersionAppWasOpenedAt = Constants.AppData.appVersion
-						Analytics.capture(
-							.success,
-							id: "onboarding_completed",
-							longDescription: "Completed onboarding",
-							source: .general
-						)
 					}
 				}
 				.transition(.opacity)
@@ -223,14 +194,6 @@ struct ShowOnboardingViewOnFirstLaunchEverModifier: ViewModifier {
 				self.showOnboarding = true
 			} else {
 				self.showOnboarding = lastAppVersionAppWasOpenedAt == "NONE"
-				if lastAppVersionAppWasOpenedAt == "NONE" {
-					Analytics.capture(
-						.info,
-						id: "onboarding_started",
-						longDescription: "Started onboarding",
-						source: .general
-					)
-				}
 			}
 		}
 	}

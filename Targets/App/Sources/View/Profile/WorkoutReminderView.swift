@@ -1,219 +1,257 @@
-import SwiftUI
 import SharedKit
-import NotifKit
+import SwiftUI
+import UserNotifications
 
 struct WorkoutReminderView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var reminderTime: Date
     @State private var isReminderEnabled: Bool
-    @State private var hasRequestedPermission = false
     @State private var hasChanges = false
+    @State private var isSaving = false
     @State private var showingSaveConfirmation = false
-    
-    // Store initial values to track changes
+    @State private var errorMessage: String?
+
     private let initialReminderTime: Date
     private let initialIsEnabled: Bool
-    
-    // Notification center for broadcasting changes
-    private let notificationCenter = NotificationCenter.default
-    
+
     init() {
-        let savedTime = UserDefaults.standard.object(forKey: "workout_reminder_time") as? Date ?? Date()
-        let enabled = UserDefaults.standard.bool(forKey: "workout_reminder_enabled")
+        let savedTime = WorkoutReminderSettings.time ?? Date()
+        let enabled = WorkoutReminderSettings.isEnabled
         _reminderTime = State(initialValue: savedTime)
         _isReminderEnabled = State(initialValue: enabled)
         initialReminderTime = savedTime
         initialIsEnabled = enabled
     }
-    
-    func requestNotificationPermission() {
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
-            DispatchQueue.main.async {
-                hasRequestedPermission = true
-                isReminderEnabled = granted
-                if granted {
-                    hasChanges = true
-                }
-            }
-        }
-    }
-    
-    func checkNotificationStatus() {
-        UNUserNotificationCenter.current().getNotificationSettings { settings in
-            DispatchQueue.main.async {
-                hasRequestedPermission = settings.authorizationStatus != .notDetermined
-                isReminderEnabled = settings.authorizationStatus == .authorized
-            }
-        }
-    }
-    
-    func scheduleNotification() {
-        // Remove existing notifications
-        UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
-        
-        guard isReminderEnabled else { return }
-        
-        // Create notification content
-        let content = UNMutableNotificationContent()
-        content.title = "Time for Your Daily Reset"
-        content.body = "Take a moment to reset and recharge."
-        content.sound = .default
-        
-        // Create date components for daily trigger
-        let calendar = Calendar.current
-        let components = calendar.dateComponents([.hour, .minute], from: reminderTime)
-        
-        // Create trigger
-        let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: true)
-        
-        // Create request
-        let request = UNNotificationRequest(
-            identifier: "daily_workout_reminder",
-            content: content,
-            trigger: trigger
-        )
-        
-        // Schedule notification
-        UNUserNotificationCenter.current().add(request) { error in
-            if let error = error {
-                print("Error scheduling notification: \(error)")
-            }
-        }
-    }
-    
-    func saveChanges() {
-        // Save to UserDefaults
-        UserDefaults.standard.set(isReminderEnabled, forKey: "workout_reminder_enabled")
-        UserDefaults.standard.set(reminderTime, forKey: "workout_reminder_time")
-        
-        // Schedule or remove notification
-        scheduleNotification()
-        
-        // Post notification that settings changed
-        notificationCenter.post(name: NSNotification.Name("WorkoutReminderSettingsChanged"), object: nil)
-        
-        // Update UI
-        hasChanges = false
-        showingSaveConfirmation = true
-        
-        // Hide confirmation after delay
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-            showingSaveConfirmation = false
-            dismiss() // Dismiss the view after saving
-        }
-    }
-    
+
     var body: some View {
-        NavigationView {
-            ZStack {
-                Color.baseBlack.ignoresSafeArea()
-                
-                VStack(spacing: 24) {
-                    // Enable/Disable Toggle
-                    HStack {
-                        Text("Daily Reminder")
-                            .font(.system(size: 17, weight: .regular))
-                            .foregroundColor(.baseWhite)
-                        
-                        Spacer()
-                        
-                        Toggle("", isOn: $isReminderEnabled)
-                            .onChange(of: isReminderEnabled) { newValue in
-                                if newValue && !hasRequestedPermission {
-                                    requestNotificationPermission()
-                                }
-                                hasChanges = newValue != initialIsEnabled
-                            }
-                            .tint(.brandPrimary)
-                    }
-                    .padding(.vertical, 8)
-                    .padding(.horizontal, 20)
-                    .background(
-                        RoundedRectangle(cornerRadius: 16)
-                            .fill(Color.baseWhite.opacity(0.05))
-                    )
-                    
-                    if isReminderEnabled {
-                        // Time Picker
-                        VStack(alignment: .leading, spacing: 16) {
-                            Text("Reminder Time")
-                                .font(.system(size: 15, weight: .medium))
-                                .foregroundColor(.baseWhite.opacity(0.7))
-                            
-                            DatePicker("Select Time",
-                                     selection: $reminderTime,
-                                     displayedComponents: .hourAndMinute)
-                                .datePickerStyle(.wheel)
-                                .labelsHidden()
-                                .colorScheme(.dark)
-                                .accentColor(.brandPrimary)
-                                .onChange(of: reminderTime) { newValue in
-                                    // Compare hours and minutes only
-                                    let calendar = Calendar.current
-                                    let initialComponents = calendar.dateComponents([.hour, .minute], from: initialReminderTime)
-                                    let newComponents = calendar.dateComponents([.hour, .minute], from: newValue)
-                                    hasChanges = initialComponents != newComponents
-                                }
-                        }
-                        .padding(20)
-                        .background(
-                            RoundedRectangle(cornerRadius: 16)
-                                .fill(Color.baseWhite.opacity(0.05))
-                        )
-                    }
-                    
-                    Spacer()
-                    
-                    // Helper Text
-                    Text("We'll send you a gentle reminder to take a moment for yourself at this time each day.")
-                        .font(.system(size: 15))
-                        .foregroundColor(.baseWhite.opacity(0.7))
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal, 24)
-                    
-                    // Save Button
-                    if hasChanges {
-                        Button(action: saveChanges) {
-                            Text("Save Changes")
-                                .font(.system(size: 17, weight: .semibold))
-                                .frame(maxWidth: .infinity)
-                                .frame(height: 56)
-                                .background(Color.brandPrimary)
-                                .foregroundColor(.baseBlack)
-                                .cornerRadius(16)
-                        }
-                        .padding(.top, 16)
-                    }
+        ZStack {
+            Color.baseBlack.ignoresSafeArea()
+
+            VStack(spacing: 24) {
+                reminderToggle
+
+                if isReminderEnabled {
+                    timePicker
                 }
-                .padding(24)
-                
-                // Save Confirmation Overlay
-                if showingSaveConfirmation {
-                    VStack {
-                        Text("Settings Saved")
-                            .font(.system(size: 17, weight: .medium))
-                            .foregroundColor(.baseWhite)
-                            .padding(.vertical, 12)
-                            .padding(.horizontal, 24)
-                            .background(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .fill(Color.baseWhite.opacity(0.1))
-                            )
+
+                Spacer()
+
+                Text(
+                    "Nervespace can send one gentle local reminder at this time each day."
+                )
+                .font(.system(size: 15))
+                .foregroundColor(.baseWhite.opacity(0.7))
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 24)
+
+                if hasChanges {
+                    Button(action: saveChanges) {
+                        Text(isSaving ? "Saving…" : "Save Changes")
+                            .font(.system(size: 17, weight: .semibold))
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 56)
+                            .background(Color.brandPrimary)
+                            .foregroundColor(.baseBlack)
+                            .cornerRadius(16)
                     }
-                    .transition(.move(edge: .top).combined(with: .opacity))
-                    .animation(.spring(), value: showingSaveConfirmation)
+                    .disabled(isSaving)
+                    .padding(.top, 16)
                 }
             }
-            .navigationTitle("Workout Reminder")
-            .navigationBarTitleDisplayMode(.inline)
-            .interactiveDismissDisabled(hasChanges)
+            .padding(24)
+
+            if showingSaveConfirmation {
+                Text("Settings Saved")
+                    .font(.system(size: 17, weight: .medium))
+                    .foregroundColor(.baseWhite)
+                    .padding(.vertical, 12)
+                    .padding(.horizontal, 24)
+                    .background(
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(Color.baseWhite.opacity(0.1))
+                    )
+                    .transition(.move(edge: .top).combined(with: .opacity))
+            }
         }
-        .onAppear {
-            checkNotificationStatus()
+        .navigationTitle("Workout Reminder")
+        .navigationBarTitleDisplayMode(.inline)
+        .interactiveDismissDisabled(hasChanges)
+        .task {
+            await reconcileAuthorization()
+        }
+        .alert("Reminder Unavailable", isPresented: Binding(
+            get: { errorMessage != nil },
+            set: { if !$0 { errorMessage = nil } }
+        )) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(errorMessage ?? "Unknown error")
+        }
+    }
+
+    private var reminderToggle: some View {
+        HStack {
+            Text("Daily Reminder")
+                .font(.system(size: 17))
+                .foregroundColor(.baseWhite)
+
+            Spacer()
+
+            Toggle("", isOn: $isReminderEnabled)
+                .labelsHidden()
+                .onChange(of: isReminderEnabled) { _, isEnabled in
+                    updateHasChanges()
+                    guard isEnabled else {
+                        return
+                    }
+                    Task {
+                        await requestAuthorizationIfNeeded()
+                    }
+                }
+                .tint(.brandPrimary)
+        }
+        .padding(.vertical, 8)
+        .padding(.horizontal, 20)
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color.baseWhite.opacity(0.05))
+        )
+    }
+
+    private var timePicker: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Reminder Time")
+                .font(.system(size: 15, weight: .medium))
+                .foregroundColor(.baseWhite.opacity(0.7))
+
+            DatePicker(
+                "Select Time",
+                selection: $reminderTime,
+                displayedComponents: .hourAndMinute
+            )
+            .datePickerStyle(.wheel)
+            .labelsHidden()
+            .colorScheme(.dark)
+            .tint(.brandPrimary)
+            .onChange(of: reminderTime) {
+                updateHasChanges()
+            }
+        }
+        .padding(20)
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color.baseWhite.opacity(0.05))
+        )
+    }
+
+    private func updateHasChanges() {
+        let calendar = Calendar.current
+        let initialComponents = calendar.dateComponents(
+            [.hour, .minute],
+            from: initialReminderTime
+        )
+        let currentComponents = calendar.dateComponents(
+            [.hour, .minute],
+            from: reminderTime
+        )
+        hasChanges = isReminderEnabled != initialIsEnabled
+            || currentComponents != initialComponents
+    }
+
+    @MainActor
+    private func requestAuthorizationIfNeeded() async {
+        do {
+            let center = UNUserNotificationCenter.current()
+            let settings = await center.notificationSettings()
+            let isAuthorized: Bool
+            switch settings.authorizationStatus {
+            case .authorized, .provisional, .ephemeral:
+                isAuthorized = true
+            case .notDetermined:
+                isAuthorized = try await center.requestAuthorization(
+                    options: [.alert, .sound, .badge]
+                )
+            case .denied:
+                isAuthorized = false
+            @unknown default:
+                isAuthorized = false
+            }
+
+            guard isAuthorized else {
+                isReminderEnabled = false
+                updateHasChanges()
+                errorMessage = "Allow notifications in Settings to enable a daily reminder."
+                return
+            }
+        } catch {
+            isReminderEnabled = false
+            updateHasChanges()
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    @MainActor
+    private func reconcileAuthorization() async {
+        let settings = await UNUserNotificationCenter.current()
+            .notificationSettings()
+        guard isReminderEnabled else {
+            return
+        }
+        switch settings.authorizationStatus {
+        case .authorized, .provisional, .ephemeral:
+            break
+        case .denied, .notDetermined:
+            isReminderEnabled = false
+            WorkoutReminderSettings.save(
+                isEnabled: false,
+                time: reminderTime
+            )
+            try? await WorkoutReminderScheduler().update(
+                isEnabled: false,
+                time: reminderTime
+            )
+            hasChanges = false
+        @unknown default:
+            break
+        }
+    }
+
+    private func saveChanges() {
+        Task {
+            isSaving = true
+            defer { isSaving = false }
+
+            if isReminderEnabled {
+                await requestAuthorizationIfNeeded()
+                guard isReminderEnabled else {
+                    return
+                }
+            }
+
+            do {
+                try await WorkoutReminderScheduler().update(
+                    isEnabled: isReminderEnabled,
+                    time: reminderTime
+                )
+                WorkoutReminderSettings.save(
+                    isEnabled: isReminderEnabled,
+                    time: reminderTime
+                )
+                hasChanges = false
+                withAnimation {
+                    showingSaveConfirmation = true
+                }
+                try? await Task.sleep(nanoseconds: 800_000_000)
+                dismiss()
+            } catch {
+                errorMessage = error.localizedDescription
+            }
         }
     }
 }
 
 #Preview {
-    WorkoutReminderView()
-} 
+    NavigationStack {
+        WorkoutReminderView()
+    }
+}

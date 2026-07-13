@@ -9,7 +9,7 @@ private struct HomeHeaderView: View {
     
     var body: some View {
         HStack {
-            Text("Form")
+            Text("Nervespace")
                 .font(.largeTitle)
                 .fontWeight(.bold)
                 .foregroundStyle(Color.baseWhite)

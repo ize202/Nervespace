@@ -1,144 +1,85 @@
-import SwiftUI
+import LocalDataKit
 import SharedKit
-import SupabaseKit
+import SwiftUI
 
 struct ProfileView: View {
     @Environment(\.dismiss) private var dismiss
-    @EnvironmentObject private var db: DB
     @State private var reminderTime: Date?
-    @State private var isReminderEnabled: Bool = false
-    
-    private var appVersion: String {
-        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0"
-        return "Version \(version)"
+    @State private var isReminderEnabled = false
+
+    private var copyrightYear: String {
+        String(Calendar.current.component(.year, from: Date()))
     }
-    
-    private func loadReminderSettings() {
-        isReminderEnabled = UserDefaults.standard.bool(forKey: "workout_reminder_enabled")
-        reminderTime = UserDefaults.standard.object(forKey: "workout_reminder_time") as? Date
-    }
-    
-    private func openEmail() {
-        if let url = URL(string: "mailto:support@useformapp.com") {
-            UIApplication.shared.open(url)
-        }
-    }
-    
-    private func openSubscriptions() {
-        if let url = URL(string: "itms-apps://apps.apple.com/account/subscriptions") {
-            UIApplication.shared.open(url)
-        }
-    }
-    
+
     var body: some View {
-        NavigationView {
-            VStack(spacing: 0) {
-                List {
-                    // Account Section
-                    Section("ACCOUNT") {
-                        NavigationLink {
-                            AccountSettingsView(db: db)
-                        } label: {
-                            Text("Account Settings")
-                        }
-                    }
-                    
-                    // Settings Section
-                    Section("SETTINGS") {
-                        NavigationLink {
-                            WorkoutReminderView()
-                        } label: {
-                            HStack {
-                                Text("Workout Reminder")
-                                Spacer()
-                                
-                                if isReminderEnabled, let time = reminderTime {
-                                    Text(time, style: .time)
-                                        .foregroundColor(.secondary)
-                                }
+        NavigationStack {
+            List {
+                Section("SETTINGS") {
+                    NavigationLink {
+                        WorkoutReminderView()
+                    } label: {
+                        HStack {
+                            Text("Workout Reminder")
+                            Spacer()
+                            if isReminderEnabled, let reminderTime {
+                                Text(reminderTime, style: .time)
+                                    .foregroundColor(.secondary)
                             }
                         }
                     }
-                    
-                    // Support Section
-                    Section("SUPPORT") {
-                        Button {
-                            openEmail()
-                        } label: {
-                            HStack {
-                                Text("Contact Support")
-                                Spacer()
-                            }
-                        }
-                        
-                        Button {
-                            openSubscriptions()
-                        } label: {
-                            HStack {
-                                Text("Membership")
-                                Spacer()
-                            }
-                        }
-                        
-                        Link(destination: URL(string: "https://www.useformapp.com/policies/terms")!) {
-                            HStack {
-                                Text("Terms of Use")
-                                Spacer()
-                            }
-                        }
-                        
-                        Link(destination: URL(string: "https://www.useformapp.com/policies/privacy")!) {
-                            HStack {
-                                Text("Privacy Policy")
-                                Spacer()
-                            }
-                        }
+
+                    NavigationLink {
+                        DailyGoalSettingsView()
+                    } label: {
+                        Text("Daily Minutes Goal")
                     }
                 }
-                
-                // App Info Section
-                VStack(spacing: 4) {
-                    Text(appVersion)
-                        .font(.footnote)
-                        .foregroundColor(.secondary)
-                    Text("Made with ♥️")
-                        .font(.footnote)
-                        .foregroundColor(.secondary)
-                    Text("© 2025 Slips LLC")
-                        .font(.footnote)
+
+                Section("ABOUT") {
+                    LabeledContent("App", value: Constants.AppData.appName)
+                    Text("Short guided routines for stretching, breathing, and resetting.")
                         .foregroundColor(.secondary)
                 }
-                .padding(.vertical)
             }
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Close", systemImage: "xmark") {
                         dismiss()
-                    } label: {
-                        Image(systemName: "xmark")
-                            .foregroundColor(.primary)
                     }
+                    .labelStyle(.iconOnly)
                 }
             }
-            .onAppear {
-                loadReminderSettings()
-                
-                // Set up notification observer
-                NotificationCenter.default.addObserver(
-                    forName: NSNotification.Name("WorkoutReminderSettingsChanged"),
-                    object: nil,
-                    queue: .main
-                ) { _ in
-                    loadReminderSettings()
+            .safeAreaInset(edge: .bottom) {
+                VStack(spacing: 4) {
+                    Text("Version \(Constants.AppData.appVersion)")
+                    Text("© \(copyrightYear) \(Constants.AppData.developerName)")
                 }
+                .font(.footnote)
+                .foregroundColor(.secondary)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 12)
+                .background(.bar)
+            }
+            .onAppear(perform: loadReminderSettings)
+            .onReceive(
+                NotificationCenter.default.publisher(
+                    for: WorkoutReminderSettings.changed
+                )
+            ) { _ in
+                loadReminderSettings()
             }
         }
+    }
+
+    private func loadReminderSettings() {
+        isReminderEnabled = WorkoutReminderSettings.isEnabled
+        reminderTime = WorkoutReminderSettings.time
     }
 }
 
 #Preview {
     ProfileView()
-        .environmentObject(DB())
-} 
+        .environmentObject(makePreviewActivityStore())
+}
