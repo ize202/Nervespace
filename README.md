@@ -2,11 +2,10 @@
 
 <img src="docs/nervespace-icon.png" alt="Nervespace app icon" width="96">
 
-## Overview
+Nervespace is a SwiftUI app for short movement, stretching, breathing, and recovery routines. Pick a routine, follow the timer, and the completed session appears in progress and history.
 
-Nervespace is a local-first SwiftUI app for short movement, stretching, breathing, and recovery routines. It is designed around one quick loop: choose a routine, follow the timed exercises, and see the completed activity in progress and history.
-
-This public build stores activity on the device. Account sync and production services are not part of it.
+Routine history, settings, bookmarks, goals, and reminders stay on the device,
+so the app works without signing in.
 
 ## Screenshots
 
@@ -20,7 +19,7 @@ This public build stores activity on the device. Account sync and production ser
 
 The clip follows a routine from selection through a saved local history entry.
 
-## Current feature set
+## What it does
 
 - First-launch onboarding
 - 20 bundled exercises, 11 routines, and 4 plan collections
@@ -32,7 +31,7 @@ The clip follows a routine from selection through a saved local history entry.
 
 ## Architecture
 
-Tuist 4.79.3 generates the Xcode workspace from `Project.swift`. The runtime code is split into three targets:
+Tuist 4.79.3 generates the Xcode workspace from `Project.swift`. The app is split into three targets:
 
 ```text
 Nervespace
@@ -51,7 +50,7 @@ Each completed routine is stored as a `RoutineCompletion` with an ID, routine ID
 Application Support/Nervespace/routine_completions.json
 ```
 
-The persistence layer keeps writes sorted, reads the earlier JSON shape for migration, and omits deleted legacy entries. Daily-goal, bookmark, and reminder settings use `UserDefaults`. Progress calculations use a calendar-aware 4:00 a.m. activity-day boundary so late-night sessions stay with the intended day.
+Writes use an atomic file replacement. The reader still accepts the older JSON format so existing installs can migrate. Daily-goal, bookmark, and reminder settings use `UserDefaults`. Progress calculations use a 4:00 a.m. activity-day boundary so a late-night session stays with the intended day.
 
 ## Setup
 
@@ -71,21 +70,12 @@ Select the `Nervespace-Staging` scheme and an iPhone simulator.
 
 ## Verification
 
-Run the canonical repository check:
+Run the tests and simulator build:
 
 ```sh
 ./scripts/verify
 ```
 
-It checks the exact Tuist version, generates the workspace, scans the manifest and active targets for removed private-provider references, selects an available iPhone from the newest installed iOS runtime, runs all four test targets, and builds for a generic iOS Simulator.
-
-The latest local run completed 40 tests with zero failures or skips, followed by a successful generic simulator build. The verifier is the correctness evidence; the screenshots and demo are presentation evidence only.
-
-## Limitations
-
-- The app provides no account-based sync or app-managed cross-device backup.
-- Reminders are local notifications and require permission. They are not remote push messages.
-- Routines, plans, exercises, and artwork are bundled with the app rather than managed remotely.
-- The current evidence covers an iPhone Simulator. A real-device build, public-main CI run, and App Store release are not claimed here.
-- The app currently uses a fixed dark appearance.
-- Nervespace is a routine tracker, not medical guidance.
+The script checks the Tuist version, generates the workspace, runs the unit and
+UI tests, and builds for a generic iOS Simulator. The current suite has 40
+tests.
