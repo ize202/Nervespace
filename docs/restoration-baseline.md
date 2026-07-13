@@ -45,9 +45,9 @@ Tuist wrote generated project output from the existing provider-heavy manifest, 
 ## Restoration verification
 
 The restored project is now provider-free and local-first. `Project.swift` has no
-external packages, and `scripts/check-provider-free` guards the active source,
-manifest, and project configuration against reintroducing the removed provider
-SDKs or credentials.
+external packages, and `scripts/check-provider-free` scans the active source,
+manifest, and project configuration for references to the removed provider
+SDKs.
 
 Run the canonical local check from the repository root:
 
@@ -65,6 +65,7 @@ an iPhone 17 Pro simulator running iOS 26.5, then completed the generic simulato
 build. That result is local evidence, not evidence that the GitHub Actions
 workflow has run.
 
-Generated Xcode projects and workspaces are still tracked at this point in the
-restoration sequence. Their removal is the next planned cleanup; until then,
-generation can leave known tracked diffs even when verification passes.
+Generated Xcode projects and workspaces were later removed from version control
+after target-parity inspection and two clean verifier runs. They are generated
+on demand and ignored, so a successful verification run leaves the source tree
+clean.
