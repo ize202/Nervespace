@@ -96,4 +96,39 @@ final class JSONRoutineHistoryPersistenceTests: XCTestCase {
         XCTAssertTrue(FileManager.default.fileExists(atPath: parentURL.path))
         XCTAssertTrue(FileManager.default.fileExists(atPath: fileURL.path))
     }
+
+    func testSaveProducesDeterministicHistoryOrdering() throws {
+        let directory = try temporaryTestDirectory(named: #function)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let fileURL = directory.appendingPathComponent("history.json")
+        let older = completion(
+            id: UUID(uuidString: "66666666-6666-6666-6666-666666666661")!,
+            minutes: 5,
+            at: testDate(2026, 7, 12, 6)
+        )
+        let newer = completion(
+            id: UUID(uuidString: "66666666-6666-6666-6666-666666666662")!,
+            minutes: 8,
+            at: testDate(2026, 7, 13, 6)
+        )
+        let persistence = JSONRoutineHistoryPersistence(fileURL: fileURL)
+
+        try persistence.save([older, newer])
+        let firstEncoding = try Data(contentsOf: fileURL)
+        try persistence.save([newer, older])
+
+        XCTAssertEqual(try Data(contentsOf: fileURL), firstEncoding)
+        XCTAssertEqual(try persistence.load().map(\.id), [newer.id, older.id])
+    }
+
+    func testCorruptExistingFileThrowsRatherThanReturningEmptyHistory() throws {
+        let directory = try temporaryTestDirectory(named: #function)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let fileURL = directory.appendingPathComponent("history.json")
+        try Data("not-json".utf8).write(to: fileURL)
+        let persistence = JSONRoutineHistoryPersistence(fileURL: fileURL)
+
+        XCTAssertThrowsError(try persistence.load())
+        XCTAssertEqual(try Data(contentsOf: fileURL), Data("not-json".utf8))
+    }
 }

@@ -152,6 +152,10 @@ public enum RoutineLibrary {
             difficulty: .intermediate
         ),
     ]
+
+    public static func routine(id: String) -> Routine? {
+        routines.first { $0.id == id }
+    }
     
     // MARK: - Premium Status
     public static var freeRoutines: [Routine] {

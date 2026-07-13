@@ -21,6 +21,21 @@ final class LocalActivityStoreTests: XCTestCase {
         XCTAssertEqual(store.progress.totalMinutes, 12)
     }
 
+    func testRecordingLoadedIdenticalCompletionDoesNotWriteAgain() throws {
+        let expected = completion(
+            id: UUID(uuidString: "bbbbbbbb-1111-1111-1111-111111111112")!,
+            minutes: 12,
+            at: testDate(2026, 7, 13, 8)
+        )
+        let store = try makeStore(
+            persistence: RejectingRoutineHistoryPersistence(completions: [expected]),
+            name: #function
+        )
+
+        XCTAssertNoThrow(try store.record(expected))
+        XCTAssertEqual(store.completions, [expected])
+    }
+
     func testReusingIdentifierWithDifferentDataThrowsConflict() throws {
         let store = try makeStore(
             persistence: InMemoryRoutineHistoryPersistence(),
@@ -57,6 +72,41 @@ final class LocalActivityStoreTests: XCTestCase {
         XCTAssertEqual(store.progress.totalMinutes, 9)
     }
 
+    func testFailedRecordDoesNotPublishUnpersistedCompletion() throws {
+        let store = try makeStore(
+            persistence: RejectingRoutineHistoryPersistence(),
+            name: #function
+        )
+
+        XCTAssertThrowsError(
+            try store.record(
+                completion(
+                    id: UUID(uuidString: "bbbbbbbb-3333-3333-3333-333333333341")!,
+                    minutes: 6,
+                    at: testDate(2026, 7, 13, 8)
+                )
+            )
+        )
+        XCTAssertEqual(store.completions, [])
+        XCTAssertEqual(store.progress.totalMinutes, 0)
+    }
+
+    func testFailedDeleteDoesNotPublishStateAheadOfPersistence() throws {
+        let expected = completion(
+            id: UUID(uuidString: "bbbbbbbb-3333-3333-3333-333333333342")!,
+            minutes: 6,
+            at: testDate(2026, 7, 13, 8)
+        )
+        let store = try makeStore(
+            persistence: RejectingRoutineHistoryPersistence(completions: [expected]),
+            name: #function
+        )
+
+        XCTAssertThrowsError(try store.deleteCompletion(id: expected.id))
+        XCTAssertEqual(store.completions, [expected])
+        XCTAssertEqual(store.progress.totalMinutes, 6)
+    }
+
     func testRecordRejectsEmptyRoutineIdentifier() throws {
         let store = try makeStore(
             persistence: InMemoryRoutineHistoryPersistence(),
@@ -83,16 +133,21 @@ final class LocalActivityStoreTests: XCTestCase {
             name: #function
         )
 
-        XCTAssertThrowsError(
-            try store.record(
-                completion(
-                    id: UUID(uuidString: "bbbbbbbb-5555-5555-5555-555555555555")!,
-                    minutes: 0,
-                    at: testDate(2026, 7, 13, 8)
+        for (identifier, minutes) in [
+            (UUID(uuidString: "bbbbbbbb-5555-5555-5555-555555555555")!, 0),
+            (UUID(uuidString: "bbbbbbbb-5555-5555-5555-555555555556")!, -1),
+        ] {
+            XCTAssertThrowsError(
+                try store.record(
+                    completion(
+                        id: identifier,
+                        minutes: minutes,
+                        at: testDate(2026, 7, 13, 8)
+                    )
                 )
-            )
-        ) { error in
-            XCTAssertEqual(error as? ActivityStoreError, .invalidDurationMinutes)
+            ) { error in
+                XCTAssertEqual(error as? ActivityStoreError, .invalidDurationMinutes)
+            }
         }
     }
 
@@ -106,8 +161,10 @@ final class LocalActivityStoreTests: XCTestCase {
             now: { testDate(2026, 7, 13, 12) }
         )
 
-        XCTAssertThrowsError(try store.setDailyGoal(minutes: 0)) { error in
-            XCTAssertEqual(error as? ActivityStoreError, .invalidDailyGoalMinutes)
+        for minutes in [0, -1] {
+            XCTAssertThrowsError(try store.setDailyGoal(minutes: minutes)) { error in
+                XCTAssertEqual(error as? ActivityStoreError, .invalidDailyGoalMinutes)
+            }
         }
         try store.setDailyGoal(minutes: 17)
         let reloadedStore = try LocalActivityStore(
@@ -122,7 +179,7 @@ final class LocalActivityStoreTests: XCTestCase {
     }
 
     private func makeStore(
-        persistence: InMemoryRoutineHistoryPersistence,
+        persistence: any RoutineHistoryPersistence,
         name: String
     ) throws -> LocalActivityStore {
         try LocalActivityStore(

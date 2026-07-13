@@ -16,6 +16,38 @@ public struct LegacyRoutineHistoryMigrator {
     }
 
     public func migrate() throws {
-        fatalError("Legacy migration is specified by tests and implemented in Task 3")
+        guard !fileManager.fileExists(atPath: destinationURL.path) else {
+            return
+        }
+        guard fileManager.fileExists(atPath: sourceURL.path) else {
+            return
+        }
+
+        let completions = try JSONRoutineHistoryPersistence(
+            fileURL: sourceURL,
+            fileManager: fileManager
+        ).load()
+        let temporaryURL = destinationURL
+            .deletingLastPathComponent()
+            .appendingPathComponent(".\(destinationURL.lastPathComponent).\(UUID().uuidString).migration")
+        defer { try? fileManager.removeItem(at: temporaryURL) }
+
+        try JSONRoutineHistoryPersistence(
+            fileURL: temporaryURL,
+            fileManager: fileManager
+        ).save(completions)
+
+        guard !fileManager.fileExists(atPath: destinationURL.path) else {
+            return
+        }
+
+        do {
+            try fileManager.moveItem(at: temporaryURL, to: destinationURL)
+        } catch {
+            if fileManager.fileExists(atPath: destinationURL.path) {
+                return
+            }
+            throw error
+        }
     }
 }

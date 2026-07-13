@@ -1,4 +1,5 @@
 import Foundation
+import os
 @testable import LocalDataKit
 
 func testCalendar() -> Calendar {
@@ -57,29 +58,42 @@ func completion(
     )
 }
 
-final class InMemoryRoutineHistoryPersistence: RoutineHistoryPersistence, @unchecked Sendable {
-    private let lock = NSLock()
-    private var storedCompletions: [RoutineCompletion]
+final class InMemoryRoutineHistoryPersistence: RoutineHistoryPersistence {
+    private let storedCompletions: OSAllocatedUnfairLock<[RoutineCompletion]>
 
     init(completions: [RoutineCompletion] = []) {
-        storedCompletions = completions
+        storedCompletions = OSAllocatedUnfairLock(initialState: completions)
     }
 
     func load() throws -> [RoutineCompletion] {
-        lock.lock()
-        defer { lock.unlock() }
-        return storedCompletions
+        storedCompletions.withLock { $0 }
     }
 
     func save(_ completions: [RoutineCompletion]) throws {
-        lock.lock()
-        defer { lock.unlock() }
-        storedCompletions = completions
+        storedCompletions.withLock { $0 = completions }
     }
 
     var snapshot: [RoutineCompletion] {
-        lock.lock()
-        defer { lock.unlock() }
-        return storedCompletions
+        storedCompletions.withLock { $0 }
+    }
+}
+
+enum TestPersistenceError: Error {
+    case rejectedWrite
+}
+
+final class RejectingRoutineHistoryPersistence: RoutineHistoryPersistence {
+    private let completions: [RoutineCompletion]
+
+    init(completions: [RoutineCompletion] = []) {
+        self.completions = completions
+    }
+
+    func load() throws -> [RoutineCompletion] {
+        completions
+    }
+
+    func save(_ completions: [RoutineCompletion]) throws {
+        throw TestPersistenceError.rejectedWrite
     }
 }

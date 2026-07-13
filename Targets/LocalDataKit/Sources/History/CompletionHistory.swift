@@ -16,6 +16,31 @@ public enum CompletionHistory {
         calendar: Calendar,
         rolloverHour: Int
     ) -> [CompletionDay] {
-        fatalError("History grouping is specified by tests and implemented in Task 3")
+        let calculator = ProgressCalculator(
+            calendar: calendar,
+            rolloverHour: rolloverHour
+        )
+        let groupedCompletions = Dictionary(grouping: completions) { completion in
+            calculator.activityDay(containing: completion.completedAt)
+        }
+
+        return groupedCompletions
+            .map { activityDay, completions in
+                CompletionDay(
+                    activityDay: activityDay,
+                    completions: completions.sorted(by: areInHistoryOrder)
+                )
+            }
+            .sorted { $0.activityDay > $1.activityDay }
+    }
+
+    private static func areInHistoryOrder(
+        _ left: RoutineCompletion,
+        _ right: RoutineCompletion
+    ) -> Bool {
+        if left.completedAt != right.completedAt {
+            return left.completedAt > right.completedAt
+        }
+        return left.id.uuidString < right.id.uuidString
     }
 }
