@@ -20,9 +20,11 @@ public struct JSONRoutineHistoryPersistence: RoutineHistoryPersistence {
 
         let data = try Data(contentsOf: fileURL)
         do {
-            return try Self.decoder().decode([RoutineCompletion].self, from: data)
+            return try JSONDecoder()
+                .decode([StoredRoutineCompletion].self, from: data)
+                .map(\.completion)
         } catch {
-            return try Self.legacyDecoder().decode([LegacyRoutineCompletion].self, from: data)
+            return try JSONDecoder().decode([LegacyRoutineCompletion].self, from: data)
                 .filter { $0.deletedAt == nil }
                 .map(\.completion)
         }
@@ -38,25 +40,15 @@ public struct JSONRoutineHistoryPersistence: RoutineHistoryPersistence {
         }
 
         let sortedCompletions = completions.sorted(by: Self.areInDeterministicOrder)
-        let data = try Self.encoder().encode(sortedCompletions)
+        let storedCompletions = sortedCompletions.map(StoredRoutineCompletion.init)
+        let data = try Self.encoder().encode(storedCompletions)
         try data.write(to: fileURL, options: .atomic)
     }
 
     private static func encoder() -> JSONEncoder {
         let encoder = JSONEncoder()
-        encoder.dateEncodingStrategy = .iso8601
         encoder.outputFormatting = [.sortedKeys]
         return encoder
-    }
-
-    private static func decoder() -> JSONDecoder {
-        let decoder = JSONDecoder()
-        decoder.dateDecodingStrategy = .iso8601
-        return decoder
-    }
-
-    private static func legacyDecoder() -> JSONDecoder {
-        JSONDecoder()
     }
 
     private static func areInDeterministicOrder(
@@ -67,6 +59,29 @@ public struct JSONRoutineHistoryPersistence: RoutineHistoryPersistence {
             return left.completedAt > right.completedAt
         }
         return left.id.uuidString < right.id.uuidString
+    }
+}
+
+private struct StoredRoutineCompletion: Codable {
+    let id: UUID
+    let routineID: String
+    let durationMinutes: Int
+    let completedAt: StoredDate
+
+    init(_ completion: RoutineCompletion) {
+        id = completion.id
+        routineID = completion.routineID
+        durationMinutes = completion.durationMinutes
+        completedAt = StoredDate(completion.completedAt)
+    }
+
+    var completion: RoutineCompletion {
+        RoutineCompletion(
+            id: id,
+            routineID: routineID,
+            durationMinutes: durationMinutes,
+            completedAt: completedAt.value
+        )
     }
 }
 
@@ -118,28 +133,82 @@ private struct LegacyRoutineCompletion: Decodable {
         id = try container.decode(UUID.self, forKey: .id)
         routineID = try container.decode(String.self, forKey: .routineID)
         durationMinutes = try container.decode(Int.self, forKey: .durationMinutes)
-        completedAt = try container.decode(LegacyDate.self, forKey: .completedAt).value
-        deletedAt = try container.decodeIfPresent(LegacyDate.self, forKey: .deletedAt)?.value
+        completedAt = try container.decode(StoredDate.self, forKey: .completedAt).value
+        deletedAt = try container.decodeIfPresent(StoredDate.self, forKey: .deletedAt)?.value
     }
 }
 
-private struct LegacyDate: Decodable {
+private struct StoredDate: Codable {
     let value: Date
 
+    init(_ value: Date) {
+        self.value = value
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case iso8601
+        case referenceDateSeconds
+    }
+
     init(from decoder: Decoder) throws {
+        if let container = try? decoder.container(keyedBy: CodingKeys.self) {
+            if let exactInterval = try container.decodeIfPresent(
+                Double.self,
+                forKey: .referenceDateSeconds
+            ) {
+                value = Date(timeIntervalSinceReferenceDate: exactInterval)
+                return
+            }
+            if let iso8601 = try container.decodeIfPresent(String.self, forKey: .iso8601) {
+                value = try Self.parseISO8601(iso8601, codingPath: decoder.codingPath)
+                return
+            }
+            throw DecodingError.dataCorrupted(
+                .init(
+                    codingPath: decoder.codingPath,
+                    debugDescription: "Expected an exact reference-date interval or ISO-8601 date"
+                )
+            )
+        }
+
         let container = try decoder.singleValueContainer()
         if let interval = try? container.decode(Double.self) {
             value = Date(timeIntervalSinceReferenceDate: interval)
             return
         }
 
-        let value = try container.decode(String.self)
-        guard let date = ISO8601DateFormatter().date(from: value) else {
-            throw DecodingError.dataCorruptedError(
-                in: container,
-                debugDescription: "Expected an ISO-8601 date or reference-date interval"
+        let iso8601 = try container.decode(String.self)
+        value = try Self.parseISO8601(iso8601, codingPath: decoder.codingPath)
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(
+            value.timeIntervalSinceReferenceDate,
+            forKey: .referenceDateSeconds
+        )
+        let format = Date.ISO8601FormatStyle(
+            includingFractionalSeconds: true,
+            timeZone: .gmt
+        )
+        try container.encode(format.format(value), forKey: .iso8601)
+    }
+
+    private static func parseISO8601(
+        _ value: String,
+        codingPath: [any CodingKey]
+    ) throws -> Date {
+        let format = Date.ISO8601FormatStyle(includingFractionalSeconds: true)
+        do {
+            return try format.parse(value)
+        } catch {
+            throw DecodingError.dataCorrupted(
+                .init(
+                    codingPath: codingPath,
+                    debugDescription: "Expected an ISO-8601 date or reference-date interval",
+                    underlyingError: error
+                )
             )
         }
-        self.value = date
     }
 }

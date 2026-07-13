@@ -23,6 +23,30 @@ final class JSONRoutineHistoryPersistenceTests: XCTestCase {
         XCTAssertEqual(loaded, [expected])
     }
 
+    func testSaveAndLoadPreserveExactFractionalDateValue() throws {
+        let directory = try temporaryTestDirectory(named: #function)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let fileURL = directory.appendingPathComponent("history.json")
+        let fractionalDate = Date(
+            timeIntervalSinceReferenceDate: 805_490_100.123_456_7
+        )
+        let expected = completion(
+            id: UUID(uuidString: "22222222-2222-2222-2222-222222222223")!,
+            minutes: 9,
+            at: fractionalDate
+        )
+        let persistence = JSONRoutineHistoryPersistence(fileURL: fileURL)
+
+        try persistence.save([expected])
+        let encodedJSON = try String(contentsOf: fileURL, encoding: .utf8)
+        let loaded = try persistence.load()
+
+        XCTAssertTrue(encodedJSON.contains("\"iso8601\""))
+        XCTAssertTrue(encodedJSON.contains("\"referenceDateSeconds\""))
+        XCTAssertEqual(loaded, [expected])
+        XCTAssertEqual(loaded[0].completedAt, fractionalDate)
+    }
+
     func testLoadDecodesNumericAndISO8601LegacyDatesAndFiltersTombstones() throws {
         let directory = try temporaryTestDirectory(named: #function)
         defer { try? FileManager.default.removeItem(at: directory) }
@@ -44,7 +68,15 @@ final class JSONRoutineHistoryPersistenceTests: XCTestCase {
             "user_id": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
             "routine_id": "evening_calm",
             "duration_minutes": 11,
-            "completed_at": "2026-07-11T19:15:00Z",
+            "completed_at": "2026-07-11T19:15:00.123456Z",
+            "sync_status": "pending"
+          },
+          {
+            "id": "44444444-4444-4444-4444-444444444445",
+            "user_id": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+            "routine_id": "offset_calm",
+            "duration_minutes": 13,
+            "completed_at": "2026-07-11T20:15:00.654321+01:00",
             "sync_status": "pending"
           },
           {
@@ -53,7 +85,7 @@ final class JSONRoutineHistoryPersistenceTests: XCTestCase {
             "routine_id": "deleted_routine",
             "duration_minutes": 20,
             "completed_at": "2026-07-12T12:00:00Z",
-            "deleted_at": "2026-07-12T12:05:00Z",
+            "deleted_at": "2026-07-12T13:05:00.987654+01:00",
             "sync_status": "synced"
           }
         ]
@@ -69,9 +101,17 @@ final class JSONRoutineHistoryPersistenceTests: XCTestCase {
         XCTAssertEqual(loaded.map(\.id), [
             UUID(uuidString: "33333333-3333-3333-3333-333333333333")!,
             UUID(uuidString: "44444444-4444-4444-4444-444444444444")!,
+            UUID(uuidString: "44444444-4444-4444-4444-444444444445")!,
         ])
         XCTAssertEqual(loaded[0].completedAt, testDate(2026, 7, 10, 9, 30))
-        XCTAssertEqual(loaded[1].completedAt, testDate(2026, 7, 11, 19, 15))
+        XCTAssertEqual(
+            loaded[1].completedAt,
+            Date(timeIntervalSinceReferenceDate: 805_490_100.123_456)
+        )
+        XCTAssertEqual(
+            loaded[2].completedAt,
+            Date(timeIntervalSinceReferenceDate: 805_490_100.654_321)
+        )
         XCTAssertFalse(loaded.contains { $0.routineID == "deleted_routine" })
     }
 
