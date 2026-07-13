@@ -41,12 +41,5 @@ struct ContentView: View {
 		.safeAreaInset(edge: .bottom) {
 			Color.clear.frame(height: 8) // Add extra padding at the top of the tab bar
 		}
-		.background {
-			TabBarItemAccessibilityIdentifier(
-				index: 2,
-				identifier: AccessibilityIdentifier.progressTab
-			)
-			.frame(width: 0, height: 0)
-		}
 	}
 }

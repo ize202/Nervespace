@@ -19,7 +19,7 @@ final class NervespaceUITests: XCTestCase {
         tap("nervespace.session.start")
         tap("nervespace.session.finish")
         tap("nervespace.completion.save")
-        tap("nervespace.tab.progress")
+        tapProgressTab()
 
         let minutesToday = element("nervespace.progress.minutes-today")
         XCTAssertTrue(minutesToday.waitForExistence(timeout: 5))
@@ -37,6 +37,15 @@ final class NervespaceUITests: XCTestCase {
         XCTAssertTrue(
             target.waitForExistence(timeout: 5),
             "Missing accessibility identifier: \(identifier)"
+        )
+        target.tap()
+    }
+
+    private func tapProgressTab() {
+        let target = app.tabBars.buttons["Progress"].firstMatch
+        XCTAssertTrue(
+            target.waitForExistence(timeout: 5),
+            "Missing native Progress tab"
         )
         target.tap()
     }
