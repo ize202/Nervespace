@@ -1,6 +1,6 @@
 import Foundation
 
-public struct LegacyRoutineHistoryMigrator: Sendable {
+public struct LegacyRoutineHistoryMigrator {
     public let sourceURL: URL
     public let destinationURL: URL
     public let fileManager: FileManager
