@@ -1,6 +1,6 @@
-import SwiftUI
+import LocalDataKit
 import SharedKit
-import SupabaseKit
+import SwiftUI
 
 public struct RoutineDetailView: View {
     let routine: Routine
@@ -11,11 +11,6 @@ public struct RoutineDetailView: View {
     @StateObject private var bookmarkManager = BookmarkManager.shared
     @Environment(\.dismiss) private var dismiss
     @Environment(\.presentationMode) private var presentationMode
-    
-    // Local-first dependencies
-    @EnvironmentObject private var progressStore: LocalProgressStore
-    @EnvironmentObject private var completionStore: RoutineCompletionStore
-    @EnvironmentObject private var syncManager: SupabaseSyncManager
     
     public init(routine: Routine, previewMode: Bool = false) {
         self.routine = routine
@@ -84,6 +79,9 @@ public struct RoutineDetailView: View {
                             .background(Color.brandPrimary)
                             .cornerRadius(12)
                     }
+                    .accessibilityIdentifier(
+                        AccessibilityIdentifier.startSession
+                    )
                     .padding()
                 }
             }
@@ -110,9 +108,6 @@ public struct RoutineDetailView: View {
             ActiveSessionView(
                 routine: routine,
                 customDurations: exerciseDurations,
-                progressStore: progressStore,
-                completionStore: completionStore,
-                syncManager: syncManager,
                 onSessionComplete: {
                     // Dismiss both the active session and the routine detail view
                     presentationMode.wrappedValue.dismiss()
@@ -196,20 +191,6 @@ private struct DurationControls: View {
 }
 
 #Preview {
-    let progressStore = LocalProgressStore()
-    let completionStore = RoutineCompletionStore()
-    let pendingStore = PendingCompletionStore()
-    let db = DB()
-    let syncManager = SupabaseSyncManager(
-        db: db,
-        progressStore: progressStore,
-        completionStore: completionStore,
-        pendingStore: pendingStore
-    )
-    
     RoutineDetailView(routine: RoutineLibrary.routines.first!)
-        .environmentObject(progressStore)
-        .environmentObject(completionStore)
-        .environmentObject(pendingStore)
-        .environmentObject(syncManager)
-} 
+        .environmentObject(makePreviewActivityStore())
+}

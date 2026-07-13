@@ -1,0 +1,56 @@
+#!/bin/zsh
+
+set -euo pipefail
+
+if ! command -v jq >/dev/null 2>&1; then
+    print -u2 "error: jq is required to select an iOS simulator"
+    exit 1
+fi
+
+if ! simulator_json="$(xcrun simctl list devices available --json 2>&1)"; then
+    print -u2 "error: could not read the available iOS simulator inventory"
+    print -u2 -- "$simulator_json"
+    exit 1
+fi
+
+simulator_id="$(
+    print -r -- "$simulator_json" | jq -r '
+        .devices
+        | to_entries
+        | map(
+            select(.key | test("SimRuntime\\.iOS-[0-9-]+$"))
+            | {
+                version: (
+                    .key
+                    | capture("iOS-(?<version>[0-9-]+)$").version
+                    | split("-")
+                    | map(tonumber)
+                ),
+                udid: (
+                    [
+                        .value[]
+                        | select(
+                            .isAvailable == true
+                            and (
+                                (.name | startswith("iPhone"))
+                                or (.deviceTypeIdentifier | contains(".iPhone-"))
+                            )
+                        )
+                    ]
+                    | first
+                    | .udid
+                )
+            }
+        )
+        | sort_by(.version)
+        | last
+        | .udid // empty
+    '
+)"
+
+if [[ -z "$simulator_id" ]]; then
+    print -u2 "error: no available iPhone simulator was found"
+    exit 1
+fi
+
+print -r -- "platform=iOS Simulator,id=$simulator_id"

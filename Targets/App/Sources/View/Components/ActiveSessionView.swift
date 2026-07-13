@@ -1,6 +1,6 @@
-import SwiftUI
+import LocalDataKit
 import SharedKit
-import SupabaseKit
+import SwiftUI
 
 public struct ActiveSessionView: View {
     let routine: Routine
@@ -16,33 +16,23 @@ public struct ActiveSessionView: View {
     @State private var showingCompletion = false
     @State private var showError = false
     @State private var errorMessage = ""
-    @State private var completionData: (id: UUID, routineId: String)?
+    @State private var completion: LocalDataKit.RoutineCompletion?
     @State private var isUpdating = false
+    @State private var hasCompletedSession = false
     @State private var sessionStartTime: Date = Date()
     @State private var totalPausedTime: TimeInterval = 0
     @State private var lastPauseTime: Date?
-    @State private var completedRoutineId: String?
-    @Environment(\.presentationMode) private var presentationMode
+    @EnvironmentObject private var activityStore: LocalActivityStore
+    @Environment(\.launchConfiguration) private var launchConfiguration
     let onSessionComplete: () -> Void
-    
-    // Local-first dependencies
-    private let progressStore: LocalProgressStore
-    private let completionStore: RoutineCompletionStore
-    private let syncManager: SupabaseSyncManager
     
     public init(
         routine: Routine,
         customDurations: [String: Int],
-        progressStore: LocalProgressStore,
-        completionStore: RoutineCompletionStore,
-        syncManager: SupabaseSyncManager,
         onSessionComplete: @escaping () -> Void
     ) {
         self.routine = routine
         self.customDurations = customDurations
-        self.progressStore = progressStore
-        self.completionStore = completionStore
-        self.syncManager = syncManager
         self.onSessionComplete = onSessionComplete
         // Initialize with the first exercise duration
         _timeRemaining = State(initialValue: routine.exercises.first.map { customDurations[$0.exercise.id] ?? $0.duration } ?? 30)
@@ -103,9 +93,20 @@ public struct ActiveSessionView: View {
                     //         .frame(width: 44, height: 44)
                     // }
                     
-                    // Placeholder view to maintain symmetry
-                    Color.clear
+                    if launchConfiguration.isUITesting {
+                        Button("Finish", systemImage: "checkmark") {
+                            finishSession()
+                        }
+                        .labelStyle(.iconOnly)
+                        .foregroundColor(Color.baseWhite)
                         .frame(width: 44, height: 44)
+                        .accessibilityIdentifier(
+                            AccessibilityIdentifier.finishSession
+                        )
+                    } else {
+                        Color.clear
+                            .frame(width: 44, height: 44)
+                    }
                 }
                 .padding(.horizontal)
                 
@@ -209,13 +210,9 @@ public struct ActiveSessionView: View {
             }
         }
         .sheet(isPresented: $showingCompletion) {
-            if let data = completionData {
+            if let completion {
                 RoutineCompletionView(
-                    routineId: data.routineId,
-                    completionId: data.id,
-                    progressStore: progressStore,
-                    completionStore: completionStore,
-                    syncManager: syncManager,
+                    completion: completion,
                     onComplete: {
                         dismiss()
                         onSessionComplete()
@@ -248,77 +245,38 @@ public struct ActiveSessionView: View {
         }
     }
     
-    private func completeRoutine() async {
-        guard !isUpdating else { 
-            print("[ActiveSession] Skipping completion - already updating")
-            return 
-        }
-        
-        await MainActor.run {
-            isUpdating = true
-        }
+    @MainActor
+    private func completeRoutine() {
+        isUpdating = true
+        defer { isUpdating = false }
         
         do {
             // Calculate actual duration in minutes, rounded up
-            let durationMinutes = Int(ceil(actualSessionDuration / 60.0))
-            print("[ActiveSession] Completing routine: id=\(routine.id), duration=\(durationMinutes)m")
-            
-            // Get current user ID
-            guard let userId = syncManager.db.currentUser?.id else {
-                throw NSError(domain: "ActiveSessionView", code: 401, userInfo: [NSLocalizedDescriptionKey: "User not authenticated"])
-            }
-            print("[ActiveSession] User authenticated: \(userId)")
-            
-            // Create completion record
-            let completion = Model.RoutineCompletion(
-                id: UUID(),
-                userId: userId,
-                routineId: routine.id,
+            let durationMinutes = max(1, Int(ceil(actualSessionDuration / 60.0)))
+            let completion = try SessionCompletionController(store: activityStore).complete(
+                routine: routine,
+                durationMinutes: durationMinutes,
                 completedAt: Date(),
-                durationMinutes: durationMinutes
+                id: UUID()
             )
-            print("[ActiveSession] Created completion record: id=\(completion.id)")
-            
-            // Save to local store and update UI state atomically
-            await MainActor.run {
-                print("[ActiveSession] Saving to local store...")
-                // Update stores first
-                completionStore.addCompletion(completion)
-                progressStore.addCompletion(durationMinutes: durationMinutes)
-                
-                print("[ActiveSession] Updating view state...")
-                // Then update view state
-                completionData = (id: completion.id, routineId: routine.id)
-                
-                // Finally show the sheet
-                showingCompletion = true
-                print("[ActiveSession] Sheet presentation triggered")
-            }
-            
-            // Background sync
-            print("[ActiveSession] Starting background sync...")
-            Task.detached {
-                do {
-                    print("[ActiveSession] Syncing to Supabase...")
-                    await syncManager.syncLocalToSupabase()
-                    print("[ActiveSession] Sync completed successfully")
-                } catch {
-                    print("[ActiveSession] Sync failed: \(error)")
-                    print("[ActiveSession] Adding to pending sync...")
-                    await syncManager.handleFailedSync(completion)
-                }
-            }
+            self.completion = completion
+            showingCompletion = true
         } catch {
-            print("[ActiveSession] Error completing routine: \(error)")
-            await MainActor.run {
-                showError = true
-                errorMessage = error.localizedDescription
-            }
+            hasCompletedSession = false
+            showError = true
+            errorMessage = error.localizedDescription
         }
-        
-        await MainActor.run {
-            isUpdating = false
+    }
+
+    @MainActor
+    private func finishSession() {
+        guard !isUpdating, !hasCompletedSession else {
+            return
         }
+        hasCompletedSession = true
+        timer?.invalidate()
+        timer = nil
+        completeRoutine()
     }
 
     private func startTimer() {
@@ -337,11 +295,7 @@ public struct ActiveSessionView: View {
                     nextExercise()
                 } else {
                     // Workout complete
-                    timer?.invalidate()
-                    timer = nil
-                    Task {
-                        await completeRoutine()
-                    }
+                    Task { @MainActor in finishSession() }
                 }
             }
         }
@@ -390,23 +344,10 @@ public struct ActiveSessionView: View {
 }
 
 #Preview {
-    let progressStore = LocalProgressStore()
-    let completionStore = RoutineCompletionStore()
-    let pendingStore = PendingCompletionStore()
-    let db = DB()
-    let syncManager = SupabaseSyncManager(
-        db: db,
-        progressStore: progressStore,
-        completionStore: completionStore,
-        pendingStore: pendingStore
-    )
-    
     ActiveSessionView(
         routine: RoutineLibrary.routines.first!,
         customDurations: [:],
-        progressStore: progressStore,
-        completionStore: completionStore,
-        syncManager: syncManager,
         onSessionComplete: {}
     )
-} 
+    .environmentObject(makePreviewActivityStore())
+}

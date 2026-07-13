@@ -1,10 +1,6 @@
-import SwiftUI
 import SharedKit
-import NotifKit
-import UserNotifications
-import StoreKit
-import SuperwallKit
-import SupabaseKit
+import SwiftUI
+import UIKit
 
 // MARK: - Haptic Feedback Manager
 
@@ -52,6 +48,7 @@ struct OnboardingScreenContainer<Content: View>: View {
     let content: Content
     let isNextButtonEnabled: Bool
     let nextButtonTitle: String
+    let nextButtonAccessibilityIdentifier: String
     let onNext: () -> Void
     let onBack: () -> Void
     let progress: CGFloat
@@ -63,6 +60,7 @@ struct OnboardingScreenContainer<Content: View>: View {
         progress: CGFloat,
         isNextButtonEnabled: Bool = true,
         nextButtonTitle: String = "Continue",
+        nextButtonAccessibilityIdentifier: String = "nervespace.onboarding.next",
         showBackButton: Bool = true,
         onNext: @escaping () -> Void = {},
         onBack: @escaping () -> Void = {},
@@ -72,6 +70,7 @@ struct OnboardingScreenContainer<Content: View>: View {
         self.subtitle = subtitle
         self.isNextButtonEnabled = isNextButtonEnabled
         self.nextButtonTitle = nextButtonTitle
+        self.nextButtonAccessibilityIdentifier = nextButtonAccessibilityIdentifier
         self.onNext = onNext
         self.onBack = onBack
         self.progress = progress
@@ -156,6 +155,7 @@ struct OnboardingScreenContainer<Content: View>: View {
                             .cornerRadius(16)
                     }
                     .disabled(!isNextButtonEnabled)
+                    .accessibilityIdentifier(nextButtonAccessibilityIdentifier)
                     .padding(.horizontal, 24)
                     .padding(.vertical, 16)
                     .background(
@@ -442,15 +442,31 @@ struct TimeCommitmentScreen: View {
 
 struct ReminderScreen: View {
     @ObservedObject var viewModel: OnboardingViewModel
+    @StateObject private var reminderController = OnboardingReminderController()
     @State private var hasRequestedPermission = false
-    
-    func requestNotificationPermission() {
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
-            DispatchQueue.main.async {
-                hasRequestedPermission = true
-                if granted {
+    @State private var errorMessage: String?
+
+    private func requestNotificationPermission() {
+        guard !reminderController.isSubmitting else {
+            return
+        }
+        Task {
+            do {
+                let outcome = try await reminderController.submit(
+                    time: viewModel.selections.reminderTime
+                )
+                switch outcome {
+                case .scheduled:
+                    hasRequestedPermission = true
                     viewModel.moveToNextScreen()
+                case .denied:
+                    hasRequestedPermission = true
+                case .ignored:
+                    break
                 }
+            } catch {
+                hasRequestedPermission = true
+                errorMessage = error.localizedDescription
             }
         }
     }
@@ -460,8 +476,10 @@ struct ReminderScreen: View {
             title: OnboardingScreen.reminder.title,
             subtitle: OnboardingScreen.reminder.subtitle,
             progress: 0.5,
-            isNextButtonEnabled: true,
-            nextButtonTitle: hasRequestedPermission ? "Skip" : "Set Reminder",
+            isNextButtonEnabled: !reminderController.isSubmitting,
+            nextButtonTitle: reminderController.isSubmitting
+                ? "Setting Reminder…"
+                : hasRequestedPermission ? "Skip" : "Set Reminder",
             onNext: {
                 if !hasRequestedPermission {
                     requestNotificationPermission()
@@ -484,6 +502,14 @@ struct ReminderScreen: View {
                     .background(Color.baseBlack)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
+        .alert("Unable to Set Reminder", isPresented: Binding(
+            get: { errorMessage != nil },
+            set: { if !$0 { errorMessage = nil } }
+        )) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(errorMessage ?? "Unknown error")
         }
     }
 }
@@ -605,15 +631,6 @@ struct ScaleButtonStyle: ButtonStyle {
 
 struct ResetPlanScreen: View {
     @ObservedObject var viewModel: OnboardingViewModel
-    @State private var hasRequestedReview = false
-    
-    func requestReview() {
-        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
-            SKStoreReviewController.requestReview(in: windowScene)
-        }
-        // Set flag and continue regardless of whether review was shown
-        hasRequestedReview = true
-    }
     
     var body: some View {
         OnboardingScreenContainer(
@@ -623,11 +640,7 @@ struct ResetPlanScreen: View {
             isNextButtonEnabled: true,
             nextButtonTitle: "Start Day 1 Now",
             onNext: {
-                if !hasRequestedReview {
-                    requestReview()
-                } else {
-                    viewModel.moveToNextScreen()
-                }
+                viewModel.moveToNextScreen()
             },
             onBack: {
                 viewModel.moveToPreviousScreen()
@@ -921,54 +934,35 @@ struct BreathingCompletionScreen: View {
 
 struct ProgressScreen: View {
     @ObservedObject var viewModel: OnboardingViewModel
-    @State private var showSignIn = false
     let onCompletion: () -> Void
     
     var body: some View {
-        ZStack {
-            OnboardingScreenContainer(
-                title: OnboardingScreen.progress.title,
-                subtitle: OnboardingScreen.progress.subtitle,
-                progress: 0.9,
-                isNextButtonEnabled: true,
-                nextButtonTitle: "Unlock Full Plan",
-                onNext: {
-                    // Show hard paywall at end of onboarding
-                    PaywallManager.shared.markOnboardingCompleted {
-                        showSignIn = true
-                    }
-                },
-                onBack: {
-                    viewModel.moveToPreviousScreen()
-                }
-            ) {
-                VStack(spacing: 24) {
-                    ProgressBar(progress: 0.33)
-                        .frame(height: 8)
-                    
-                    VStack(spacing: 16) {
-                        ProgressDayView(day: 1, title: "Grounding Breath", isLocked: false)
-                        ProgressDayView(day: 2, title: "Somatic Ease", isLocked: true)
-                        ProgressDayView(day: 3, title: "Evening Calm", isLocked: true)
-                        ProgressDayView(day: 4, title: "Posture Reset", isLocked: true)
-                    }
-                }
-                .padding(.vertical, 20)
+        OnboardingScreenContainer(
+            title: OnboardingScreen.progress.title,
+            subtitle: OnboardingScreen.progress.subtitle,
+            progress: 1,
+            isNextButtonEnabled: true,
+            nextButtonTitle: "Start Your Plan",
+            nextButtonAccessibilityIdentifier:
+                AccessibilityIdentifier.onboardingCompletion,
+            onNext: onCompletion,
+            onBack: {
+                viewModel.moveToPreviousScreen()
             }
-            
-            if showSignIn {
-                Color.baseBlack
-                    .ignoresSafeArea()
-                    .overlay {
-                        SignInView(db: DB()) {
-                            onCompletion()
-                        }
-                    }
-                    .transition(.opacity)
-                    .zIndex(1)
+        ) {
+            VStack(spacing: 24) {
+                ProgressBar(progress: 0.33)
+                    .frame(height: 8)
+
+                VStack(spacing: 16) {
+                    ProgressDayView(day: 1, title: "Grounding Breath", isLocked: false)
+                    ProgressDayView(day: 2, title: "Somatic Ease", isLocked: true)
+                    ProgressDayView(day: 3, title: "Evening Calm", isLocked: true)
+                    ProgressDayView(day: 4, title: "Posture Reset", isLocked: true)
+                }
             }
+            .padding(.vertical, 20)
         }
-        .animation(.easeInOut, value: showSignIn)
     }
 }
 

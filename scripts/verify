@@ -1,0 +1,52 @@
+#!/bin/zsh
+
+set -euo pipefail
+
+script_directory="${0:A:h}"
+repository_root="${script_directory:h}"
+
+if [[ "${PWD:A}" != "$repository_root" ]]; then
+    print -u2 "Run ./scripts/verify from the Nervespace repository root"
+    exit 1
+fi
+
+for command_name in tuist xcodebuild xcrun jq rg; do
+    if ! command -v "$command_name" >/dev/null 2>&1; then
+        print -u2 "error: required command is unavailable: $command_name"
+        exit 1
+    fi
+done
+
+expected_tuist_version="4.79.3"
+actual_tuist_version="$(tuist version)"
+actual_tuist_version="${actual_tuist_version//$'\r'/}"
+if [[ "$actual_tuist_version" != "$expected_tuist_version" ]]; then
+    print -u2 \
+        "Expected tuist $expected_tuist_version, found $actual_tuist_version"
+    exit 1
+fi
+
+tuist generate --no-open
+./scripts/check-provider-free
+
+simulator_destination="$(./scripts/select-ios-simulator)"
+
+NSUnbufferedIO=YES xcodebuild \
+    -workspace Nervespace.xcworkspace \
+    -scheme Nervespace-Staging \
+    -destination "$simulator_destination" \
+    -derivedDataPath "$repository_root/Derived/Verification" \
+    -disableAutomaticPackageResolution \
+    test \
+    CODE_SIGNING_ALLOWED=NO
+
+NSUnbufferedIO=YES xcodebuild \
+    -workspace Nervespace.xcworkspace \
+    -scheme Nervespace-Staging \
+    -destination "generic/platform=iOS Simulator" \
+    -derivedDataPath "$repository_root/Derived/Verification" \
+    -disableAutomaticPackageResolution \
+    build \
+    CODE_SIGNING_ALLOWED=NO
+
+print "Nervespace verification passed"

@@ -1,0 +1,15 @@
+#!/bin/sh
+
+set -eu
+
+cd "$(dirname "$0")/.."
+
+provider_pattern='Supabase|OneSignal|Mixpanel|Sentry|Superwall|SupabaseKit|NotifKit|AnalyticsKit|CrashlyticsKit'
+
+if rg --quiet --line-number "$provider_pattern" Project.swift Targets; then
+    echo "Private-provider references remain in Project.swift or Targets:" >&2
+    rg --line-number "$provider_pattern" Project.swift Targets >&2
+    exit 1
+fi
+
+echo "Provider-free guard passed"

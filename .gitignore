@@ -26,3 +26,6 @@ Pods/
 
 # Tuist
 *.xcworkspace/.tuist-generated
+/*.xcodeproj/
+/*.xcworkspace/
+/.package.resolved

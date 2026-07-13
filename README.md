@@ -1,49 +1,91 @@
 # Nervespace
 
-Nervespace is a SwiftUI iOS app for short movement and recovery routines. It includes guided routines, multi-day plans, reminders, progress tracking, and account sync in a Tuist workspace.
+<img src="docs/nervespace-icon.png" alt="Nervespace app icon" width="96">
 
-## What it is
+## Overview
 
-This repo contains the full app code for Nervespace. The project is split into the main app target plus smaller framework targets for shared UI and helpers, auth and sync, notifications, analytics, and crash reporting.
+Nervespace is a local-first SwiftUI app for short movement, stretching, breathing, and recovery routines. It is designed around one quick loop: choose a routine, follow the timed exercises, and see the completed activity in progress and history.
 
-## What problem it solves
+This public build stores activity on the device. Account sync and production services are not part of it.
 
-I wanted a routine app that was quick to open, easy to follow, and able to keep progress in sync across devices without adding a social layer. The app is built around that, with simple onboarding, clear navigation, history, and optional sign-in.
+## Screenshots
 
-## What I built
+| Home | Active session | Local history |
+| --- | --- | --- |
+| <img src="docs/screenshots/home.png" alt="Nervespace home screen" width="260"> | <img src="docs/screenshots/routine-session.png" alt="Nervespace timed routine session" width="260"> | <img src="docs/screenshots/progress-history.png" alt="Nervespace local routine history" width="260"> |
 
-- SwiftUI screens for onboarding, home, explore, plan detail, routine detail, progress, history, and account settings
-- A Tuist-based workspace with `App`, `SharedKit`, `SupabaseKit`, `NotifKit`, `AnalyticsKit`, and `CrashlyticsKit`
-- Local progress storage with sync hooks into Supabase
-- Subscription and paywall wiring with Superwall
-- Push notifications through OneSignal, analytics through Mixpanel, and crash reporting through Sentry
+## Demo
 
-## Stack
+[Watch the 28-second app demo](docs/demo/nervespace-demo.mp4) · [Read the capture notes](docs/demo/README.md)
 
-- SwiftUI
-- Tuist
-- Supabase
-- Superwall
-- OneSignal
-- Mixpanel
-- Sentry
+The clip follows a routine from selection through a saved local history entry.
 
-## Screenshots or demo
+## Current feature set
 
-![Nervespace app icon](docs/nervespace-icon.png)
-![Bundled routine artwork](docs/routine-evening-calm.jpg)
+- First-launch onboarding
+- 20 bundled exercises, 11 routines, and 4 plan collections
+- Home, quick-routine, plan, category, and body-area browsing
+- Routine bookmarks and per-exercise duration controls
+- Timed sessions with pause, previous, next, and exercise details
+- Completion history, daily minutes, a configurable daily goal, and streak tracking
+- A repeating local reminder using iOS notifications
 
-The repo includes app assets and the full codebase. Exported App Store screenshots are not checked in yet.
+## Architecture
 
-## Local setup
+Tuist 4.79.3 generates the Xcode workspace from `Project.swift`. The runtime code is split into three targets:
 
-1. Install Xcode 15 or newer.
-2. Install Tuist.
-3. From the repo root, run `tuist install` and `tuist generate`.
-4. Open `Nervespace.xcworkspace` or `Nervespace.xcodeproj`.
-5. Update the plist files in `Targets/*/Config` if you want to run against your own Supabase, Mixpanel, OneSignal, and Sentry projects.
-6. Build the `Nervespace` scheme or the `Nervespace-Staging` scheme if you want the bundled StoreKit config.
+```text
+Nervespace
+├── App            SwiftUI screens and iOS adapters
+├── SharedKit      Bundled content, shared models, and reusable UI
+└── LocalDataKit   Completion storage, migration, and progress rules
+```
 
-## Current status
+The app has no external package dependencies. Tests are separated into `AppTests`, `SharedKitTests`, `LocalDataKitTests`, and `NervespaceUITests`.
 
-Active iOS app repo with the main app code, production assets, and local setup notes in one place.
+## Local data model
+
+Each completed routine is stored as a `RoutineCompletion` with an ID, routine ID, duration in minutes, and completion date. Completions are written atomically to:
+
+```text
+Application Support/Nervespace/routine_completions.json
+```
+
+The persistence layer keeps writes sorted, reads the earlier JSON shape for migration, and omits deleted legacy entries. Daily-goal, bookmark, and reminder settings use `UserDefaults`. Progress calculations use a calendar-aware 4:00 a.m. activity-day boundary so late-night sessions stay with the intended day.
+
+## Setup
+
+Requirements:
+
+- Xcode with an iOS Simulator
+- Tuist 4.79.3
+
+From the repository root:
+
+```sh
+tuist generate --no-open
+open Nervespace.xcworkspace
+```
+
+Select the `Nervespace-Staging` scheme and an iPhone simulator.
+
+## Verification
+
+Run the canonical repository check:
+
+```sh
+./scripts/verify
+```
+
+It checks the exact Tuist version, generates the workspace, scans the manifest and active targets for removed private-provider references, selects an available iPhone from the newest installed iOS runtime, runs all four test targets, and builds for a generic iOS Simulator.
+
+The latest local run completed 40 tests with zero failures or skips, followed by a successful generic simulator build. The verifier is the correctness evidence; the screenshots and demo are presentation evidence only.
+
+## Limitations
+
+- The app provides no account-based sync or app-managed cross-device backup.
+- Reminders are local notifications and require permission. They are not remote push messages.
+- Routines, plans, exercises, and artwork are bundled with the app rather than managed remotely.
+- The current evidence covers an iPhone Simulator. A real-device build, public-main CI run, and App Store release are not claimed here.
+- The app currently uses a fixed dark appearance.
+- Nervespace is a routine tracker, not medical guidance.
