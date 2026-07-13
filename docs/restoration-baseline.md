@@ -41,3 +41,30 @@ As a fallback device inventory, `xcrun simctl list devices available` completed 
 ## Baseline conclusion
 
 Tuist wrote generated project output from the existing provider-heavy manifest, but package resolution remains unproven. Workspace destination discovery did not finish, and this baseline does not claim that the app builds or tests successfully.
+
+## Restoration verification
+
+The restored project is now provider-free and local-first. `Project.swift` has no
+external packages, and `scripts/check-provider-free` guards the active source,
+manifest, and project configuration against reintroducing the removed provider
+SDKs or credentials.
+
+Run the canonical local check from the repository root:
+
+```sh
+./scripts/verify
+```
+
+The verifier requires Tuist 4.79.3, regenerates the workspace, runs the provider
+guard, selects the first available iPhone from the newest installed iOS runtime,
+runs all four test targets through `Nervespace-Staging`, and performs a generic
+iOS Simulator build. The same command is the only repository command run by CI.
+
+The first complete harness run finished 40 tests with zero failures or skips on
+an iPhone 17 Pro simulator running iOS 26.5, then completed the generic simulator
+build. That result is local evidence, not evidence that the GitHub Actions
+workflow has run.
+
+Generated Xcode projects and workspaces are still tracked at this point in the
+restoration sequence. Their removal is the next planned cleanup; until then,
+generation can leave known tracked diffs even when verification passes.
